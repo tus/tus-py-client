@@ -18,8 +18,3 @@ class EndPoint(object):
         if self.client:
             return self.client.headers
         return {}
-
-
-def do_tus():
-    ep = EndPoint('http://master.tus.io/files/')
-    return ep.file_upload('./LICENSE')
