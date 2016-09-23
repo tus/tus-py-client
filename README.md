@@ -23,7 +23,7 @@ from tusclient import upload
 end_point = endpoint.EndPoint('http://master.tus.io/files/')
 
 # chunk_size is optional
-uploader = upload('YOUR/FILE/PATH.EXTENSION', end_point=end_point, chunk_size=2048)
+uploader = upload.FileUpload('YOUR/FILE/PATH.EXTENSION', end_point=end_point, chunk_size=2048)
 
 # you may also specify a url and ignore the end_point parameter
 uploader = upload('YOUR/FILE/PATH.EXTENSION', url='http://master.tus.io/files/4467e4675abc75edff442', chunk_size=2048)
