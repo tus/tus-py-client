@@ -2,14 +2,15 @@ from tusclient import endpoint
 
 
 class TusClient(object):
-    DEFAULT_HEADER = {}
 
     def __init__(self, headers=None):
-        if headers:
-            self.headers = headers
-        self.headers.update(self.DEFAULT_HEADERS)
+        if headers is None:
+            headers = {}
+
+        self.headers = headers
         self.end_points = {}
 
+    # you can set authentication headers with this.
     def set_headers(self, headers):
         self.headers.update(headers)
 
