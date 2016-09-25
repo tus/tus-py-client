@@ -1,21 +1,16 @@
-from tusclient import endpoint
+from tusclient.uploader import Uploader
 
 
 class TusClient(object):
 
-    def __init__(self, headers=None):
-        if headers is None:
-            headers = {}
-
-        self.headers = headers
-        self.end_points = {}
+    def __init__(self, url, headers=None):
+        self.url = url
+        self.headers = headers or {}
 
     # you can set authentication headers with this.
     def set_headers(self, headers):
         self.headers.update(headers)
 
-    def end_point(self, url):
-        end_point = self.end_points.get(url)
-        if not end_point:
-            self.end_points[url] = endpoint.EndPoint(url)
-        return self.end_points[url]
+    def uploader(self, *args, **kwargs):
+        kwargs['client'] = self
+        return Uploader(*args, **kwargs)
