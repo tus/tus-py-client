@@ -2,6 +2,14 @@ import pycurl
 
 
 class TusRequest(object):
+    """
+    Http Request Abstraction.
+
+    Sets up tus custom http request on instantiation.
+
+    requires argument 'uploader' an instance of tusclient.uploader.Uploader
+    on instantiation.
+    """
     def __init__(self, uploader):
         self.handle = pycurl.Curl()
         self.response_headers = {}
@@ -20,6 +28,8 @@ class TusRequest(object):
         self.handle.setopt(pycurl.HTTPHEADER, headers)
 
     def _prepare_response_header(self, header_line):
+        # prepares response header and adds it to 'response_headers'
+        # attribute
         header_line = header_line.decode('iso-8859-1')
         if ':' not in header_line:
             return
@@ -31,11 +41,20 @@ class TusRequest(object):
 
     @property
     def status_code(self):
+        """
+        Return resquest status code.
+        """
         return self.handle.getinfo(pycurl.RESPONSE_CODE)
 
     def perform(self):
+        """
+        Perform actual request.
+        """
         self.handle.perform()
 
     def close(self):
+        """
+        close request handle and end request session
+        """
         self.handle.close()
         self.file.close()
