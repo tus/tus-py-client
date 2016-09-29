@@ -1,5 +1,7 @@
+from __future__ import print_function
 import os
 
+from six import iteritems
 import requests
 
 from tusclient.exceptions import TusUploadFailed
@@ -63,7 +65,7 @@ class Uploader(object):
         Does the same as 'headers' except it is returned as a list.
         """
         headers = self.headers
-        headers_list = ['{}: {}'.format(key, value) for key, value in headers.iteritems()]
+        headers_list = ['{}: {}'.format(key, value) for key, value in iteritems(headers)]
         return headers_list
 
     def get_offset(self):
@@ -101,7 +103,8 @@ class Uploader(object):
         Raises TusUploadFailed exception if the upload was not sucessful.
         """
         if self.request.status_code == 204:
-            print '{} bytes uploaded ...'.format(self.request.response_headers.get('upload-offset'))
+            msg = '{} bytes uploaded ...'.format(self.request.response_headers.get('upload-offset'))
+            print(msg)
         else:
             raise TusUploadFailed
 
@@ -132,7 +135,7 @@ class Uploader(object):
         while self.offset < self.stop_at:
             self.upload_chunk()
         else:
-            print "maximum upload specified({} bytes) has been reached".format(self.stop_at)
+            print("maximum upload specified({} bytes) has been reached".format(self.stop_at))
 
     def upload_chunk(self):
         """
