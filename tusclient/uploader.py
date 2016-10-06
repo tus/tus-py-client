@@ -13,7 +13,7 @@ class Uploader(object):
     Object to control upload related functions.
 
     :Attributes:
-        - file_name`<str>`:
+        - file_path`<str>`:
             This is the path(absolute/relative) to the file that is intended for upload
             to the tus server. On instantiation this attribute is required.
         -  url`<str>`:
@@ -33,15 +33,15 @@ class Uploader(object):
                        "Tus-Resumable": "1.0.0"}
     DEFAULT_CHUNK_SIZE = 2 * 1024 * 1024  # 2kb
 
-    def __init__(self, file_name, url=None, client=None, chunk_size=None):
-        if not os.path.isfile(file_name):
-            raise ValueError("invalid file {}".format(file_name))
+    def __init__(self, file_path, url=None, client=None, chunk_size=None):
+        if not os.path.isfile(file_path):
+            raise ValueError("invalid file {}".format(file_path))
 
         if url is None and client is None:
             raise ValueError("Either 'url' or 'client' cannot be None.")
 
-        self.file_name = file_name
-        self.file_size = os.path.getsize(file_name)
+        self.file_path = file_path
+        self.file_size = os.path.getsize(file_path)
         self.stop_at = self.file_size
         self.client = client
         self.url = url or self.create_url()
@@ -60,6 +60,7 @@ class Uploader(object):
         client_headers = getattr(self.client, 'headers') or {}
         return dict(self.DEFAULT_HEADERS, **client_headers)
 
+    @property
     def headers_as_list(self):
         """
         Does the same as 'headers' except it is returned as a list.
@@ -105,10 +106,13 @@ class Uploader(object):
         if self.request.status_code == 204:
             msg = '{} bytes uploaded ...'.format(self.request.response_headers.get('upload-offset'))
             print(msg)
+            return True
         else:
             raise TusUploadFailed
 
     def _do_request(self):
+        # TODO: Maybe the request should not be re-instantiated everytime.
+        #      the request handle could be left open until upload is done.
         self.request = TusRequest(self)
         try:
             self.request.perform()

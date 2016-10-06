@@ -19,12 +19,12 @@ class TusRequest(object):
         self.handle.setopt(pycurl.UPLOAD, 1)
         self.handle.setopt(pycurl.CUSTOMREQUEST, 'PATCH')
 
-        self.file = open(uploader.file_name, 'rb')
+        self.file = open(uploader.file_path, 'rb')
         self.file.seek(uploader.offset)
         self.handle.setopt(pycurl.READFUNCTION, self.file.read)
         self.handle.setopt(pycurl.INFILESIZE, uploader.request_length)
 
-        headers = ["upload-offset: {}".format(uploader.offset)] + uploader.headers_as_list()
+        headers = ["upload-offset: {}".format(uploader.offset)] + uploader.headers_as_list
         self.handle.setopt(pycurl.HTTPHEADER, headers)
 
     def _prepare_response_header(self, header_line):
