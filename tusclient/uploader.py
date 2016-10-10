@@ -13,20 +13,34 @@ class Uploader(object):
     Object to control upload related functions.
 
     :Attributes:
-        - file_path`<str>`:
+        - file_path (str):
             This is the path(absolute/relative) to the file that is intended for upload
             to the tus server. On instantiation this attribute is required.
-        -  url`<str>`:
+        -  url (Optional[str]):
             If the upload url for the file is known, it can be passed to the constructor.
             This may happen when you resume an upload.
-        - client`<tusclient.client.TusClient>`:
+        - client (<tusclient.client.TusClient>):
             An instance of `tusclient.client.TusClient`. This would tell the uploader instance
             what client it is operating with. Although this argument is optional, it is only
             optional if the 'url' argument is specified.
-        - chunk_size`<int>`:
+        - chunk_size (int):
             This tells the uploader what chunk size(in bytes) should be uploaded when the
             method `upload_chunk` is called. This defaults to 2 * 1024 * 1024 i.e 2kb if not
             specified.
+        - offset (int):
+            The offset value of the upload indicates the current position of the file upload.
+        - file_size (int):
+            The size of the file.
+        - stop_at (int):
+            At what offset value the upload should stop.
+        - request (<tusclient.request.TusRequest>):
+            A http Request instance of the last chunk uploaded.
+
+    :Constructor Args:
+        - file_path (str)
+        -  url (Optional[str])
+        - client (Optional [<tusclient.client.TusClient>])
+        - chunk_size (Optional[int])
     """
     DEFAULT_HEADERS = {"Content-Type": "application/offset+octet-stream",
                        "Tus-Resumable": "1.0.0"}
@@ -110,8 +124,8 @@ class Uploader(object):
             raise TusUploadFailed
 
     def _do_request(self):
-        # TODO: Maybe the request should not be re-instantiated everytime.
-        #      the request handle could be left open until upload is done.
+        # TODO: Maybe the request should not be re-created everytime.
+        #      The request handle could be left open until upload is done instead.
         self.request = TusRequest(self)
         try:
             self.request.perform()
@@ -126,8 +140,8 @@ class Uploader(object):
         Performs continous upload of chunks of the file. The size uploaded at each cycle is
         the value of the attribute 'chunk_size'.
 
-        :Arguments:
-            - stop_at`<int>`:
+        :Args:
+            - stop_at (Optional[int]):
                 Determines at what offset value the upload should stop. If not specified this
                 defaults to the file size.
         """

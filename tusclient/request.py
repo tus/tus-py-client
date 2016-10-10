@@ -9,6 +9,12 @@ class TusRequest(object):
 
     requires argument 'uploader' an instance of tusclient.uploader.Uploader
     on instantiation.
+
+    :Attributes:
+        - handle (<pycurl.Curl>)
+        - response_headers (dict)
+        - file (file):
+            The file that is being uploaded.
     """
     def __init__(self, uploader):
         self.handle = pycurl.Curl()
@@ -42,7 +48,7 @@ class TusRequest(object):
     @property
     def status_code(self):
         """
-        Return resquest status code.
+        Return request status code.
         """
         return self.handle.getinfo(pycurl.RESPONSE_CODE)
 
