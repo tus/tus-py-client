@@ -28,8 +28,7 @@ class Uploader(object):
             method `upload_chunk` is called. This defaults to 2 * 1024 * 1024 i.e 2kb if not
             specified.
     """
-    DEFAULT_HEADERS = {"Expect": '',
-                       "Content-Type": "application/offset+octet-stream",
+    DEFAULT_HEADERS = {"Content-Type": "application/offset+octet-stream",
                        "Tus-Resumable": "1.0.0"}
     DEFAULT_CHUNK_SIZE = 2 * 1024 * 1024  # 2kb
 
@@ -130,11 +129,9 @@ class Uploader(object):
         :Arguments:
             - stop_at`<int>`:
                 Determines at what offset value the upload should stop. If not specified this
-                defaults to the value of 'stop_at' the last time the method was called. The
-                value is set to the file size on instantiation of the uploader class.
+                defaults to the file size.
         """
-        if stop_at:
-            self.stop_at = stop_at
+        self.stop_at = stop_at or self.file_size
 
         while self.offset < self.stop_at:
             self.upload_chunk()
