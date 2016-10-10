@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # tusclient documentation build configuration file, created by
-# sphinx-quickstart on Mon Oct 10 15:11:50 2016.
+# sphinx-quickstart on Mon Oct 10 16:30:15 2016.
 #
 # This file is execfile()d with the current directory set to its
 # containing dir.
@@ -42,7 +42,7 @@ templates_path = ['_templates']
 # You can specify multiple suffix as a list of string:
 #
 # source_suffix = ['.rst', '.md']
-source_suffix = '.md'
+source_suffix = '.rst'
 
 # The encoding of source files.
 #
@@ -53,7 +53,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'tusclient'
-copyright = u'2016, Author'
+copyright = u'2016, Ifedapo Olarewaju'
 author = u'Ifedapo Olarewaju'
 
 # The version info for the project you're documenting, acts as replacement for
