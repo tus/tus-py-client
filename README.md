@@ -18,21 +18,36 @@ pip install -r requirements.txt
 
 Now you are ready to use the api
 
-```python
-from tusclient import endpoint
-from tusclient import upload
+``` python
+from tusclient import client
 
-end_point = endpoint.EndPoint('http://master.tus.io/files/')
+my_client = client.TusClient('http://master.tus.io/files/', headers={'Authorization': 'Basic xxyyZZAAbbCC='})
 
-# chunk_size is optional
-uploader = upload.FileUpload('YOUR/FILE/PATH.EXTENSION', end_point=end_point, chunk_size=2048)
+# set more headers
+my_client.set_headers({'HEADER_NAME': 'HEADER_VALUE'})
 
-# you may also specify a url and ignore the end_point parameter
-uploader = upload('YOUR/FILE/PATH.EXTENSION', url='http://master.tus.io/files/4467e4675abc75edff442', chunk_size=2048)
+uploader = my_client.uploader('path/to/file.ext', chunk_size=200)
 
-# upload a chunk i.e 2048 bytes
+# upload a chunk i.e 200 bytes
 uploader.upload_chunk()
 
-# upload entire file
+# uploads the entire file.
+# This uploads chunk by chunk.
 uploader.upload()
+
+# you could increase the chunk size to reduce the
+# number of upload_chunk cycles.
+uploader.chunk_size = 800
+uploader.upload()
+
+# Continue uploading chunks till total chunks uploaded reaches 1000 bytes.
+uploader.upload(stop_at=1000)
+```
+
+If the upload url is known and the client headers are not required, uploaders can also be used standalone
+
+``` python
+from tusclient.uploader import Uploader
+
+my_uploader = Uploader('path/to/file.ext', url='http://master.tus.io/files/abcdef123456', chunk_size=200)
 ```
