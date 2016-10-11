@@ -1,6 +1,14 @@
+import os
 from setuptools import setup
 
 import tusclient
+
+
+on_rtd = os.environ.get('READTHEDOCS') == 'True'
+if on_rtd:
+    install_requires = ['requests==2.11.1', 'six==1.10.0', ]
+else:
+    install_requires = ['pycurl==7.43.0', 'requests==2.11.1', 'six==1.10.0']
 
 
 setup(
@@ -9,10 +17,7 @@ setup(
     url='http://github.com/ifedapoolarewaju/tus-py-client/',
     license='MIT',
     author='Ifedapo Olarewaju',
-    install_requires=['pycurl==7.43.0',
-                      'requests==2.11.1',
-                      'six==1.10.0',
-                      ],
+    install_requires=install_requires,
     author_email='ifedapoolarewaju@gmail.com',
     description='A Python client for the tus resumable upload protocol',
     packages=['tusclient'],
