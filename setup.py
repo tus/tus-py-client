@@ -19,7 +19,7 @@ setup(
     author='Ifedapo Olarewaju',
     install_requires=install_requires,
     author_email='ifedapoolarewaju@gmail.com',
-    description='A Python client for the tus resumable upload protocol',
+    description='A Python client for the tus resumable upload protocol ->  http://tus.io',
     packages=['tusclient'],
     include_package_data=True,
     platforms='any',

@@ -12,7 +12,7 @@ Welcome to tusclient's documentation!
    :target: https://travis-ci.org/ifedapoolarewaju/tus-py-client
 
 # tus-py-client
-A Python client for the tus resumable upload protocol
+A Python client for the tus resumable upload protocol ->  http://tus.io
 
 Contents:
 
@@ -39,13 +39,16 @@ Installation
 
     pip install tusclient
 
-Now you are ready to use the api
+Now you are ready to use the api.
 
 .. code:: python
 
     from tusclient import client
 
-    my_client = client.TusClient('http://master.tus.io/files/', headers={'Authorization': 'Basic xxyyZZAAbbCC='})
+    # Set Authorization headers if it is required
+    # by the tus server.
+    my_client = client.TusClient('http://master.tus.io/files/',
+                                  headers={'Authorization': 'Basic xxyyZZAAbbCC='})
 
     # set more headers
     my_client.set_headers({'HEADER_NAME': 'HEADER_VALUE'})
@@ -68,10 +71,12 @@ Now you are ready to use the api
     uploader.upload(stop_at=1000)
 
 If the upload url is known and the client headers are not required,
-uploaders can also be used standalone
+uploaders can also be used standalone.
 
 .. code:: python
 
     from tusclient.uploader import Uploader
 
-    my_uploader = Uploader('path/to/file.ext', url='http://master.tus.io/files/abcdef123456', chunk_size=200)
+    my_uploader = Uploader('path/to/file.ext',
+                            url='http://master.tus.io/files/abcdef123456',
+                            chunk_size=200)
