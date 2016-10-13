@@ -37,7 +37,7 @@ Installation
 
 .. code:: bash
 
-    pip install tuspyclient
+    pip install tuspy
 
 Now you are ready to use the api.
 

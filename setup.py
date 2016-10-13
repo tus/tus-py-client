@@ -12,7 +12,7 @@ else:
 
 
 setup(
-    name='tuspyclient',
+    name='tuspy',
     version=tusclient.__version__,
     url='http://github.com/ifedapoolarewaju/tus-py-client/',
     license='MIT',

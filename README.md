@@ -8,7 +8,7 @@ See Documentation here http://tus-py-client.readthedocs.io/en/latest/
 ## Get started
 
 ```bash
-pip install tuspyclient
+pip install tuspy
 ```
 
 Now you are ready to use the api.
