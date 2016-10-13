@@ -12,7 +12,7 @@ else:
 
 
 setup(
-    name='tusclient',
+    name='tuspyclient',
     version=tusclient.__version__,
     url='http://github.com/ifedapoolarewaju/tus-py-client/',
     license='MIT',
@@ -28,9 +28,11 @@ setup(
         'Natural Language :: English',
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
-        'License :: MIT License',
+        'Development Status :: 3 - Alpha',
+        'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Topic :: Software Development :: Libraries :: Python Modules',
-        'Topic :: Internet :: WWW/HTTP :: Upload',
+        'Topic :: Internet :: File Transfer Protocol (FTP)',
+        'Topic :: Communications :: File Sharing',
     ]
 )
