@@ -16,6 +16,7 @@ class TusRequest(object):
         - file (file):
             The file that is being uploaded.
     """
+
     def __init__(self, uploader):
         self.handle = pycurl.Curl()
         self.response_headers = {}
@@ -30,7 +31,8 @@ class TusRequest(object):
         self.handle.setopt(pycurl.READFUNCTION, self.file.read)
         self.handle.setopt(pycurl.INFILESIZE, uploader.request_length)
 
-        headers = ["upload-offset: {}".format(uploader.offset)] + uploader.headers_as_list
+        headers = ["upload-offset: {}".format(uploader.offset),
+                   "Content-Type: application/offset+octet-stream"] + uploader.headers_as_list
         self.handle.setopt(pycurl.HTTPHEADER, headers)
 
     def _prepare_response_header(self, header_line):

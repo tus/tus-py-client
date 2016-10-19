@@ -42,8 +42,7 @@ class Uploader(object):
         - client (Optional [<tusclient.client.TusClient>])
         - chunk_size (Optional[int])
     """
-    DEFAULT_HEADERS = {"Content-Type": "application/offset+octet-stream",
-                       "Tus-Resumable": "1.0.0"}
+    DEFAULT_HEADERS = {"Tus-Resumable": "1.0.0"}
     DEFAULT_CHUNK_SIZE = 2 * 1024 * 1024  # 2kb
 
     def __init__(self, file_path, url=None, client=None, chunk_size=None):

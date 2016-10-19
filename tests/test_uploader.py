@@ -25,23 +25,18 @@ class UploaderTest(mixin.Mixin):
         self.assertEqual(self.uploader.offset, 0)
 
     def test_headers(self):
-        self.assertEqual(self.uploader.headers, {"Content-Type": "application/offset+octet-stream",
-                                                 "Tus-Resumable": "1.0.0"})
+        self.assertEqual(self.uploader.headers, {"Tus-Resumable": "1.0.0"})
 
         self.client.set_headers({'foo': 'bar'})
-        self.assertEqual(self.uploader.headers, {"Content-Type": "application/offset+octet-stream",
-                                                 "Tus-Resumable": "1.0.0",
-                                                 'foo': 'bar'})
+        self.assertEqual(self.uploader.headers, {"Tus-Resumable": "1.0.0", 'foo': 'bar'})
 
     def test_headers_as_list(self):
         six.assertCountEqual(self, self.uploader.headers_as_list,
-                             ["Content-Type: application/offset+octet-stream",
-                              "Tus-Resumable: 1.0.0"])
+                             ["Tus-Resumable: 1.0.0"])
 
         self.client.set_headers({'foo': 'bar'})
         six.assertCountEqual(self, self.uploader.headers_as_list,
-                             ['Content-Type: application/offset+octet-stream',
-                              'Tus-Resumable: 1.0.0', 'foo: bar'])
+                             ['Tus-Resumable: 1.0.0', 'foo: bar'])
 
     @responses.activate
     def test_get_offset(self):
