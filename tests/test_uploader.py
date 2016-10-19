@@ -14,6 +14,8 @@ class UploaderTest(mixin.Mixin):
     def mock_pycurl(self, request_mock):
         request_mock = request_mock.return_value
         request_mock.status_code = 204
+        request_mock.response_headers = {
+            'upload-offset': self.uploader.offset + self.uploader.request_length}
         request_mock.perform.return_value = None
         request_mock.close.return_value = None
         return request_mock

@@ -116,8 +116,6 @@ class Uploader(object):
         Raises TusUploadFailed exception if the upload was not sucessful.
         """
         if self.request.status_code == 204:
-            msg = '{} bytes uploaded ...'.format(self.request.response_headers.get('upload-offset'))
-            print(msg)
             return True
         else:
             raise TusUploadFailed
@@ -156,4 +154,6 @@ class Uploader(object):
         Upload chunk of file.
         """
         self._do_request()
-        self.offset += self.request_length
+        self.offset = int(self.request.response_headers.get('upload-offset'))
+        msg = '{} bytes uploaded ...'.format(self.offset)
+        print(msg)
