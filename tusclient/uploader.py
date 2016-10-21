@@ -1,6 +1,6 @@
 from __future__ import print_function
 import os
-import cStringIO
+from io import StringIO
 
 from six import iteritems
 import requests
@@ -123,7 +123,7 @@ class Uploader(object):
 
     def get_file_stream(self):
         if self.file_stream:
-            return cStringIO.StringIO(self.file_stream)
+            return StringIO(self.file_stream)
         elif os.path.isfile(self.file_path):
             return open(self.file_path, 'rb')
         else:
