@@ -1,5 +1,6 @@
 from __future__ import print_function
 import os
+import cStringIO
 
 from six import iteritems
 import requests
@@ -45,15 +46,15 @@ class Uploader(object):
     DEFAULT_HEADERS = {"Tus-Resumable": "1.0.0"}
     DEFAULT_CHUNK_SIZE = 2 * 1024 * 1024  # 2kb
 
-    def __init__(self, file_path, url=None, client=None, chunk_size=None):
-        if not os.path.isfile(file_path):
-            raise ValueError("invalid file {}".format(file_path))
+    def __init__(self, file_path=None, file_stream=None, url=None, client=None, chunk_size=None):
+        if not any((file_path, file_stream)):
+            raise ValueError("Either 'file_path' or 'file_stream' cannot be None.")
 
         if url is None and client is None:
             raise ValueError("Either 'url' or 'client' cannot be None.")
 
         self.file_path = file_path
-        self.file_size = os.path.getsize(file_path)
+        self.file_stream = file_stream
         self.stop_at = self.file_size
         self.client = client
         self.url = url or self.create_url()
@@ -119,6 +120,20 @@ class Uploader(object):
             return True
         else:
             raise TusUploadFailed
+
+    def get_file_stream(self):
+        if self.file_stream:
+            return cStringIO.StringIO(self.file_stream)
+        elif os.path.isfile(self.file_path):
+            return open(self.file_path, 'rb')
+        else:
+            raise ValueError("invalid file {}".format(self.file_path))
+
+    @property
+    def file_size(self):
+        stream = self.get_file_stream()
+        stream.seek(0, os.SEEK_END)
+        return stream.tell()
 
     def _do_request(self):
         # TODO: Maybe the request should not be re-created everytime.

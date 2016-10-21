@@ -12,4 +12,4 @@ class Mixin(unittest.TestCase):
         url = 'http://master.tus.io/files/15acd89eabdf5738ffc'
         responses.add(responses.HEAD, url,
                       adding_headers={"upload-offset": "0"})
-        self.uploader = self.client.uploader('./LICENSE', url)
+        self.uploader = self.client.uploader('./LICENSE', url=url)
