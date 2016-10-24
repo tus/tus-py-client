@@ -1,11 +1,13 @@
 from __future__ import print_function
 import os
+import re
 from io import BytesIO
+from base64 import b64encode
 
 from six import iteritems
 import requests
 
-from tusclient.exceptions import TusUploadFailed
+from tusclient.exceptions import TusUploadFailed, TusCommunicationError
 from tusclient.request import TusRequest
 
 
@@ -46,7 +48,8 @@ class Uploader(object):
     DEFAULT_HEADERS = {"Tus-Resumable": "1.0.0"}
     DEFAULT_CHUNK_SIZE = 2 * 1024 * 1024  # 2kb
 
-    def __init__(self, file_path=None, file_stream=None, url=None, client=None, chunk_size=None):
+    def __init__(self, file_path=None, file_stream=None, url=None, client=None,
+                 chunk_size=None, metadata=None):
         if not any((file_path, file_stream)):
             raise ValueError("Either 'file_path' or 'file_stream' cannot be None.")
 
@@ -57,6 +60,7 @@ class Uploader(object):
         self.file_stream = file_stream
         self.stop_at = self.file_size
         self.client = client
+        self.metadata = metadata or {}
         self.url = url or self.create_url()
         self.offset = self.get_offset()
         self.chunk_size = chunk_size or self.DEFAULT_CHUNK_SIZE
@@ -90,7 +94,24 @@ class Uploader(object):
         http request to the tus server to retrieve the offset.
         """
         resp = requests.head(self.url, headers=self.headers)
-        return int(resp.headers["upload-offset"])
+        offset = resp.headers.get('upload-offset')
+        if offset is None:
+            msg = 'Attemp to retrieve offset fails with status {}'.format(resp.status_code)
+            raise TusCommunicationError(msg)
+        return int(offset)
+
+    def encode_metadata(self):
+        encoded_list = []
+        for key, value in iteritems(self.metadata):
+            key_str = str(key)  # dict keys may be of any object type.
+
+            # confirm that the key does not contain unwanted charcters.
+            if re.search(r'^$|[\s,]+', key_str):
+                msg = 'Upload-metadata key "{}" cannot be empty nor contain spaces or commas.'
+                raise ValueError(msg.format(key_str))
+
+            encoded_list.append('{} {}'.format(key_str.encode('ascii'), b64encode(value)))
+        return ','.join(encoded_list)
 
     def create_url(self):
         """
@@ -100,8 +121,13 @@ class Uploader(object):
         """
         headers = self.headers
         headers['upload-length'] = str(self.file_size)
+        headers['upload-metadata'] = self.encode_metadata()
         resp = requests.post(self.client.url, headers=headers)
-        return resp.headers.get("location")
+        url = resp.headers.get("location")
+        if url is None:
+            msg = 'Attemp to retrieve create file url with status {}'.format(resp.status_code)
+            raise TusCommunicationError(msg)
+        return url
 
     @property
     def request_length(self):
