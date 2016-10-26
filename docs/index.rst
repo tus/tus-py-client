@@ -55,6 +55,10 @@ Now you are ready to use the api.
 
     uploader = my_client.uploader('path/to/file.ext', chunk_size=200)
 
+    # A file stream may also be passed in place of a file path.
+    fs = open('path/to/file.ext')
+    uploader = my_client.uploader(file_stream=fs, chunk_size=200)
+
     # upload a chunk i.e 200 bytes
     uploader.upload_chunk()
 

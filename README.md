@@ -26,6 +26,10 @@ my_client.set_headers({'HEADER_NAME': 'HEADER_VALUE'})
 
 uploader = my_client.uploader('path/to/file.ext', chunk_size=200)
 
+# A file stream may also be passed in place of a file path.
+fs = open('path/to/file.ext')
+uploader = my_client.uploader(file_stream=fs, chunk_size=200)
+
 # Upload a chunk i.e 200 bytes.
 uploader.upload_chunk()
 
