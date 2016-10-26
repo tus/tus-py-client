@@ -48,9 +48,9 @@ class UploaderTest(mixin.Mixin):
 
     def test_encode_metadata(self):
         self.uploader.metadata = {'foo': 'bar', 'red': 'blue'}
-        encoded_metadata = 'foo'.encode('ascii') + ' ' + b64encode('bar') + \
-            ',' + 'red'.encode('ascii') + ' ' + b64encode('blue')
-        self.assertEqual(self.uploader.encode_metadata(), encoded_metadata)
+        encoded_metadata = ['foo' + ' ' + b64encode(b'bar').decode('ascii'),
+                            'red' + ' ' + b64encode(b'blue').decode('ascii')]
+        six.assertCountEqual(self, self.uploader.encode_metadata(), encoded_metadata)
 
         with pytest.raises(ValueError):
             self.uploader.metadata = {'foo, ': 'bar'}

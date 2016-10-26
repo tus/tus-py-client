@@ -3,7 +3,7 @@ import os
 import re
 from base64 import b64encode
 
-from six import iteritems
+from six import iteritems, b
 import requests
 
 from tusclient.exceptions import TusUploadFailed, TusCommunicationError
@@ -109,8 +109,9 @@ class Uploader(object):
                 msg = 'Upload-metadata key "{}" cannot be empty nor contain spaces or commas.'
                 raise ValueError(msg.format(key_str))
 
-            encoded_list.append('{} {}'.format(key_str.encode('ascii'), b64encode(value)))
-        return ','.join(encoded_list)
+            value_bytes = b(value)  # python 3 only encodes bytes
+            encoded_list.append('{} {}'.format(key_str, b64encode(value_bytes).decode('ascii')))
+        return encoded_list
 
     def create_url(self):
         """
@@ -120,7 +121,7 @@ class Uploader(object):
         """
         headers = self.headers
         headers['upload-length'] = str(self.file_size)
-        headers['upload-metadata'] = self.encode_metadata()
+        headers['upload-metadata'] = ','.join(self.encode_metadata())
         resp = requests.post(self.client.url, headers=headers)
         url = resp.headers.get("location")
         if url is None:
