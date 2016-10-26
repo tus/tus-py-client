@@ -1,7 +1,6 @@
 from __future__ import print_function
 import os
 import re
-from io import BytesIO
 from base64 import b64encode
 
 from six import iteritems
@@ -19,7 +18,7 @@ class Uploader(object):
         - file_path (str):
             This is the path(absolute/relative) to the file that is intended for upload
             to the tus server. On instantiation this attribute is required.
-        -  url (Optional[str]):
+        -  url (str):
             If the upload url for the file is known, it can be passed to the constructor.
             This may happen when you resume an upload.
         - client (<tusclient.client.TusClient>):
@@ -41,7 +40,7 @@ class Uploader(object):
 
     :Constructor Args:
         - file_path (str)
-        -  url (Optional[str])
+        - url (Optional[str])
         - client (Optional [<tusclient.client.TusClient>])
         - chunk_size (Optional[int])
     """
@@ -149,7 +148,8 @@ class Uploader(object):
 
     def get_file_stream(self):
         if self.file_stream:
-            return BytesIO(self.file_stream)
+            self.file_stream.seek(0)
+            return self.file_stream
         elif os.path.isfile(self.file_path):
             return open(self.file_path, 'rb')
         else:
