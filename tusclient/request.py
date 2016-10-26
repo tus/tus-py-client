@@ -65,4 +65,3 @@ class TusRequest(object):
         close request handle and end request session
         """
         self.handle.close()
-        self.file.close()

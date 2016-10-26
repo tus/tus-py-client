@@ -1,4 +1,5 @@
 import os
+from base64 import b64encode
 
 import six
 import responses
@@ -21,7 +22,6 @@ class UploaderTest(mixin.Mixin):
         return request_mock
 
     def test_instance_attributes(self):
-        self.assertEqual(self.uploader.file_size, os.path.getsize(self.uploader.file_path))
         self.assertEqual(self.uploader.chunk_size, self.uploader.DEFAULT_CHUNK_SIZE)
         self.assertEqual(self.uploader.client, self.client)
         self.assertEqual(self.uploader.offset, 0)
@@ -45,6 +45,16 @@ class UploaderTest(mixin.Mixin):
         responses.add(responses.HEAD, self.uploader.url,
                       adding_headers={"upload-offset": "300"})
         self.assertEqual(self.uploader.get_offset(), 300)
+
+    def test_encode_metadata(self):
+        self.uploader.metadata = {'foo': 'bar', 'red': 'blue'}
+        encoded_metadata = 'foo'.encode('ascii') + ' ' + b64encode('bar') + \
+            ',' + 'red'.encode('ascii') + ' ' + b64encode('blue')
+        self.assertEqual(self.uploader.encode_metadata(), encoded_metadata)
+
+        with pytest.raises(ValueError):
+            self.uploader.metadata = {'foo, ': 'bar'}
+            self.uploader.encode_metadata()
 
     @responses.activate
     def test_create_url(self):
@@ -71,6 +81,25 @@ class UploaderTest(mixin.Mixin):
         request_mock.status_code = 204
         self.uploader.upload_chunk()
         self.assertIs(self.uploader.verify_upload(), True)
+
+    def test_get_file_stream(self):
+        with open('./LICENSE', 'rb') as fs:
+            self.uploader.file_stream = fs
+            self.uploader.file_path = None
+            self.assertEqual(self.uploader.file_stream, self.uploader.get_file_stream())
+
+        with open('./AUTHORS', 'rb') as fs:
+            self.uploader.file_stream = None
+            self.uploader.file_path = './AUTHORS'
+            self.assertEqual(fs.read(), self.uploader.get_file_stream().read())
+
+    def test_file_size(self):
+        self.assertEqual(self.uploader.file_size, os.path.getsize(self.uploader.file_path))
+
+        with open('./AUTHORS', 'rb') as fs:
+            self.uploader.file_stream = fs
+            self.uploader.file_path = None
+            self.assertEqual(self.uploader.file_size, os.path.getsize('./AUTHORS'))
 
     @mock.patch('tusclient.uploader.TusRequest')
     def test_upload_chunk(self, request_mock):

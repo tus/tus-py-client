@@ -25,4 +25,3 @@ class TusRequestTest(mixin.Mixin):
             self.request.handle = mock_
             self.request.close()
         mock_.close.assert_called_with()
-        self.assertIs(self.request.file.closed, True)
