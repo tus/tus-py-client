@@ -19,7 +19,7 @@ class Uploader(object):
             This is the path(absolute/relative) to the file that is intended for upload
             to the tus server. On instantiation this attribute is required.
         - file_stream (file):
-            As an alternative to the `file_path`, an insance of the file to be uploaded
+            As an alternative to the `file_path`, an instance of the file to be uploaded
             can be passed to the constructor as `file_stream`. Do note that either the
             `file_stream` or the `file_path` must be passed on instantiation.
         -  url (str):
@@ -78,7 +78,7 @@ class Uploader(object):
     def headers(self):
         """
         Return headers of the uploader instance. This would include the headers of the
-        client insance.
+        client instance.
         """
         client_headers = getattr(self.client, 'headers') or {}
         return dict(self.DEFAULT_HEADERS, **client_headers)
@@ -114,7 +114,7 @@ class Uploader(object):
         for key, value in iteritems(self.metadata):
             key_str = str(key)  # dict keys may be of any object type.
 
-            # confirm that the key does not contain unwanted charcters.
+            # confirm that the key does not contain unwanted characters.
             if re.search(r'^$|[\s,]+', key_str):
                 msg = 'Upload-metadata key "{}" cannot be empty nor contain spaces or commas.'
                 raise ValueError(msg.format(key_str))
