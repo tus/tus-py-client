@@ -8,8 +8,8 @@ Welcome to tusclient's documentation!
 
 |Build Status|
 
-.. |Build Status| image:: https://travis-ci.org/ifedapoolarewaju/tus-py-client.svg?branch=master
-   :target: https://travis-ci.org/ifedapoolarewaju/tus-py-client
+.. |Build Status| image:: https://travis-ci.org/tus/tus-py-client.svg?branch=master
+   :target: https://travis-ci.org/tus/tus-py-client
 
 # tus-py-client
 A Python client for the tus resumable upload protocol ->  http://tus.io
