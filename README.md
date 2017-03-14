@@ -1,9 +1,16 @@
-[![Build Status](https://travis-ci.org/tus/tus-py-client.svg?branch=master)](https://travis-ci.org/tus/tus-py-client)
+# tus-py-client [![Build Status](https://travis-ci.org/tus/tus-py-client.svg?branch=master)](https://travis-ci.org/tus/tus-py-client)
 
-# tus-py-client
-A Python client for the tus resumable upload protocol ->  http://tus.io
+> **tus** is a protocol based on HTTP for *resumable file uploads*. Resumable
+> means that an upload can be interrupted at any moment and can be resumed without
+> re-uploading the previous data again. An interruption may happen willingly, if
+> the user wants to pause, or by accident in case of a network issue or server
+> outage.
 
-See Documentation here http://tus-py-client.readthedocs.io/en/latest/
+**tus-py-client** is a Python client for uploading files using the *tus* protocol to any remote server supporting it.
+
+## Documentation
+
+See documentation here: http://tus-py-client.readthedocs.io/en/latest/
 
 ## Get started
 
@@ -55,3 +62,7 @@ my_uploader = Uploader('path/to/file.ext',
                        url='http://master.tus.io/files/abcdef123456',
                        chunk_size=200)
 ```
+
+## License
+
+MIT
