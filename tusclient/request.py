@@ -1,3 +1,8 @@
+try:
+    import StringIO as io
+except ImportError:
+    import io
+
 import pycurl
 
 
@@ -20,6 +25,7 @@ class TusRequest(object):
     def __init__(self, uploader):
         self.handle = pycurl.Curl()
         self.response_headers = {}
+        self.storage = io.StringIO()
 
         self.handle.setopt(pycurl.URL, uploader.url)
         self.handle.setopt(pycurl.HEADERFUNCTION, self._prepare_response_header)
@@ -29,6 +35,7 @@ class TusRequest(object):
         self.file = uploader.get_file_stream()
         self.file.seek(uploader.offset)
         self.handle.setopt(pycurl.READFUNCTION, self.file.read)
+        self.handle.setopt(pycurl.WRITEFUNCTION, self.storage.write)
         self.handle.setopt(pycurl.INFILESIZE, uploader.request_length)
 
         headers = ["upload-offset: {}".format(uploader.offset),
@@ -53,6 +60,13 @@ class TusRequest(object):
         Return request status code.
         """
         return self.handle.getinfo(pycurl.RESPONSE_CODE)
+
+    @property
+    def return_value(self):
+        """
+        Return request ,essage
+        """
+        return self.storage.getvalue()
 
     def perform(self):
         """
