@@ -155,7 +155,7 @@ class Uploader(object):
         if self.request.status_code == 204:
             return True
         else:
-            raise TusUploadFailed
+            raise TusUploadFailed(self.request.return_value)
 
     def get_file_stream(self):
         """
