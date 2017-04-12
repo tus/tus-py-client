@@ -1,4 +1,5 @@
 import pycurl
+import six
 
 
 class TusRequest(object):
@@ -20,6 +21,7 @@ class TusRequest(object):
     def __init__(self, uploader):
         self.handle = pycurl.Curl()
         self.response_headers = {}
+        self.output = six.StringIO()
 
         self.handle.setopt(pycurl.URL, uploader.url)
         self.handle.setopt(pycurl.HEADERFUNCTION, self._prepare_response_header)
@@ -29,6 +31,7 @@ class TusRequest(object):
         self.file = uploader.get_file_stream()
         self.file.seek(uploader.offset)
         self.handle.setopt(pycurl.READFUNCTION, self.file.read)
+        self.handle.setopt(pycurl.WRITEFUNCTION, self.output.write)
         self.handle.setopt(pycurl.INFILESIZE, uploader.request_length)
 
         headers = ["upload-offset: {}".format(uploader.offset),
@@ -53,6 +56,13 @@ class TusRequest(object):
         Return request status code.
         """
         return self.handle.getinfo(pycurl.RESPONSE_CODE)
+
+    @property
+    def response_content(self):
+        """
+        Return response data
+        """
+        return self.output.getvalue()
 
     def perform(self):
         """
