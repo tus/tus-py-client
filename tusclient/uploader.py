@@ -103,7 +103,7 @@ class Uploader(object):
         offset = resp.headers.get('upload-offset')
         if offset is None:
             msg = 'Attemp to retrieve offset fails with status {}'.format(resp.status_code)
-            raise TusCommunicationError(msg)
+            raise TusCommunicationError(msg, resp.status_code, resp.content)
         return int(offset)
 
     def encode_metadata(self):
@@ -136,7 +136,7 @@ class Uploader(object):
         url = resp.headers.get("location")
         if url is None:
             msg = 'Attemp to retrieve create file url with status {}'.format(resp.status_code)
-            raise TusCommunicationError(msg)
+            raise TusCommunicationError(msg, resp.status_code, resp.content)
         return url
 
     @property
@@ -155,7 +155,7 @@ class Uploader(object):
         if self.request.status_code == 204:
             return True
         else:
-            raise TusUploadFailed
+            raise TusUploadFailed('', self.request.status_code, self.request.response_content)
 
     def get_file_stream(self):
         """
