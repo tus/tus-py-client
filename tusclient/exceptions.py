@@ -3,12 +3,7 @@ Global Tusclient exception and warning classes.
 """
 
 
-class TusException(Exception):
-    """
-    Base exception class for Tus-related errors
-    """
-
-class TusCommunicationError(TusException):
+class TusCommunicationError(Exception):
     """
     Should be raised when communications with tus-server behaves
     unexpectedly.
@@ -25,8 +20,8 @@ class TusCommunicationError(TusException):
         - status_code (Optional[int])
         - response_content (Optional[str])
     """
-    def __init__(self, message, status_code, response_content):
-        super(TusException, self).__init__(message)
+    def __init__(self, message, status_code=None, response_content=None):
+        super(TusCommunicationError, self).__init__(message)
         self.status_code = status_code
         self.response_content = response_content
 
