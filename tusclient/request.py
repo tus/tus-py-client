@@ -22,7 +22,7 @@ class TusRequest(object):
         self.handle = pycurl.Curl()
         self.response_headers = {}
         self.output = six.StringIO()
-        self._status_code = None
+        self.status_code = None
 
         self.handle.setopt(pycurl.URL, uploader.url)
         self.handle.setopt(pycurl.HEADERFUNCTION, self._prepare_response_header)
@@ -52,13 +52,6 @@ class TusRequest(object):
         self.response_headers[name.lower()] = value
 
     @property
-    def status_code(self):
-        """
-        Return request status code.
-        """
-        return self._status_code
-
-    @property
     def response_content(self):
         """
         Return response data
@@ -70,7 +63,10 @@ class TusRequest(object):
         Perform actual request.
         """
         self.handle.perform()
-        self._status_code = self.handle.getinfo(pycurl.RESPONSE_CODE)
+        self._finish_request()
+
+    def _finish_request(self):
+        self.status_code = self.handle.getinfo(pycurl.RESPONSE_CODE)
 
     def close(self):
         """
