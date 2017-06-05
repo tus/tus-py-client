@@ -1,6 +1,8 @@
 import pycurl
 import six
 
+from tusclient.exceptions import TusUploadFailed
+
 
 class TusRequest(object):
     """
@@ -62,8 +64,11 @@ class TusRequest(object):
         """
         Perform actual request.
         """
-        self.handle.perform()
-        self._finish_request()
+        try:
+            self.handle.perform()
+            self._finish_request()
+        except pycurl.error as e:
+            raise TusUploadFailed(e)
 
     def _finish_request(self):
         self.status_code = self.handle.getinfo(pycurl.RESPONSE_CODE)
