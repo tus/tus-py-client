@@ -11,6 +11,16 @@ from tusclient.exceptions import TusUploadFailed, TusCommunicationError
 from tusclient.request import TusRequest
 
 
+# Catches requests exceptions and throws custom tuspy errors.
+def _catch_requests_error(func):
+    def _wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except requests.exceptions.RequestException as error:
+            raise TusCommunicationError(error)
+    return _wrapper
+
+
 class Uploader(object):
     """
     Object to control upload related functions.
@@ -47,7 +57,7 @@ class Uploader(object):
             The number of attempts the uploader should make in the case of a failed upload.
             If not specified, it defaults to 0.
         - retry_delay (int):
-            How long (in seconds) the uploader should wait before retrying a failed attempt.
+            How long (in seconds) the uploader should wait before retrying a failed upload attempt.
             If not specified, it defaults to 30.
 
     :Constructor Args:
@@ -104,6 +114,7 @@ class Uploader(object):
         headers_list = ['{}: {}'.format(key, value) for key, value in iteritems(headers)]
         return headers_list
 
+    @_catch_requests_error
     def get_offset(self):
         """
         Return offset from tus server.
@@ -111,16 +122,11 @@ class Uploader(object):
         This is different from the instance attribute 'offset' because this makes an
         http request to the tus server to retrieve the offset.
         """
-        try:
-            resp = requests.head(self.url, headers=self.headers)
-        except requests.exceptions.RequestException as error:
-            raise TusCommunicationError(error)
-        else:
-            offset = resp.headers.get('upload-offset')
-            if offset is None:
-                msg = 'Attemp to retrieve offset fails with status {}'.format(resp.status_code)
-                raise TusCommunicationError(msg, resp.status_code, resp.content)
-            return int(offset)
+        resp = requests.head(self.url, headers=self.headers)
+        offset = resp.headers.get('upload-offset')
+        if offset is None:
+            raise TusCommunicationError('', resp.status_code, resp.content)
+        return int(offset)
 
     def encode_metadata(self):
         """
@@ -139,6 +145,7 @@ class Uploader(object):
             encoded_list.append('{} {}'.format(key_str, b64encode(value_bytes).decode('ascii')))
         return encoded_list
 
+    @_catch_requests_error
     def create_url(self):
         """
         Return upload url.
@@ -151,8 +158,7 @@ class Uploader(object):
         resp = requests.post(self.client.url, headers=headers)
         url = resp.headers.get("location")
         if url is None:
-            msg = 'Attemp to retrieve create file url with status {}'.format(resp.status_code)
-            raise TusCommunicationError(msg, resp.status_code, resp.content)
+            raise TusCommunicationError('', resp.status_code, resp.content)
         return url
 
     @property
@@ -217,6 +223,7 @@ class Uploader(object):
         """
         Upload chunk of file.
         """
+        self._retried = 0
         self._do_request()
         self.offset = int(self.request.response_headers.get('upload-offset'))
         msg = '{} bytes uploaded ...'.format(self.offset)
@@ -226,17 +233,17 @@ class Uploader(object):
         # TODO: Maybe the request should not be re-created everytime.
         #      The request handle could be left open until upload is done instead.
         self.request = TusRequest(self)
-        self._retried = 0
         try:
             self.request.perform()
             self.verify_upload()
         except TusUploadFailed as error:
+            self.request.close()
             self._retry_or_cry(error)
         finally:
             self.request.close()
 
     def _retry_or_cry(self, error):
-        if self.retries < self._retried:
+        if self.retries > self._retried:
             time.sleep(self.retry_delay)
 
             self._retried += 1
@@ -245,6 +252,6 @@ class Uploader(object):
             except TusCommunicationError as e:
                 self._retry_or_cry(e)
             else:
-                self.request.perform()
+                self._do_request()
         else:
             raise error
