@@ -2,12 +2,23 @@ from __future__ import print_function
 import os
 import re
 from base64 import b64encode
+import time
 
 from six import iteritems, b
 import requests
 
 from tusclient.exceptions import TusUploadFailed, TusCommunicationError
 from tusclient.request import TusRequest
+
+
+# Catches requests exceptions and throws custom tuspy errors.
+def _catch_requests_error(func):
+    def _wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except requests.exceptions.RequestException as error:
+            raise TusCommunicationError(error)
+    return _wrapper
 
 
 class Uploader(object):
@@ -42,6 +53,12 @@ class Uploader(object):
             At what offset value the upload should stop.
         - request (<tusclient.request.TusRequest>):
             A http Request instance of the last chunk uploaded.
+        - retries (int):
+            The number of attempts the uploader should make in the case of a failed upload.
+            If not specified, it defaults to 0.
+        - retry_delay (int):
+            How long (in seconds) the uploader should wait before retrying a failed upload attempt.
+            If not specified, it defaults to 30.
 
     :Constructor Args:
         - file_path (str)
@@ -50,13 +67,15 @@ class Uploader(object):
         - client (Optional [<tusclient.client.TusClient>])
         - chunk_size (Optional[int])
         - metadata (Optional[dict])
+        - retries (Optional[int])
+        - retry_delay (Optional[int])
     """
     DEFAULT_HEADERS = {"Tus-Resumable": "1.0.0"}
-    DEFAULT_CHUNK_SIZE = 2 * 1024 * 1024  # 2kb
+    DEFAULT_CHUNK_SIZE = 2 * 1024 * 1024  # 2MB
 
     def __init__(self, file_path=None, file_stream=None, url=None, client=None,
-                 chunk_size=None, metadata=None):
-        if not any((file_path, file_stream)):
+                 chunk_size=None, metadata=None, retries=0, retry_delay=30):
+        if file_path is None and file_stream is None:
             raise ValueError("Either 'file_path' or 'file_stream' cannot be None.")
 
         if url is None and client is None:
@@ -71,6 +90,9 @@ class Uploader(object):
         self.offset = self.get_offset()
         self.chunk_size = chunk_size or self.DEFAULT_CHUNK_SIZE
         self.request = None
+        self.retries = retries
+        self._retried = 0
+        self.retry_delay = retry_delay
 
     # it is important to have this as a @property so it gets
     # updated client headers.
@@ -92,6 +114,7 @@ class Uploader(object):
         headers_list = ['{}: {}'.format(key, value) for key, value in iteritems(headers)]
         return headers_list
 
+    @_catch_requests_error
     def get_offset(self):
         """
         Return offset from tus server.
@@ -123,6 +146,7 @@ class Uploader(object):
             encoded_list.append('{} {}'.format(key_str, b64encode(value_bytes).decode('ascii')))
         return encoded_list
 
+    @_catch_requests_error
     def create_url(self):
         """
         Return upload url.
@@ -178,16 +202,6 @@ class Uploader(object):
         stream.seek(0, os.SEEK_END)
         return stream.tell()
 
-    def _do_request(self):
-        # TODO: Maybe the request should not be re-created everytime.
-        #      The request handle could be left open until upload is done instead.
-        self.request = TusRequest(self)
-        try:
-            self.request.perform()
-            self.verify_upload()
-        finally:
-            self.request.close()
-
     def upload(self, stop_at=None):
         """
         Perform file upload.
@@ -211,7 +225,35 @@ class Uploader(object):
         """
         Upload chunk of file.
         """
+        self._retried = 0
         self._do_request()
         self.offset = int(self.request.response_headers.get('upload-offset'))
         msg = '{} bytes uploaded ...'.format(self.offset)
         print(msg)
+
+    def _do_request(self):
+        # TODO: Maybe the request should not be re-created everytime.
+        #      The request handle could be left open until upload is done instead.
+        self.request = TusRequest(self)
+        try:
+            self.request.perform()
+            self.verify_upload()
+        except TusUploadFailed as error:
+            self.request.close()
+            self._retry_or_cry(error)
+        finally:
+            self.request.close()
+
+    def _retry_or_cry(self, error):
+        if self.retries > self._retried:
+            time.sleep(self.retry_delay)
+
+            self._retried += 1
+            try:
+                self.offset = self.get_offset()
+            except TusCommunicationError as e:
+                self._retry_or_cry(e)
+            else:
+                self._do_request()
+        else:
+            raise error

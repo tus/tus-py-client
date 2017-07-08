@@ -116,3 +116,17 @@ class UploaderTest(mixin.Mixin):
 
         self.uploader.upload()
         self.assertEqual(self.uploader.offset, self.uploader.file_size)
+
+    @mock.patch('tusclient.uploader.TusRequest')
+    def test_upload_retry(self, request_mock):
+        NUM_OF_RETRIES = 3
+        self.uploader.retries = NUM_OF_RETRIES
+        self.uploader.retry_delay = 3
+
+        request_mock = self.mock_pycurl(request_mock)
+        request_mock.status_code = 00
+
+        self.assertEqual(self.uploader._retried, 0)
+        with pytest.raises(exceptions.TusCommunicationError):
+            self.uploader.upload_chunk()
+        self.assertEqual(self.uploader._retried, NUM_OF_RETRIES)
