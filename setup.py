@@ -14,7 +14,7 @@ else:
 setup(
     name='tuspy',
     version=tusclient.__version__,
-    url='http://github.com/ifedapoolarewaju/tus-py-client/',
+    url='http://github.com/tus/tus-py-client/',
     license='MIT',
     author='Ifedapo Olarewaju',
     install_requires=install_requires,
