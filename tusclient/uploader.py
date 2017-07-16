@@ -4,7 +4,7 @@ import re
 from base64 import b64encode
 import time
 
-from six import iteritems, b
+from six import iteritems, b, wraps
 import requests
 
 from tusclient.exceptions import TusUploadFailed, TusCommunicationError
@@ -13,6 +13,7 @@ from tusclient.request import TusRequest
 
 # Catches requests exceptions and throws custom tuspy errors.
 def _catch_requests_error(func):
+    @wraps(func)
     def _wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
