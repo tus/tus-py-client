@@ -5,6 +5,7 @@ from base64 import b64encode
 import time
 
 from six import iteritems, b, wraps
+from six.moves.urllib.parse import urljoin
 import requests
 
 from tusclient.exceptions import TusUploadFailed, TusCommunicationError
@@ -162,7 +163,7 @@ class Uploader(object):
         if url is None:
             msg = 'Attemp to retrieve create file url with status {}'.format(resp.status_code)
             raise TusCommunicationError(msg, resp.status_code, resp.content)
-        return url
+        return urljoin(self.client.url, url)
 
     @property
     def request_length(self):

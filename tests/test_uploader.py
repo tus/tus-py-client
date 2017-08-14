@@ -57,9 +57,15 @@ class UploaderTest(mixin.Mixin):
             self.uploader.encode_metadata()
 
     @responses.activate
-    def test_create_url(self):
+    def test_create_url_absolute(self):
         responses.add(responses.POST, self.client.url,
                       adding_headers={"location": 'http://master.tus.io/files/foo'})
+        self.assertEqual(self.uploader.create_url(), 'http://master.tus.io/files/foo')
+
+    @responses.activate
+    def test_create_url_relative(self):
+        responses.add(responses.POST, self.client.url,
+                      adding_headers={"location": "/files/foo"})
         self.assertEqual(self.uploader.create_url(), 'http://master.tus.io/files/foo')
 
     def test_request_length(self):
