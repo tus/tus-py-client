@@ -1,3 +1,7 @@
+### 0.1.1 / ????-??-?? ###
+
+* Support relative upload urls (Thank you @ciklop)
+
 ### 0.1 / 2017-07-10 ###
 
 * Automatically retry a chunk upload on failure.
