@@ -10,6 +10,7 @@ import requests
 
 from tusclient.exceptions import TusUploadFailed, TusCommunicationError
 from tusclient.request import TusRequest
+from tusclient.storage import filestorage
 
 
 # Catches requests exceptions and throws custom tuspy errors.
@@ -76,12 +77,16 @@ class Uploader(object):
     DEFAULT_CHUNK_SIZE = 2 * 1024 * 1024  # 2MB
 
     def __init__(self, file_path=None, file_stream=None, url=None, client=None,
-                 chunk_size=None, metadata=None, retries=0, retry_delay=30):
+                 chunk_size=None, metadata=None, retries=0, retry_delay=30,
+                 resumable=False, storage_instance=None):
         if file_path is None and file_stream is None:
             raise ValueError("Either 'file_path' or 'file_stream' cannot be None.")
 
         if url is None and client is None:
             raise ValueError("Either 'url' or 'client' cannot be None.")
+
+        if resumable and storage_instance is None:
+            raise ValueError("Please specify a storage instance to enable resumablility.")
 
         self.file_path = file_path
         self.file_stream = file_stream
@@ -95,6 +100,8 @@ class Uploader(object):
         self.retries = retries
         self._retried = 0
         self.retry_delay = retry_delay
+        self.resumable = resumable
+        self.storage_instance = storage_instance
 
     # it is important to have this as a @property so it gets
     # updated client headers.
@@ -147,6 +154,13 @@ class Uploader(object):
             value_bytes = b(value)  # python 3 only encodes bytes
             encoded_list.append('{} {}'.format(key_str, b64encode(value_bytes).decode('ascii')))
         return encoded_list
+
+    def get_url(self):
+        if self.resumable and self.storage_instance:
+            url = self.storage_instance.get_item(fingerprint)
+            return url or self.create_url()
+        else:
+            return self.create_url()
 
     @_catch_requests_error
     def create_url(self):
