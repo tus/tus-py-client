@@ -9,7 +9,7 @@ on_rtd = os.environ.get('READTHEDOCS') == 'True'
 if on_rtd:
     install_requires = ['requests==2.11.1', 'six==1.10.0', ]
 else:
-    install_requires = ['pycurl==7.43.0', 'requests==2.11.1', 'six==1.10.0']
+    install_requires = ['pycurl==7.43.0', 'requests>=2.11.1', 'six==1.10.0']
 
 PY_VERSION = sys.version_info[0], sys.version_info[1]
 if PY_VERSION < (3, 0):
