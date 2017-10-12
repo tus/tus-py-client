@@ -1,6 +1,8 @@
-### 0.1.1 / ????-??-?? ###
+### 0.1.1 / 2017-10-12 ###
 
 * Support relative upload urls (Thank you @ciklop)
+* Unpin requests library version (Thank you @peixian)
+* Test against Python 3.6 (Thank you @thedrow)
 
 ### 0.1 / 2017-07-10 ###
 
