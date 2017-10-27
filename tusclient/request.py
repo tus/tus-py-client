@@ -1,4 +1,5 @@
 import pycurl
+import certifi
 import six
 
 from tusclient.exceptions import TusUploadFailed
@@ -26,6 +27,7 @@ class TusRequest(object):
         self.output = six.StringIO()
         self.status_code = None
 
+        self.handle.setopt(pycurl.CAINFO, certifi.where())
         self.handle.setopt(pycurl.URL, uploader.url)
         self.handle.setopt(pycurl.HEADERFUNCTION, self._prepare_response_header)
         self.handle.setopt(pycurl.UPLOAD, 1)
