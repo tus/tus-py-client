@@ -93,3 +93,6 @@ ENV/
 
 # code editor
 .vscode
+
+# test generated file
+storage.json

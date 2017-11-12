@@ -7,6 +7,7 @@ import pytest
 import mock
 
 from tusclient import exceptions
+from tusclient.storage import filestorage
 from tests import mixin
 
 
@@ -67,6 +68,21 @@ class UploaderTest(mixin.Mixin):
         responses.add(responses.POST, self.client.url,
                       adding_headers={"location": "/files/foo"})
         self.assertEqual(self.uploader.create_url(), 'http://master.tus.io/files/foo')
+
+    @responses.activate 
+    def test_get_url(self):
+        responses.add(responses.POST, self.client.url,
+                      adding_headers={"location": 'http://master.tus.io/files/foo'})
+        self.assertEqual(self.uploader.get_url(), 'http://master.tus.io/files/foo')
+
+        # test for stored urls
+        responses.add(responses.HEAD, 'http://master.tus.io/files/foo_bar',
+                      adding_headers={"upload-offset": "0"})
+        storage_path = '{}/storage_file'.format(os.path.dirname(os.path.abspath(__file__)))
+        resumable_uploader = self.client.uploader(
+            file_path='./LICENSE', resumable=True, storage=filestorage.FileStorage(storage_path)
+        )
+        self.assertEqual(resumable_uploader.get_url(), 'http://master.tus.io/files/foo_bar')
 
     def test_request_length(self):
         self.uploader.chunk_size = 200

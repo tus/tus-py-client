@@ -18,8 +18,16 @@ class Fingerprint(interface.Fingerprint):
         :Returns: fingerprint[str]
         """
         hasher = hashlib.md5()
-        buf = fs.read(self.BLOCK_SIZE)
+        # we encode the content to avoid python 3 uncicode errors
+        buf = self._encode_data(fs.read(self.BLOCK_SIZE))
         while len(buf) > 0:
             hasher.update(buf)
             buf = fs.read(self.BLOCK_SIZE)
         return hasher.hexdigest()
+
+    def _encode_data(self, data):
+        try:
+            return data.encode('utf-8')
+        except AttributeError:
+            # in the case of binary content, this failure would happen.
+            return data
