@@ -33,8 +33,3 @@ snowballstemmer==1.2.1
 Sphinx==1.2.3
 tinydb==3.5.0
 tox==2.3.1
-tus==0.1a1
--e git+git@github.com:tus/tus-py-client.git@050a257ce8178a368e109b88f7eb7ddbf4b5d372#egg=tusclient
-tuspy==0.1
-tuspyclient==0.1a1
-virtualenv==15.0.3

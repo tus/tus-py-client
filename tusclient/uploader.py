@@ -11,6 +11,7 @@ import requests
 from tusclient.exceptions import TusUploadFailed, TusCommunicationError
 from tusclient.request import TusRequest
 from tusclient.storage import filestorage
+from tusclient.fingerprint import fingerprint
 
 
 # Catches requests exceptions and throws custom tuspy errors.
@@ -62,6 +63,17 @@ class Uploader(object):
         - retry_delay (int):
             How long (in seconds) the uploader should wait before retrying a failed upload attempt.
             If not specified, it defaults to 30.
+        - resumable (bool):
+            Determines whether or not url should be stored, and uploads should be resumed.
+        - storage (<tusclient.storage.interface.Storage>):
+            An implementation of <tusclient.storage.interface.Storage> which is an API for ur storage.
+            if resumable is set to true, the default storage module (<tusclient.storage.filestorage.FileStorage>)
+            would be used. But you can set your own custom storage API by passing it to the constructor.
+        - fingerprinter (<tusclient.fingerprint.interface.Fingerprint>):
+            An implementation of <tusclient.fingerprint.interface.Fingerprint> which is an API to generate
+            a unique fingerprint for the uploaded file. This is used for url storage when resumability is enabled.
+            if resumable is set to true, the default fingerprint module (<tusclient.fingerprint.fingerprint.Fingerprint>)
+            would be used. But you can set your own custom fingerprint module by passing it to the constructor.
 
     :Constructor Args:
         - file_path (str)
@@ -72,20 +84,23 @@ class Uploader(object):
         - metadata (Optional[dict])
         - retries (Optional[int])
         - retry_delay (Optional[int])
+        - resumable (Optional[bool])
+        - storage (Optinal [<tusclient.storage.interface.Storage>])
+        - fingerprinter (Optional [<tusclient.fingerprint.interface.Fingerprint>])
     """
     DEFAULT_HEADERS = {"Tus-Resumable": "1.0.0"}
     DEFAULT_CHUNK_SIZE = 2 * 1024 * 1024  # 2MB
 
     def __init__(self, file_path=None, file_stream=None, url=None, client=None,
                  chunk_size=None, metadata=None, retries=0, retry_delay=30,
-                 resumable=False, storage_instance=None):
+                 resumable=False, storage=None, fingerprinter=None):
         if file_path is None and file_stream is None:
             raise ValueError("Either 'file_path' or 'file_stream' cannot be None.")
 
         if url is None and client is None:
             raise ValueError("Either 'url' or 'client' cannot be None.")
 
-        if resumable and storage_instance is None:
+        if resumable and storage is None:
             raise ValueError("Please specify a storage instance to enable resumablility.")
 
         self.file_path = file_path
@@ -93,15 +108,16 @@ class Uploader(object):
         self.stop_at = self.file_size
         self.client = client
         self.metadata = metadata or {}
-        self.url = url or self.create_url()
+        self.resumable = resumable
+        self.storage = storage
+        self.fingerprinter = fingerprinter or fingerprint.Fingerprint()
+        self.url = url or self.get_url()
         self.offset = self.get_offset()
         self.chunk_size = chunk_size or self.DEFAULT_CHUNK_SIZE
         self.request = None
         self.retries = retries
         self._retried = 0
         self.retry_delay = retry_delay
-        self.resumable = resumable
-        self.storage_instance = storage_instance
 
     # it is important to have this as a @property so it gets
     # updated client headers.
@@ -156,9 +172,19 @@ class Uploader(object):
         return encoded_list
 
     def get_url(self):
-        if self.resumable and self.storage_instance:
-            url = self.storage_instance.get_item(fingerprint)
-            return url or self.create_url()
+        """
+        Return the tus upload url.
+
+        If resumability is enabled, this would try to get the url from storage if available,
+        otherwise it would request a new upload url from the tus server.
+        """
+        if self.resumable and self.storage:
+            key = self.fingerprinter.get_fingerprint(self.get_file_stream())
+            url = self.storage.get_item(key)
+            if not url:
+                url = self.create_url()
+                self.storage.set_item(key, url)
+            return url
         else:
             return self.create_url()
 
