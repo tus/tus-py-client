@@ -4,6 +4,8 @@ using the hashlib to generate an md5 hash based on the file content
 """
 import hashlib
 
+from six import b
+
 from . import interface
 
 
@@ -23,11 +25,11 @@ class Fingerprint(interface.Fingerprint):
         while len(buf) > 0:
             hasher.update(buf)
             buf = fs.read(self.BLOCK_SIZE)
-        return hasher.hexdigest()
+        return 'md5:' + hasher.hexdigest()
 
     def _encode_data(self, data):
         try:
-            return data.encode('utf-8')
+            return b(data)
         except AttributeError:
-            # in the case of binary content, this failure would happen.
+            # in case the content is already binary, this failure would happen.
             return data

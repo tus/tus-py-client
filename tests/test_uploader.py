@@ -80,7 +80,7 @@ class UploaderTest(mixin.Mixin):
                       adding_headers={"upload-offset": "0"})
         storage_path = '{}/storage_file'.format(os.path.dirname(os.path.abspath(__file__)))
         resumable_uploader = self.client.uploader(
-            file_path='./LICENSE', resumable=True, storage=filestorage.FileStorage(storage_path)
+            file_path='./LICENSE', store_url=True, url_storage=filestorage.FileStorage(storage_path)
         )
         self.assertEqual(resumable_uploader.get_url(), 'http://master.tus.io/files/foo_bar')
 
