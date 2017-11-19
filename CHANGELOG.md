@@ -1,3 +1,12 @@
+### 0.2 / 2017-??-?? ###
+
+* Support for URL storage
+* Use uploader without Client [#14](https://github.com/tus/tus-py-client/issues/14)
+
+### 0.1.3 / 2017-11-15 ###
+
+* Fix installation issues, due to missing readme.
+
 ### 0.1.2 / 2017-10-27 ###
 
 * Fix PyCurl ssl error [#11](https://github.com/tus/tus-py-client/issues/11)
