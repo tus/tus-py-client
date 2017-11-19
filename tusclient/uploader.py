@@ -129,7 +129,7 @@ class Uploader(object):
         Return headers of the uploader instance. This would include the headers of the
         client instance.
         """
-        client_headers = getattr(self.client, 'headers') or {}
+        client_headers = getattr(self.client, 'headers', {})
         return dict(self.DEFAULT_HEADERS, **client_headers)
 
     @property
