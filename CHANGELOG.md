@@ -1,4 +1,4 @@
-### 0.2 / 2017-??-?? ###
+### 0.2 / 2017-12-02 ###
 
 * Support for URL storage
 * Use uploader without Client [#14](https://github.com/tus/tus-py-client/issues/14)
