@@ -10,7 +10,6 @@ import requests
 
 from tusclient.exceptions import TusUploadFailed, TusCommunicationError
 from tusclient.request import TusRequest
-from tusclient.storage import filestorage
 from tusclient.fingerprint import fingerprint
 
 
