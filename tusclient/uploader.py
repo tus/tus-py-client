@@ -10,7 +10,7 @@ import requests
 
 from tusclient.exceptions import TusUploadFailed, TusCommunicationError
 from tusclient.request import TusRequest
-from tusclient.fingerprint import fingerprint
+from .fingerprint import fingerprint
 
 
 # Catches requests exceptions and throws custom tuspy errors.
