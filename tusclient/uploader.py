@@ -10,7 +10,7 @@ import requests
 
 from tusclient.exceptions import TusUploadFailed, TusCommunicationError
 from tusclient.request import TusRequest
-from .fingerprint import fingerprint
+from tusclient.fingerprint import fingerprint
 
 
 # Catches requests exceptions and throws custom tuspy errors.
@@ -67,8 +67,7 @@ class Uploader(object):
             Determines whether or not url should be stored, and uploads should be resumed.
         - url_storage (<tusclient.storage.interface.Storage>):
             An implementation of <tusclient.storage.interface.Storage> which is an API for URL storage.
-            This value must be set if store_url is set to true. A ready to use implementation exists at
-            <tusclient.storage.filestorage.FileStorage>, and can be used out of the box. But you can
+            This value must be set if store_url is set to true. A ready to use implementation exists atbe used out of the box. But you can
             implement your own custom storage API and pass an instace of it as value.
         - fingerprinter (<tusclient.fingerprint.interface.Fingerprint>):
             An implementation of <tusclient.fingerprint.interface.Fingerprint> which is an API to generate
