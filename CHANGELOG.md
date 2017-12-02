@@ -1,3 +1,7 @@
+### 0.2.1 / 2017-12-02 ###
+
+* Fix installtion and Doc autogeneration issue
+
 ### 0.2 / 2017-12-02 ###
 
 * Support for URL storage
