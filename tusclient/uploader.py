@@ -260,8 +260,6 @@ class Uploader(object):
 
         while self.offset < self.stop_at:
             self.upload_chunk()
-        else:
-            print("maximum upload specified({} bytes) has been reached".format(self.stop_at))
 
     def upload_chunk(self):
         """
@@ -270,8 +268,6 @@ class Uploader(object):
         self._retried = 0
         self._do_request()
         self.offset = int(self.request.response_headers.get('upload-offset'))
-        msg = '{} bytes uploaded ...'.format(self.offset)
-        print(msg)
 
     def _do_request(self):
         # TODO: Maybe the request should not be re-created everytime.
