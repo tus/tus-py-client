@@ -1,6 +1,5 @@
-import pycurl
-import certifi
-import six
+import http
+from future.moves.urllib.parse import urlparse
 
 from tusclient.exceptions import TusUploadFailed
 
@@ -15,65 +14,54 @@ class TusRequest(object):
     on instantiation.
 
     :Attributes:
-        - handle (<pycurl.Curl>)
+        - handle (<http.client.HTTPConnection>)
         - response_headers (dict)
         - file (file):
             The file that is being uploaded.
     """
 
     def __init__(self, uploader):
-        self.handle = pycurl.Curl()
+        url = urlparse(uploader.url)
+        if url.scheme == 'https':
+            self.handle = http.client.HTTPSConnection(url.hostname, url.port)
+        else:
+            self.handle = http.client.HTTPConnection(url.hostname, url.port)
+        self._url = url
+
         self.response_headers = {}
-        self.output = six.StringIO()
         self.status_code = None
-
-        self.handle.setopt(pycurl.CAINFO, certifi.where())
-        self.handle.setopt(pycurl.URL, uploader.url)
-        self.handle.setopt(pycurl.HEADERFUNCTION, self._prepare_response_header)
-        self.handle.setopt(pycurl.UPLOAD, 1)
-        self.handle.setopt(pycurl.CUSTOMREQUEST, 'PATCH')
-
         self.file = uploader.get_file_stream()
         self.file.seek(uploader.offset)
-        self.handle.setopt(pycurl.READFUNCTION, self.file.read)
-        self.handle.setopt(pycurl.WRITEFUNCTION, self.output.write)
-        self.handle.setopt(pycurl.INFILESIZE, uploader.request_length)
 
-        headers = ["upload-offset: {}".format(uploader.offset),
-                   "Content-Type: application/offset+octet-stream"] + uploader.headers_as_list
-        self.handle.setopt(pycurl.HTTPHEADER, headers)
-
-    def _prepare_response_header(self, header_line):
-        # prepares response header and adds it to 'response_headers'
-        # attribute
-        header_line = header_line.decode('iso-8859-1')
-        if ':' not in header_line:
-            return
-
-        name, value = header_line.split(':', 1)
-        name = name.strip()
-        value = value.strip()
-        self.response_headers[name.lower()] = value
+        self._request_headers = {
+            'upload-offset': uploader.offset,
+            'Content-Type': 'application/offset+octet-stream'
+        }
+        self._request_headers.update(uploader.headers)
+        self._content_length = uploader.request_length
+        self._response = None
 
     @property
     def response_content(self):
         """
         Return response data
         """
-        return self.output.getvalue()
+        return self._response.read()
 
     def perform(self):
         """
         Perform actual request.
         """
         try:
-            self.handle.perform()
-            self._finish_request()
-        except pycurl.error as e:
-            raise TusUploadFailed(e)
+            host = '{}://{}'.format(self._url.scheme, self._url.netloc)
+            path = self._url.geturl().replace(host, '', 1)
 
-    def _finish_request(self):
-        self.status_code = self.handle.getinfo(pycurl.RESPONSE_CODE)
+            self.handle.request("PATCH", path, self.file.read(self._content_length), self._request_headers)
+            self._response = self.handle.getresponse()
+            self.status_code = self._response.status
+            self.response_headers = {k.lower(): v for k, v in self._response.getheaders()}
+        except http.client.HTTPException as e:
+            raise TusUploadFailed(e)
 
     def close(self):
         """
