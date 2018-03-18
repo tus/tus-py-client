@@ -74,6 +74,8 @@ class Uploader(object):
             a unique fingerprint for the uploaded file. This is used for url storage when resumability is enabled.
             if store_url is set to true, the default fingerprint module (<tusclient.fingerprint.fingerprint.Fingerprint>)
             would be used. But you can set your own custom fingerprint module by passing it to the constructor.
+        - log_func (<function>):
+            A logging function to be passed diagnostic messages during file uploads
 
     :Constructor Args:
         - file_path (str)
@@ -87,13 +89,14 @@ class Uploader(object):
         - store_url (Optional[bool])
         - url_storage (Optinal [<tusclient.storage.interface.Storage>])
         - fingerprinter (Optional [<tusclient.fingerprint.interface.Fingerprint>])
+        - log_func (Optional [<function>])
     """
     DEFAULT_HEADERS = {"Tus-Resumable": "1.0.0"}
     DEFAULT_CHUNK_SIZE = 2 * 1024 * 1024  # 2MB
 
     def __init__(self, file_path=None, file_stream=None, url=None, client=None,
                  chunk_size=None, metadata=None, retries=0, retry_delay=30,
-                 store_url=False, url_storage=None, fingerprinter=None):
+                 store_url=False, url_storage=None, fingerprinter=None, log_func=None):
         if file_path is None and file_stream is None:
             raise ValueError("Either 'file_path' or 'file_stream' cannot be None.")
 
@@ -118,6 +121,7 @@ class Uploader(object):
         self.retries = retries
         self._retried = 0
         self.retry_delay = retry_delay
+        self.log_func = log_func
 
     # it is important to have this as a @property so it gets
     # updated client headers.
@@ -261,7 +265,8 @@ class Uploader(object):
         while self.offset < self.stop_at:
             self.upload_chunk()
         else:
-            print("maximum upload specified({} bytes) has been reached".format(self.stop_at))
+            if self.log_func:
+                self.log_func("maximum upload specified({} bytes) has been reached".format(self.stop_at))
 
     def upload_chunk(self):
         """
@@ -270,8 +275,9 @@ class Uploader(object):
         self._retried = 0
         self._do_request()
         self.offset = int(self.request.response_headers.get('upload-offset'))
-        msg = '{} bytes uploaded ...'.format(self.offset)
-        print(msg)
+        if self.log_func:
+            msg = '{} bytes uploaded ...'.format(self.offset)
+            self.log_func(msg)
 
     def _do_request(self):
         # TODO: Maybe the request should not be re-created everytime.
