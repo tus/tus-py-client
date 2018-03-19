@@ -1,4 +1,4 @@
-import http
+import http.client
 from future.moves.urllib.parse import urlparse
 
 from tusclient.exceptions import TusUploadFailed
