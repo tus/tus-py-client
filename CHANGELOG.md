@@ -1,3 +1,8 @@
+### 0.2.2/ 2018-19-03 ###
+
+* Replace the use of PyCurl with builtin http.client
+* Remove unwanted debug printing
+
 ### 0.2.1 / 2017-12-02 ###
 
 * Fix installtion and Doc autogeneration issue
