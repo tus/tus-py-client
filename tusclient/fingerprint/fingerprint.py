@@ -15,6 +15,7 @@ class Fingerprint(interface.Fingerprint):
     def get_fingerprint(self, fs):
         """
         Return a unique fingerprint string value based on the file stream recevied
+
         :Args:
             - fs[file]: The file stream instance of the file for which a fingerprint would be generated.
         :Returns: fingerprint[str]

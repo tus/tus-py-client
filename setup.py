@@ -5,9 +5,10 @@ from setuptools import setup
 import tusclient
 
 
-on_rtd = os.environ.get('READTHEDOCS') == 'True'
-if on_rtd:
-    install_requires = ['requests==2.11.1', 'six==1.10.0', 'tinydb>=3.5.0']
+if os.environ.get('READTHEDOCS') == 'True':
+    install_requires = [
+        'requests==2.11.1', 'six==1.10.0', 'tinydb>=3.5.0', 'future==0.16.0'
+    ]
 else:
     install_requires = [
         'future==0.16.0', 'requests>=2.11.1', 'six==1.10.0',

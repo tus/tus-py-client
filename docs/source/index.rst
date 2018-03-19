@@ -1,10 +1,10 @@
-.. tusclient documentation master file, created by
-   sphinx-quickstart on Mon Oct 10 15:11:50 2016.
+.. tuspy documentation master file, created by
+   sphinx-quickstart on Mon Mar 19 01:01:39 2018.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to tusclient's documentation!
-=====================================
+Welcome to tuspy's documentation!
+=================================
 
 |Build Status|
 
@@ -14,12 +14,14 @@ Welcome to tusclient's documentation!
 # tus-py-client
 A Python client for the tus resumable upload protocol ->  http://tus.io
 
-Contents:
-
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 2
+   :caption: Contents:
 
    tusclient
+   storage
+   fingerprint
+
 
 
 Indices and tables
@@ -84,3 +86,19 @@ uploaders can also be used standalone.
     my_uploader = Uploader('path/to/file.ext',
                             url='http://master.tus.io/files/abcdef123456',
                             chunk_size=200)
+
+URL Storage
+~~~~~~~~~~~
+There is a simple filestorage implementation available to save upload URLs.
+
+.. code:: python
+
+    from tusclient.uploader import Uploader
+    from tusclient.storage import filestorage
+
+    storage = filestorage.FileStorage('storage_file')
+    my_uploader = Uploader('path/to/file.ext', store_url=True, url_storage=storage)
+    my_uploader.upload()
+
+While the filestorage is implemented for simple usecases, you may create your own
+custom storage class by implementing the **tusclient.storage.interface.Storage** interface.

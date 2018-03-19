@@ -14,6 +14,7 @@ class FileStorage(interface.Storage):
     def get_item(self, key):
         """
         Return the tus url of a file, identified by the key specified.
+
         :Args:
             - key[str]: The unique id for the stored item (in this case, url)
         :Returns: url[str]
@@ -24,6 +25,7 @@ class FileStorage(interface.Storage):
     def set_item(self, key, url):
         """
         Store the url value under the unique key.
+
         :Args:
             - key[str]: The unique id to which the item (in this case, url) would be stored.
             - value[str]: The actual url value to be stored.
