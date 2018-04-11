@@ -60,7 +60,7 @@ class TusRequest(object):
             self._response = self.handle.getresponse()
             self.status_code = self._response.status
             self.response_headers = {k.lower(): v for k, v in self._response.getheaders()}
-        except http.client.HTTPException as e:
+        except (http.client.HTTPException, EnvironmentError) as e:
             raise TusUploadFailed(e)
 
     def close(self):
