@@ -31,6 +31,7 @@ setup(
     author_email='ifedapoolarewaju@gmail.com',
     description='A Python client for the tus resumable upload protocol ->  http://tus.io',
     long_description=(long_description),
+    long_description_content_type='text/markdown',
     packages=['tusclient', 'tusclient.fingerprint', 'tusclient.storage'],
     include_package_data=True,
     platforms='any',
