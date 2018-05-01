@@ -11,8 +11,8 @@ if os.environ.get('READTHEDOCS') == 'True':
     ]
 else:
     install_requires = [
-        'future==0.16.0', 'requests>=2.11.1', 'six==1.10.0',
-        'certifi==2017.7.27.1', 'tinydb>=3.5.0'
+        'future>=0.16.0', 'requests>=2.18.4', 'six>=1.11.0',
+        'certifi>=2018.1.18', 'tinydb>=3.5.0'
     ]
 
 PY_VERSION = sys.version_info[0], sys.version_info[1]
