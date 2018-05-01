@@ -46,7 +46,7 @@ class Uploader(object):
             optional if the 'url' argument is specified.
         - chunk_size (int):
             This tells the uploader what chunk size(in bytes) should be uploaded when the
-            method `upload_chunk` is called. This defaults to 2 * 1024 * 1024 i.e 2kb if not
+            method `upload_chunk` is called. This defaults to 2 * 1024 * 1024 i.e 2mb if not
             specified.
         - metadata (dict):
             A dictionary containing the upload-metadata. This would be encoded internally
@@ -154,7 +154,7 @@ class Uploader(object):
         resp = requests.head(self.url, headers=self.headers)
         offset = resp.headers.get('upload-offset')
         if offset is None:
-            msg = 'Attemp to retrieve offset fails with status {}'.format(resp.status_code)
+            msg = 'Attempt to retrieve offset fails with status {}'.format(resp.status_code)
             raise TusCommunicationError(msg, resp.status_code, resp.content)
         return int(offset)
 
@@ -205,7 +205,7 @@ class Uploader(object):
         resp = requests.post(self.client.url, headers=headers)
         url = resp.headers.get("location")
         if url is None:
-            msg = 'Attemp to retrieve create file url with status {}'.format(resp.status_code)
+            msg = 'Attempt to retrieve create file url with status {}'.format(resp.status_code)
             raise TusCommunicationError(msg, resp.status_code, resp.content)
         return urljoin(self.client.url, url)
 

@@ -1,4 +1,5 @@
 import http.client
+import errno
 from future.moves.urllib.parse import urlparse
 
 from tusclient.exceptions import TusUploadFailed
@@ -62,6 +63,12 @@ class TusRequest(object):
             self.response_headers = {k.lower(): v for k, v in self._response.getheaders()}
         except http.client.HTTPException as e:
             raise TusUploadFailed(e)
+        # wrap connection related errors not raised by the http.client.HTTP(S)Connection
+        # as TusUploadFailed exceptions to enable retries
+        except OSError as e:
+            if e.errno in (errno.EPIPE, errno.ESHUTDOWN, errno.ECONNABORTED, errno.ECONNREFUSED, errno.ECONNRESET):
+                raise TusUploadFailed(e)
+            raise e
 
     def close(self):
         """
