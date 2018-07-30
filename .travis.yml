@@ -8,3 +8,26 @@ install:
     - "pip install -r requirements.txt"
 script: 
     - "py.test --cov=tusclient"
+deploy:
+    - provider: releases
+      tag: $TRAVIS_TAG
+      api_key: $GITHUB_TOKEN
+      file_glob: true
+      file: "dist/*"
+      skip_cleanup: true
+      draft: false
+      prerelease: true
+      on: 
+        tags: true
+        branch: production
+    - provider: pypi
+      user: <USERNAME>
+      password:
+        secure: <ENCRYPTED_PASSWORD>
+      distributions: sdist bdist_wheel
+      draft: false
+      prerelease: true
+      on:
+        tags: true
+        branch: production
+    
