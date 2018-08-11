@@ -4,7 +4,7 @@ import re
 from base64 import b64encode
 import time
 
-from six import iteritems, b, wraps
+from six import iteritems, b, wraps, MAXSIZE
 from six.moves.urllib.parse import urljoin
 import requests
 
@@ -92,7 +92,7 @@ class Uploader(object):
         - log_func (Optional [<function>])
     """
     DEFAULT_HEADERS = {"Tus-Resumable": "1.0.0"}
-    DEFAULT_CHUNK_SIZE = 2 * 1024 * 1024  # 2MB
+    DEFAULT_CHUNK_SIZE = MAXSIZE
 
     def __init__(self, file_path=None, file_stream=None, url=None, client=None,
                  chunk_size=None, metadata=None, retries=0, retry_delay=30,
