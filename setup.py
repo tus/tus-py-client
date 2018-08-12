@@ -5,15 +5,11 @@ from setuptools import setup
 import tusclient
 
 
-if os.environ.get('READTHEDOCS') == 'True':
-    install_requires = [
-        'requests==2.11.1', 'six==1.10.0', 'tinydb>=3.5.0', 'future==0.16.0'
-    ]
-else:
-    install_requires = [
-        'future>=0.16.0', 'requests>=2.18.4', 'six>=1.11.0',
-        'certifi>=2018.1.18', 'tinydb>=3.5.0'
-    ]
+install_requires = [
+    'future>=0.16.0', 'requests>=2.18.4', 'six>=1.11.0', 'tinydb>=3.5.0'
+]
+if os.environ.get('READTHEDOCS') != 'True':
+    install_requires.append('certifi>=2018.1.18')
 
 PY_VERSION = sys.version_info[0], sys.version_info[1]
 if PY_VERSION < (3, 0):
