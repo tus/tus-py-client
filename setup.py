@@ -10,6 +10,8 @@ install_requires = [
 ]
 if os.environ.get('READTHEDOCS') != 'True':
     install_requires.append('certifi>=2018.1.18')
+tests_require = ['responses>=0.5.1', 'mock>=2.0.0', 'coverage>=4.2', 'pytest>=3.0.3',
+'pytest-cov>=2.3.1']
 
 PY_VERSION = sys.version_info[0], sys.version_info[1]
 if PY_VERSION < (3, 0):
@@ -24,8 +26,11 @@ setup(
     license='MIT',
     author='Ifedapo Olarewaju',
     install_requires=install_requires,
+    tests_require=tests_require,
+    extras_require={'test': tests_require},
     author_email='ifedapoolarewaju@gmail.com',
-    description='A Python client for the tus resumable upload protocol ->  http://tus.io',
+    description=
+    'A Python client for the tus resumable upload protocol ->  http://tus.io',
     long_description=(long_description),
     long_description_content_type='text/markdown',
     packages=['tusclient', 'tusclient.fingerprint', 'tusclient.storage'],
@@ -42,5 +47,4 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Internet :: File Transfer Protocol (FTP)',
         'Topic :: Communications :: File Sharing',
-    ]
-)
+    ])
