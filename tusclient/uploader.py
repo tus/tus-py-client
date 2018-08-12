@@ -46,7 +46,7 @@ class Uploader(object):
             optional if the 'url' argument is specified.
         - chunk_size (int):
             This tells the uploader what chunk size(in bytes) should be uploaded when the
-            method `upload_chunk` is called. This defaults to 2 * 1024 * 1024 i.e 2mb if not
+            method `upload_chunk` is called. This defaults to the maximum possible integer if not
             specified.
         - metadata (dict):
             A dictionary containing the upload-metadata. This would be encoded internally
