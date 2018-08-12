@@ -5,6 +5,6 @@ python:
     - "3.5"
     - "3.6"
 install: 
-    - "pip install -e ."
+    - "pip install -e .[test]"
 script: 
     - "py.test --cov=tusclient"
