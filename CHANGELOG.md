@@ -1,3 +1,9 @@
+### 0.2.3/ 2018-13-03 ###
+
+* Refine connection error handling
+* Make long description render correctly on pypi.org
+* Set default chunksize to largest possible number 
+
 ### 0.2.2/ 2018-19-03 ###
 
 * Replace the use of PyCurl with builtin http.client
