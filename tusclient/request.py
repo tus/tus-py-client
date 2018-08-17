@@ -40,6 +40,8 @@ class TusRequest(object):
         }
         self._request_headers.update(uploader.headers)
         self._content_length = uploader.request_length
+        self._checksum_algorithm = uploader.checksum_algorithm
+        self._checksum_algorithm_name = uploader.checksum_algorithm_name
         self._response = None
 
     @property
@@ -57,7 +59,16 @@ class TusRequest(object):
             host = '{}://{}'.format(self._url.scheme, self._url.netloc)
             path = self._url.geturl().replace(host, '', 1)
 
-            self.handle.request("PATCH", path, self.file.read(self._content_length), self._request_headers)
+            chunk = self.file.read(self._content_length)
+
+            if self._checksum_algorithm and self._checksum_algorithm_name:
+                self._request_headers["upload-checksum"] = \
+                    " ".join((
+                        self._checksum_algorithm_name, 
+                        self._checksum_algorithm(chunk).decode("ascii"),
+                    ))
+
+            self.handle.request("PATCH", path, chunk, self._request_headers)
             self._response = self.handle.getresponse()
             self.status_code = self._response.status
             self.response_headers = {k.lower(): v for k, v in self._response.getheaders()}
