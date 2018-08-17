@@ -152,3 +152,16 @@ class UploaderTest(mixin.Mixin):
         with pytest.raises(exceptions.TusCommunicationError):
             self.uploader.upload_chunk()
         self.assertEqual(self.uploader._retried, NUM_OF_RETRIES)
+
+    @mock.patch('tusclient.uploader.TusRequest')
+    def test_upload_checksum(self, request_mock):
+        self.mock_pycurl(request_mock)
+
+        self.uploader.checksum_algorithm_name = "sha1"
+        self.uploader.upload()
+        self.assertEqual(self.uploader.offset, self.uploader.file_size)
+    
+    def test_invalid_checksum_algorithm_name(self):
+        with pytest.raises(ValueError):
+            self.uploader.checksum_algorithm_name = \
+                "hopefully not a support checksum algorithm name"
