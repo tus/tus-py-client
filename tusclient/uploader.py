@@ -7,6 +7,7 @@ import time
 from six import iteritems, b, wraps, MAXSIZE
 from six.moves.urllib.parse import urljoin
 import requests
+import hashlib
 
 from tusclient.exceptions import TusUploadFailed, TusCommunicationError
 from tusclient.request import TusRequest
@@ -76,6 +77,9 @@ class Uploader(object):
             would be used. But you can set your own custom fingerprint module by passing it to the constructor.
         - log_func (<function>):
             A logging function to be passed diagnostic messages during file uploads
+        - upload_checksum (bool):
+            Whether or not to supply the Upload-Checksum header along with each
+            chunk. Defaults to False.
 
     :Constructor Args:
         - file_path (str)
@@ -90,13 +94,16 @@ class Uploader(object):
         - url_storage (Optinal [<tusclient.storage.interface.Storage>])
         - fingerprinter (Optional [<tusclient.fingerprint.interface.Fingerprint>])
         - log_func (Optional [<function>])
+        - upload_checksum (Optional[bool])
     """
     DEFAULT_HEADERS = {"Tus-Resumable": "1.0.0"}
     DEFAULT_CHUNK_SIZE = MAXSIZE
+    CHECKSUM_ALGORITHM_PAIR = ("sha1", hashlib.sha1, )
 
     def __init__(self, file_path=None, file_stream=None, url=None, client=None,
                  chunk_size=None, metadata=None, retries=0, retry_delay=30,
-                 store_url=False, url_storage=None, fingerprinter=None, log_func=None):
+                 store_url=False, url_storage=None, fingerprinter=None, 
+                 log_func=None, upload_checksum=False):
         if file_path is None and file_stream is None:
             raise ValueError("Either 'file_path' or 'file_stream' cannot be None.")
 
@@ -122,6 +129,9 @@ class Uploader(object):
         self._retried = 0
         self.retry_delay = retry_delay
         self.log_func = log_func
+        self.upload_checksum = upload_checksum
+        self.__checksum_algorithm_name, self.__checksum_algorithm = \
+            self.CHECKSUM_ALGORITHM_PAIR
 
     # it is important to have this as a @property so it gets
     # updated client headers.
@@ -142,6 +152,19 @@ class Uploader(object):
         headers = self.headers
         headers_list = ['{}: {}'.format(key, value) for key, value in iteritems(headers)]
         return headers_list
+    
+    @property
+    def checksum_algorithm(self):
+        """The checksum algorithm to be used for the Upload-Checksum extension. 
+        """
+        return self.__checksum_algorithm
+
+    @property
+    def checksum_algorithm_name(self):
+        """The name of the checksum algorithm to be used for the Upload-Checksum 
+        extension. 
+        """
+        return self.__checksum_algorithm_name
 
     @_catch_requests_error
     def get_offset(self):

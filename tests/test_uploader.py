@@ -152,3 +152,10 @@ class UploaderTest(mixin.Mixin):
         with pytest.raises(exceptions.TusCommunicationError):
             self.uploader.upload_chunk()
         self.assertEqual(self.uploader._retried, NUM_OF_RETRIES)
+    
+    @mock.patch('tusclient.uploader.TusRequest')
+    def test_upload_checksum(self, request_mock):
+        self.mock_pycurl(request_mock)
+        self.uploader.upload_checksum = True
+        self.uploader.upload()
+        self.assertEqual(self.uploader.offset, self.uploader.file_size)
