@@ -1,3 +1,7 @@
+### 0.2.4/ 2019-14-01 ###
+
+* Add support for tus upload-checksum header
+
 ### 0.2.3/ 2018-13-03 ###
 
 * Refine connection error handling
