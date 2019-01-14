@@ -10,8 +10,10 @@ install_requires = [
 ]
 if os.environ.get('READTHEDOCS') != 'True':
     install_requires.append('certifi>=2018.1.18')
-tests_require = ['responses>=0.5.1', 'mock>=2.0.0', 'coverage>=4.2', 'pytest>=3.0.3',
-'pytest-cov>=2.3.1']
+tests_require = [
+    'responses>=0.5.1', 'mock>=2.0.0', 'coverage>=4.2', 'pytest>=3.0.3',
+    'pytest-cov>=2.3.1,<2.6'
+]
 
 PY_VERSION = sys.version_info[0], sys.version_info[1]
 if PY_VERSION < (3, 0):
