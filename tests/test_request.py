@@ -17,13 +17,13 @@ class TusRequestTest(mixin.Mixin):
             self.request.perform()
         with open('LICENSE', 'rb') as f:
             headers = {
-                'upload-offset': 0,
+                'upload-offset': '0',
                 'Content-Type': 'application/offset+octet-stream'
             }
             headers.update(self.uploader.headers)
-            mock_.request.assert_called_with(
-                'PATCH', '/files/15acd89eabdf5738ffc',
-                f.read(), headers)
+            mock_.patch.assert_called_with(
+                'http://master.tus.io/files/15acd89eabdf5738ffc',
+                data=f.read(), headers=headers)
 
     def test_perform_checksum(self):
         self.uploader.upload_checksum = True
@@ -34,15 +34,15 @@ class TusRequestTest(mixin.Mixin):
         with open('LICENSE', 'rb') as f:
             license = f.read()
             headers = {
-                'upload-offset': 0,
+                'upload-offset': '0',
                 'Content-Type': 'application/offset+octet-stream'
             }
             headers.update(self.uploader.headers)
             headers["upload-checksum"] = "sha1 " + \
                 base64.standard_b64encode(hashlib.sha1(license).digest()).decode("ascii")
-            mock_.request.assert_called_with(
-                'PATCH', '/files/15acd89eabdf5738ffc',
-                license, headers)
+            mock_.patch.assert_called_with(
+                'http://master.tus.io/files/15acd89eabdf5738ffc',
+                data=license, headers=headers)
 
     def test_close(self):
         with mock.patch.object(self.request, 'handle') as mock_:
