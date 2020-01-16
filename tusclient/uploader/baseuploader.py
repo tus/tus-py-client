@@ -1,17 +1,21 @@
-from __future__ import print_function
+from typing import Optional, IO, Dict, TYPE_CHECKING
 import os
 import re
 from base64 import b64encode
-import time
-
-from six import iteritems, b, wraps, MAXSIZE
-from six.moves.urllib.parse import urljoin
-import requests
+from sys import maxsize as MAXSIZE
+from functools import wraps
 import hashlib
+from urllib.parse import urljoin
 
-from tusclient.exceptions import TusUploadFailed, TusCommunicationError
+import requests
+
+from tusclient.exceptions import TusCommunicationError
 from tusclient.request import TusRequest
-from tusclient.fingerprint import fingerprint
+from tusclient.fingerprint import fingerprint, interface
+from tusclient.storage.interface import Storage
+
+if TYPE_CHECKING:
+    from tusclient.client import TusClient
 
 
 # Catches requests exceptions and throws custom tuspy errors.
@@ -26,7 +30,7 @@ def _catch_requests_error(func):
     return _wrapper
 
 
-class Uploader(object):
+class BaseUploader:
     """
     Object to control upload related functions.
 
@@ -100,18 +104,23 @@ class Uploader(object):
     DEFAULT_CHUNK_SIZE = MAXSIZE
     CHECKSUM_ALGORITHM_PAIR = ("sha1", hashlib.sha1, )
 
-    def __init__(self, file_path=None, file_stream=None, url=None, client=None,
-                 chunk_size=None, metadata=None, retries=0, retry_delay=30,
-                 store_url=False, url_storage=None, fingerprinter=None, 
-                 log_func=None, upload_checksum=False):
+    def __init__(self, file_path: Optional[str] = None, file_stream: Optional[IO] = None,
+                 url: Optional[str] = None, client: Optional['TusClient'] = None,
+                 chunk_size: int = MAXSIZE, metadata: Optional[Dict] = None,
+                 retries: int = 0, retry_delay: int = 30,
+                 store_url=False, url_storage: Optional[Storage] = None,
+                 fingerprinter: Optional[interface.Fingerprint] = None,
+                 upload_checksum=False):
         if file_path is None and file_stream is None:
-            raise ValueError("Either 'file_path' or 'file_stream' cannot be None.")
+            raise ValueError(
+                "Either 'file_path' or 'file_stream' cannot be None.")
 
         if url is None and client is None:
             raise ValueError("Either 'url' or 'client' cannot be None.")
 
         if store_url and url_storage is None:
-            raise ValueError("Please specify a storage instance to enable resumablility.")
+            raise ValueError(
+                "Please specify a storage instance to enable resumablility.")
 
         self.file_path = file_path
         self.file_stream = file_stream
@@ -123,12 +132,11 @@ class Uploader(object):
         self.fingerprinter = fingerprinter or fingerprint.Fingerprint()
         self.url = url or self.get_url()
         self.offset = self.get_offset()
-        self.chunk_size = chunk_size or self.DEFAULT_CHUNK_SIZE
-        self.request = None
+        self.chunk_size = chunk_size
         self.retries = retries
+        self.request: Optional[TusRequest] = None
         self._retried = 0
         self.retry_delay = retry_delay
-        self.log_func = log_func
         self.upload_checksum = upload_checksum
         self.__checksum_algorithm_name, self.__checksum_algorithm = \
             self.CHECKSUM_ALGORITHM_PAIR
@@ -145,15 +153,6 @@ class Uploader(object):
         return dict(self.DEFAULT_HEADERS, **client_headers)
 
     @property
-    def headers_as_list(self):
-        """
-        Does the same as 'headers' except it is returned as a list.
-        """
-        headers = self.headers
-        headers_list = ['{}: {}'.format(key, value) for key, value in iteritems(headers)]
-        return headers_list
-    
-    @property
     def checksum_algorithm(self):
         """The checksum algorithm to be used for the Upload-Checksum extension. 
         """
@@ -161,8 +160,8 @@ class Uploader(object):
 
     @property
     def checksum_algorithm_name(self):
-        """The name of the checksum algorithm to be used for the Upload-Checksum 
-        extension. 
+        """The name of the checksum algorithm to be used for the Upload-Checksum
+        extension.
         """
         return self.__checksum_algorithm_name
 
@@ -177,7 +176,8 @@ class Uploader(object):
         resp = requests.head(self.url, headers=self.headers)
         offset = resp.headers.get('upload-offset')
         if offset is None:
-            msg = 'Attempt to retrieve offset fails with status {}'.format(resp.status_code)
+            msg = 'Attempt to retrieve offset fails with status {}'.format(
+                resp.status_code)
             raise TusCommunicationError(msg, resp.status_code, resp.content)
         return int(offset)
 
@@ -186,7 +186,7 @@ class Uploader(object):
         Return list of encoded metadata as defined by the Tus protocol.
         """
         encoded_list = []
-        for key, value in iteritems(self.metadata):
+        for key, value in self.metadata.items():
             key_str = str(key)  # dict keys may be of any object type.
 
             # confirm that the key does not contain unwanted characters.
@@ -194,8 +194,9 @@ class Uploader(object):
                 msg = 'Upload-metadata key "{}" cannot be empty nor contain spaces or commas.'
                 raise ValueError(msg.format(key_str))
 
-            value_bytes = b(value)  # python 3 only encodes bytes
-            encoded_list.append('{} {}'.format(key_str, b64encode(value_bytes).decode('ascii')))
+            value_bytes = value.encode('latin-1')
+            encoded_list.append('{} {}'.format(
+                key_str, b64encode(value_bytes).decode('ascii')))
         return encoded_list
 
     def get_url(self):
@@ -228,7 +229,8 @@ class Uploader(object):
         resp = requests.post(self.client.url, headers=headers)
         url = resp.headers.get("location")
         if url is None:
-            msg = 'Attempt to retrieve create file url with status {}'.format(resp.status_code)
+            msg = 'Attempt to retrieve create file url with status {}'.format(
+                resp.status_code)
             raise TusCommunicationError(msg, resp.status_code, resp.content)
         return urljoin(self.client.url, url)
 
@@ -239,16 +241,6 @@ class Uploader(object):
         """
         remainder = self.stop_at - self.offset
         return self.chunk_size if remainder > self.chunk_size else remainder
-
-    def verify_upload(self):
-        """
-        Confirm that the last upload was sucessful.
-        Raises TusUploadFailed exception if the upload was not sucessful.
-        """
-        if self.request.status_code == 204:
-            return True
-        else:
-            raise TusUploadFailed('', self.request.status_code, self.request.response_content)
 
     def get_file_stream(self):
         """
@@ -270,61 +262,3 @@ class Uploader(object):
         stream = self.get_file_stream()
         stream.seek(0, os.SEEK_END)
         return stream.tell()
-
-    def upload(self, stop_at=None):
-        """
-        Perform file upload.
-
-        Performs continous upload of chunks of the file. The size uploaded at each cycle is
-        the value of the attribute 'chunk_size'.
-
-        :Args:
-            - stop_at (Optional[int]):
-                Determines at what offset value the upload should stop. If not specified this
-                defaults to the file size.
-        """
-        self.stop_at = stop_at or self.file_size
-
-        while self.offset < self.stop_at:
-            self.upload_chunk()
-        else:
-            if self.log_func:
-                self.log_func("maximum upload specified({} bytes) has been reached".format(self.stop_at))
-
-    def upload_chunk(self):
-        """
-        Upload chunk of file.
-        """
-        self._retried = 0
-        self._do_request()
-        self.offset = int(self.request.response_headers.get('upload-offset'))
-        if self.log_func:
-            msg = '{} bytes uploaded ...'.format(self.offset)
-            self.log_func(msg)
-
-    def _do_request(self):
-        # TODO: Maybe the request should not be re-created everytime.
-        #      The request handle could be left open until upload is done instead.
-        self.request = TusRequest(self)
-        try:
-            self.request.perform()
-            self.verify_upload()
-        except TusUploadFailed as error:
-            self.request.close()
-            self._retry_or_cry(error)
-        finally:
-            self.request.close()
-
-    def _retry_or_cry(self, error):
-        if self.retries > self._retried:
-            time.sleep(self.retry_delay)
-
-            self._retried += 1
-            try:
-                self.offset = self.get_offset()
-            except TusCommunicationError as e:
-                self._retry_or_cry(e)
-            else:
-                self._do_request()
-        else:
-            raise error

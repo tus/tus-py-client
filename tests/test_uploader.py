@@ -19,7 +19,6 @@ class UploaderTest(mixin.Mixin):
         request_mock.response_headers = {
             'upload-offset': self.uploader.offset + self.uploader.request_length}
         request_mock.perform.return_value = None
-        request_mock.close.return_value = None
         return request_mock
 
     def test_instance_attributes(self):
@@ -32,14 +31,6 @@ class UploaderTest(mixin.Mixin):
 
         self.client.set_headers({'foo': 'bar'})
         self.assertEqual(self.uploader.headers, {"Tus-Resumable": "1.0.0", 'foo': 'bar'})
-
-    def test_headers_as_list(self):
-        six.assertCountEqual(self, self.uploader.headers_as_list,
-                             ["Tus-Resumable: 1.0.0"])
-
-        self.client.set_headers({'foo': 'bar'})
-        six.assertCountEqual(self, self.uploader.headers_as_list,
-                             ['Tus-Resumable: 1.0.0', 'foo: bar'])
 
     @responses.activate
     def test_get_offset(self):
@@ -91,19 +82,6 @@ class UploaderTest(mixin.Mixin):
         self.uploader.chunk_size = self.uploader.file_size + 3000
         self.assertEqual(self.uploader.request_length, self.uploader.file_size)
 
-    @mock.patch('tusclient.uploader.TusRequest')
-    def test_verify_upload(self, request_mock):
-        request_mock = self.mock_pycurl(request_mock)
-        request_mock.status_code = 00
-
-        with pytest.raises(exceptions.TusUploadFailed):
-            self.uploader.upload_chunk()
-            self.uploader.verify_upload()
-
-        request_mock.status_code = 204
-        self.uploader.upload_chunk()
-        self.assertIs(self.uploader.verify_upload(), True)
-
     def test_get_file_stream(self):
         with open('./LICENSE', 'rb') as fs:
             self.uploader.file_stream = fs
@@ -123,7 +101,7 @@ class UploaderTest(mixin.Mixin):
             self.uploader.file_path = None
             self.assertEqual(self.uploader.file_size, os.path.getsize('./AUTHORS'))
 
-    @mock.patch('tusclient.uploader.TusRequest')
+    @mock.patch('tusclient.uploader.uploader.TusRequest')
     def test_upload_chunk(self, request_mock):
         self.mock_pycurl(request_mock)
 
@@ -132,17 +110,17 @@ class UploaderTest(mixin.Mixin):
         self.uploader.upload_chunk()
         self.assertEqual(self.uploader.offset, request_length)
 
-    @mock.patch('tusclient.uploader.TusRequest')
+    @mock.patch('tusclient.uploader.uploader.TusRequest')
     def test_upload(self, request_mock):
         self.mock_pycurl(request_mock)
 
         self.uploader.upload()
         self.assertEqual(self.uploader.offset, self.uploader.file_size)
 
-    @mock.patch('tusclient.uploader.TusRequest')
+    @mock.patch('tusclient.uploader.uploader.TusRequest')
     def test_upload_retry(self, request_mock):
-        NUM_OF_RETRIES = 3
-        self.uploader.retries = NUM_OF_RETRIES
+        num_of_retries = 3
+        self.uploader.retries = num_of_retries
         self.uploader.retry_delay = 3
 
         request_mock = self.mock_pycurl(request_mock)
@@ -151,9 +129,9 @@ class UploaderTest(mixin.Mixin):
         self.assertEqual(self.uploader._retried, 0)
         with pytest.raises(exceptions.TusCommunicationError):
             self.uploader.upload_chunk()
-        self.assertEqual(self.uploader._retried, NUM_OF_RETRIES)
+        self.assertEqual(self.uploader._retried, num_of_retries)
     
-    @mock.patch('tusclient.uploader.TusRequest')
+    @mock.patch('tusclient.uploader.uploader.TusRequest')
     def test_upload_checksum(self, request_mock):
         self.mock_pycurl(request_mock)
         self.uploader.upload_checksum = True

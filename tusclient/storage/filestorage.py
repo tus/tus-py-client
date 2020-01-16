@@ -11,7 +11,7 @@ class FileStorage(interface.Storage):
         self._db = TinyDB(fp)
         self._urls = Query()
 
-    def get_item(self, key):
+    def get_item(self, key: str):
         """
         Return the tus url of a file, identified by the key specified.
 
@@ -22,7 +22,7 @@ class FileStorage(interface.Storage):
         result = self._db.search(self._urls.key == key)
         return result[0].get('url') if result else None
 
-    def set_item(self, key, url):
+    def set_item(self, key: str, url: str):
         """
         Store the url value under the unique key.
 
@@ -35,7 +35,7 @@ class FileStorage(interface.Storage):
         else:
             self._db.insert({'key': key, 'url': url})
 
-    def remove_item(self, key):
+    def remove_item(self, key: str):
         """
         Remove/Delete the url value under the unique key from storage.
         """
