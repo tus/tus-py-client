@@ -1,10 +1,9 @@
 import os
 from base64 import b64encode
+from unittest import mock
 
-import six
 import responses
 import pytest
-import mock
 
 from tusclient import exceptions
 from tusclient.storage import filestorage
@@ -13,7 +12,7 @@ from tests import mixin
 
 class UploaderTest(mixin.Mixin):
 
-    def mock_pycurl(self, request_mock):
+    def mock_request(self, request_mock):
         request_mock = request_mock.return_value
         request_mock.status_code = 204
         request_mock.response_headers = {
@@ -42,7 +41,7 @@ class UploaderTest(mixin.Mixin):
         self.uploader.metadata = {'foo': 'bar', 'red': 'blue'}
         encoded_metadata = ['foo' + ' ' + b64encode(b'bar').decode('ascii'),
                             'red' + ' ' + b64encode(b'blue').decode('ascii')]
-        six.assertCountEqual(self, self.uploader.encode_metadata(), encoded_metadata)
+        self.assertCountEqual(self.uploader.encode_metadata(), encoded_metadata)
 
         with pytest.raises(ValueError):
             self.uploader.metadata = {'foo, ': 'bar'}
@@ -103,7 +102,7 @@ class UploaderTest(mixin.Mixin):
 
     @mock.patch('tusclient.uploader.uploader.TusRequest')
     def test_upload_chunk(self, request_mock):
-        self.mock_pycurl(request_mock)
+        self.mock_request(request_mock)
 
         self.uploader.offset = 0
         request_length = self.uploader.request_length
@@ -112,7 +111,7 @@ class UploaderTest(mixin.Mixin):
 
     @mock.patch('tusclient.uploader.uploader.TusRequest')
     def test_upload(self, request_mock):
-        self.mock_pycurl(request_mock)
+        self.mock_request(request_mock)
 
         self.uploader.upload()
         self.assertEqual(self.uploader.offset, self.uploader.file_size)
@@ -123,7 +122,7 @@ class UploaderTest(mixin.Mixin):
         self.uploader.retries = num_of_retries
         self.uploader.retry_delay = 3
 
-        request_mock = self.mock_pycurl(request_mock)
+        request_mock = self.mock_request(request_mock)
         request_mock.status_code = 00
 
         self.assertEqual(self.uploader._retried, 0)
@@ -133,7 +132,7 @@ class UploaderTest(mixin.Mixin):
     
     @mock.patch('tusclient.uploader.uploader.TusRequest')
     def test_upload_checksum(self, request_mock):
-        self.mock_pycurl(request_mock)
+        self.mock_request(request_mock)
         self.uploader.upload_checksum = True
         self.uploader.upload()
         self.assertEqual(self.uploader.offset, self.uploader.file_size)

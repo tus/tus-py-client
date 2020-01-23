@@ -10,8 +10,8 @@ install_requires = [
 ]
 if os.environ.get('READTHEDOCS') != 'True':
     install_requires.append('certifi>=2018.1.18')
-tests_require = [
-    'responses>=0.5.1', 'mock>=2.0.0', 'coverage>=4.2', 'pytest>=3.0.3',
+TESTS_REQUIRE = [
+    'responses>=0.5.1', 'coverage>=4.2', 'pytest>=3.0.3',
     'pytest-cov>=2.3.1,<2.6'
 ]
 
@@ -28,9 +28,9 @@ setup(
     license='MIT',
     author='Ifedapo Olarewaju',
     install_requires=install_requires,
-    tests_require=tests_require,
+    tests_require=TESTS_REQUIRE,
     extras_require={
-        'test': tests_require,
+        'test': TESTS_REQUIRE,
         'dev': ['tox>=2.3.1', 'sphinx-autobuild==0.7.1', 'Sphinx==1.7.1']
     },
     author_email='ifedapoolarewaju@gmail.com',

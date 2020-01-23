@@ -103,7 +103,7 @@ class AsyncUploader(BaseUploader):
 
     async def _retry_or_cry(self, error):
         if self.retries > self._retried:
-            asyncio.sleep(self.retry_delay, loop=self.io_loop)
+            await asyncio.sleep(self.retry_delay, loop=self.io_loop)
 
             self._retried += 1
             try:

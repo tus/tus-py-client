@@ -3,7 +3,7 @@ import unittest
 import responses
 
 from tusclient import client
-from tusclient.uploader import Uploader
+from tusclient.uploader import Uploader, AsyncUploader
 
 
 class TusClientTest(unittest.TestCase):
@@ -33,3 +33,14 @@ class TusClientTest(unittest.TestCase):
 
         self.assertIsInstance(uploader, Uploader)
         self.assertEqual(uploader.client, self.client)
+
+    @responses.activate
+    def test_async_uploader(self):
+        url = 'http://master.tus.io/files/15acd89eabdf5738ffc'
+        responses.add(responses.HEAD, url,
+                      adding_headers={"upload-offset": "0"})
+
+        async_uploader = self.client.async_uploader('./LICENSE', url=url)
+
+        self.assertIsInstance(async_uploader, AsyncUploader)
+        self.assertEqual(async_uploader.client, self.client)
