@@ -20,7 +20,7 @@ class TusRequestTest(mixin.Mixin):
                       status=204)
 
             self.request.perform()
-            self.assertEqual(f'{size}', self.request.response_headers['upload-offset'])
+            self.assertEqual(str(size), self.request.response_headers['upload-offset'])
 
     def test_perform_checksum(self):
         self.uploader.upload_checksum = True
