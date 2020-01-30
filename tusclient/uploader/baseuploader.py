@@ -121,7 +121,7 @@ class BaseUploader:
         self.__init_url_and_offset(url)
         self.chunk_size = chunk_size
         self.retries = retries
-        self.request: Optional[TusRequest] = None
+        self.request = None
         self._retried = 0
         self.retry_delay = retry_delay
         self.upload_checksum = upload_checksum
