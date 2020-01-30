@@ -23,8 +23,8 @@ class TusClient:
     """
 
     def __init__(self, url: str, headers: Optional[Dict[str, str]] = None):
-        self.url: str = url
-        self.headers: Dict[str, str] = headers or {}
+        self.url = url
+        self.headers = headers or {}
 
     def set_headers(self, headers: Dict[str, str]):
         """

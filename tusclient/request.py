@@ -73,7 +73,7 @@ class TusRequest(BaseTusRequest):
         Perform actual request.
         """
         try:
-            chunk: bytes = self.file.read(self._content_length)
+            chunk = self.file.read(self._content_length)
             self.add_checksum(chunk)
             resp = requests.patch(self._url, data=chunk,
                                   headers=self._request_headers)
@@ -95,7 +95,7 @@ class AsyncTusRequest(BaseTusRequest):
         """
         Perform actual request.
         """
-        chunk: bytes = self.file.read(self._content_length)
+        chunk = self.file.read(self._content_length)
         self.add_checksum(chunk)
         try:
             async with aiohttp.ClientSession(loop=self.io_loop) as session:
