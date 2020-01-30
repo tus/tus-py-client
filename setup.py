@@ -11,7 +11,7 @@ install_requires = [
 if os.environ.get('READTHEDOCS') != 'True':
     install_requires.append('certifi>=2018.1.18')
 TESTS_REQUIRE = [
-    'responses>=0.5.1', 'coverage>=4.2', 'pytest>=3.0.3',
+    'responses>=0.5.1', 'aioresponses>=0.6.2', 'coverage>=4.2', 'pytest>=3.0.3',
     'pytest-cov>=2.3.1,<2.6'
 ]
 
