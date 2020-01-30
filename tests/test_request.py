@@ -14,7 +14,7 @@ class TusRequestTest(mixin.Mixin):
 
     def test_perform(self):
         with open('LICENSE', 'rb') as stream, responses.RequestsMock() as resps:
-            size: int = stream.tell()
+            size = stream.tell()
             resps.add(responses.PATCH, self.url,
                       adding_headers={'upload-offset': f'{size}'},
                       status=204)
