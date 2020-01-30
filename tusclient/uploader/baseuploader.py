@@ -3,31 +3,17 @@ import os
 import re
 from base64 import b64encode
 from sys import maxsize as MAXSIZE
-from functools import wraps
 import hashlib
-from urllib.parse import urljoin
 
 import requests
 
 from tusclient.exceptions import TusCommunicationError
-from tusclient.request import TusRequest
+from tusclient.request import TusRequest, catch_requests_error
 from tusclient.fingerprint import fingerprint, interface
 from tusclient.storage.interface import Storage
 
 if TYPE_CHECKING:
     from tusclient.client import TusClient
-
-
-# Catches requests exceptions and throws custom tuspy errors.
-def _catch_requests_error(func):
-    @wraps(func)
-    def _wrapper(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except requests.exceptions.RequestException as error:
-            raise TusCommunicationError(error)
-
-    return _wrapper
 
 
 class BaseUploader:
@@ -124,14 +110,15 @@ class BaseUploader:
 
         self.file_path = file_path
         self.file_stream = file_stream
-        self.stop_at = self.file_size
+        self.stop_at = self.get_file_size()
         self.client = client
         self.metadata = metadata or {}
         self.store_url = store_url
         self.url_storage = url_storage
         self.fingerprinter = fingerprinter or fingerprint.Fingerprint()
-        self.url = url or self.get_url()
-        self.offset = self.get_offset()
+        self.offset = 0
+        self.url = None
+        self.__init_url_and_offset(url)
         self.chunk_size = chunk_size
         self.retries = retries
         self.request: Optional[TusRequest] = None
@@ -141,16 +128,20 @@ class BaseUploader:
         self.__checksum_algorithm_name, self.__checksum_algorithm = \
             self.CHECKSUM_ALGORITHM_PAIR
 
-    # it is important to have this as a @property so it gets
-    # updated client headers.
-    @property
-    def headers(self):
+    def get_headers(self):
         """
         Return headers of the uploader instance. This would include the headers of the
         client instance.
         """
         client_headers = getattr(self.client, 'headers', {})
         return dict(self.DEFAULT_HEADERS, **client_headers)
+
+    def get_url_creation_headers(self):
+        """Return headers required to create upload url"""
+        headers = self.get_headers()
+        headers['upload-length'] = str(self.get_file_size())
+        headers['upload-metadata'] = ','.join(self.encode_metadata())
+        return headers
 
     @property
     def checksum_algorithm(self):
@@ -165,7 +156,7 @@ class BaseUploader:
         """
         return self.__checksum_algorithm_name
 
-    @_catch_requests_error
+    @catch_requests_error
     def get_offset(self):
         """
         Return offset from tus server.
@@ -173,7 +164,7 @@ class BaseUploader:
         This is different from the instance attribute 'offset' because this makes an
         http request to the tus server to retrieve the offset.
         """
-        resp = requests.head(self.url, headers=self.headers)
+        resp = requests.head(self.url, headers=self.get_headers())
         offset = resp.headers.get('upload-offset')
         if offset is None:
             msg = 'Attempt to retrieve offset fails with status {}'.format(
@@ -199,43 +190,31 @@ class BaseUploader:
                 key_str, b64encode(value_bytes).decode('ascii')))
         return encoded_list
 
-    def get_url(self):
+    def __init_url_and_offset(self, url: Optional[str] = None):
         """
         Return the tus upload url.
 
         If resumability is enabled, this would try to get the url from storage if available,
         otherwise it would request a new upload url from the tus server.
         """
+        if url:
+            self.set_url(url)
+
         if self.store_url and self.url_storage:
             key = self.fingerprinter.get_fingerprint(self.get_file_stream())
-            url = self.url_storage.get_item(key)
-            if not url:
-                url = self.create_url()
-                self.url_storage.set_item(key, url)
-            return url
-        else:
-            return self.create_url()
+            self.set_url(self.url_storage.get_item(key))
 
-    @_catch_requests_error
-    def create_url(self):
-        """
-        Return upload url.
+        if self.url:
+            self.offset = self.get_offset()
 
-        Makes request to tus server to create a new upload url for the required file upload.
-        """
-        headers = self.headers
-        headers['upload-length'] = str(self.file_size)
-        headers['upload-metadata'] = ','.join(self.encode_metadata())
-        resp = requests.post(self.client.url, headers=headers)
-        url = resp.headers.get("location")
-        if url is None:
-            msg = 'Attempt to retrieve create file url with status {}'.format(
-                resp.status_code)
-            raise TusCommunicationError(msg, resp.status_code, resp.content)
-        return urljoin(self.client.url, url)
+    def set_url(self, url: str):
+        """Set the upload URL"""
+        self.url = url
+        if self.store_url and self.url_storage:
+            key = self.fingerprinter.get_fingerprint(self.get_file_stream())
+            self.url_storage.set_item(key, url)
 
-    @property
-    def request_length(self):
+    def get_request_length(self):
         """
         Return length of next chunk upload.
         """
@@ -254,8 +233,7 @@ class BaseUploader:
         else:
             raise ValueError("invalid file {}".format(self.file_path))
 
-    @property
-    def file_size(self):
+    def get_file_size(self):
         """
         Return size of the file.
         """

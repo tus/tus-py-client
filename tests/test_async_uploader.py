@@ -31,7 +31,7 @@ class AsyncUploaderTest(unittest.TestCase):
             self.assertEqual(expected_content, body)
 
         response_headers = {
-            'upload-offset': str(self.async_uploader.offset + self.async_uploader.request_length)}
+            'upload-offset': str(self.async_uploader.offset + self.async_uploader.get_request_length())}
 
         return CallbackResult(status=204, headers=response_headers)
 
@@ -39,7 +39,7 @@ class AsyncUploaderTest(unittest.TestCase):
         with aioresponses() as resps:
             resps.patch(self.url, callback=self._validate_request)
 
-            request_length = self.async_uploader.request_length
+            request_length = self.async_uploader.get_request_length()
             self.loop.run_until_complete(self.async_uploader.upload_chunk())
             self.assertEqual(self.async_uploader.offset, request_length)
 
@@ -49,7 +49,7 @@ class AsyncUploaderTest(unittest.TestCase):
 
             self.loop.run_until_complete(self.async_uploader.upload())
             self.assertEqual(self.async_uploader.offset,
-                             self.async_uploader.file_size)
+                             self.async_uploader.get_file_size())
 
     def test_upload_retry(self):
         num_of_retries = 3

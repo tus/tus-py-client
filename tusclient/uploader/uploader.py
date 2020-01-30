@@ -1,18 +1,23 @@
 from typing import Optional
 import time
 import asyncio
+from urllib.parse import urljoin
+
+import requests
+import aiohttp
 
 from tusclient.uploader.baseuploader import BaseUploader
 
 from tusclient.exceptions import TusUploadFailed, TusCommunicationError
-from tusclient.request import TusRequest, AsyncTusRequest
+from tusclient.request import TusRequest, AsyncTusRequest, catch_requests_error
 
 
 def _verify_upload(request: TusRequest):
     if request.status_code == 204:
         return True
     else:
-        raise TusUploadFailed('', request.status_code, request.response_content)
+        raise TusUploadFailed('', request.status_code,
+                              request.response_content)
 
 
 class Uploader(BaseUploader):
@@ -28,7 +33,7 @@ class Uploader(BaseUploader):
                 Determines at what offset value the upload should stop. If not specified this
                 defaults to the file size.
         """
-        self.stop_at = stop_at or self.file_size
+        self.stop_at = stop_at or self.get_file_size()
 
         while self.offset < self.stop_at:
             self.upload_chunk()
@@ -38,8 +43,27 @@ class Uploader(BaseUploader):
         Upload chunk of file.
         """
         self._retried = 0
+        if not self.url:
+            self.set_url(self.create_url())
+            self.offset = 0
         self._do_request()
         self.offset = int(self.request.response_headers.get('upload-offset'))
+
+    @catch_requests_error
+    def create_url(self):
+        """
+        Return upload url.
+
+        Makes request to tus server to create a new upload url for the required file upload.
+        """
+        resp = requests.post(
+            self.client.url, headers=self.get_url_creation_headers())
+        url = resp.headers.get("location")
+        if url is None:
+            msg = 'Attempt to retrieve create file url with status {}'.format(
+                resp.status_code)
+            raise TusCommunicationError(msg, resp.status_code, resp.content)
+        return urljoin(self.client.url, url)
 
     def _do_request(self):
         self.request = TusRequest(self)
@@ -56,8 +80,8 @@ class Uploader(BaseUploader):
             self._retried += 1
             try:
                 self.offset = self.get_offset()
-            except TusCommunicationError as e:
-                self._retry_or_cry(e)
+            except TusCommunicationError as err:
+                self._retry_or_cry(err)
             else:
                 self._do_request()
         else:
@@ -81,7 +105,7 @@ class AsyncUploader(BaseUploader):
                 Determines at what offset value the upload should stop. If not specified this
                 defaults to the file size.
         """
-        self.stop_at = stop_at or self.file_size
+        self.stop_at = stop_at or self.get_file_size()
         while self.offset < self.stop_at:
             await self.upload_chunk()
 
@@ -90,8 +114,30 @@ class AsyncUploader(BaseUploader):
         Upload chunk of file.
         """
         self._retried = 0
+        if not self.url:
+            self.set_url(await self.create_url())
+            self.offset = 0
         await self._do_request()
         self.offset = int(self.request.response_headers.get('upload-offset'))
+
+    async def create_url(self):
+        """
+        Return upload url.
+
+        Makes request to tus server to create a new upload url for the required file upload.
+        """
+        try:
+            async with aiohttp.ClientSession(loop=self.io_loop) as session:
+                headers = self.get_url_creation_headers()
+                async with session.post(self.client.url, headers=headers) as resp:
+                    url = resp.headers.get("location")
+                    if url is None:
+                        msg = 'Attempt to retrieve create file url with status {}'.format(
+                            resp.status_code)
+                        raise TusCommunicationError(msg, resp.status, await resp.content.read())
+                    return urljoin(self.client.url, url)
+        except aiohttp.ClientError as error:
+            raise TusCommunicationError(error)
 
     async def _do_request(self):
         self.request = AsyncTusRequest(self)

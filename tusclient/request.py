@@ -1,11 +1,25 @@
 from typing import Optional
 import base64
 import asyncio
+from functools import wraps
 
 import requests
 import aiohttp
 
-from tusclient.exceptions import TusUploadFailed
+from tusclient.exceptions import TusUploadFailed, TusCommunicationError
+
+
+# Catches requests exceptions and throws custom tuspy errors.
+def catch_requests_error(func):
+    """Deocrator to catch requests exceptions"""
+    @wraps(func)
+    def _wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except requests.exceptions.RequestException as error:
+            raise TusCommunicationError(error)
+
+    return _wrapper
 
 
 class BaseTusRequest:
@@ -35,8 +49,8 @@ class BaseTusRequest:
             'upload-offset': str(uploader.offset),
             'Content-Type': 'application/offset+octet-stream'
         }
-        self._request_headers.update(uploader.headers)
-        self._content_length = uploader.request_length
+        self._request_headers.update(uploader.get_headers())
+        self._content_length = uploader.get_request_length()
         self._upload_checksum = uploader.upload_checksum
         self._checksum_algorithm = uploader.checksum_algorithm
         self._checksum_algorithm_name = uploader.checksum_algorithm_name
@@ -53,6 +67,7 @@ class BaseTusRequest:
 
 
 class TusRequest(BaseTusRequest):
+    """Class to handle async Tus upload requests"""
     def perform(self):
         """
         Perform actual request.
@@ -71,6 +86,7 @@ class TusRequest(BaseTusRequest):
 
 
 class AsyncTusRequest(BaseTusRequest):
+    """Class to handle async Tus upload requests"""
     def __init__(self, *args, io_loop: Optional[asyncio.AbstractEventLoop] = None, **kwargs):
         self.io_loop = io_loop
         super().__init__(*args, **kwargs)
