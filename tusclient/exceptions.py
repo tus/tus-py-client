@@ -30,4 +30,3 @@ class TusCommunicationError(Exception):
 
 class TusUploadFailed(TusCommunicationError):
     """Should be raised when an attempted upload fails"""
-    pass

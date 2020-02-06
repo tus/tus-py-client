@@ -6,12 +6,12 @@ import tusclient
 
 
 install_requires = [
-    'future>=0.16.0', 'requests>=2.18.4', 'six>=1.11.0', 'tinydb>=3.5.0'
+    'future>=0.16.0', 'requests>=2.18.4', 'six>=1.11.0', 'tinydb>=3.5.0', 'aiohttp>=3.6.2'
 ]
 if os.environ.get('READTHEDOCS') != 'True':
     install_requires.append('certifi>=2018.1.18')
-tests_require = [
-    'responses>=0.5.1', 'mock>=2.0.0', 'coverage>=4.2', 'pytest>=3.0.3',
+TESTS_REQUIRE = [
+    'responses>=0.5.1', 'aioresponses>=0.6.2', 'coverage>=4.2', 'pytest>=3.0.3',
     'pytest-cov>=2.3.1,<2.6'
 ]
 
@@ -28,9 +28,9 @@ setup(
     license='MIT',
     author='Ifedapo Olarewaju',
     install_requires=install_requires,
-    tests_require=tests_require,
+    tests_require=TESTS_REQUIRE,
     extras_require={
-        'test': tests_require,
+        'test': TESTS_REQUIRE,
         'dev': ['tox>=2.3.1', 'sphinx-autobuild==0.7.1', 'Sphinx==1.7.1']
     },
     author_email='ifedapoolarewaju@gmail.com',
@@ -38,7 +38,7 @@ setup(
     'A Python client for the tus resumable upload protocol ->  http://tus.io',
     long_description=(long_description),
     long_description_content_type='text/markdown',
-    packages=['tusclient', 'tusclient.fingerprint', 'tusclient.storage'],
+    packages=['tusclient', 'tusclient.fingerprint', 'tusclient.storage', 'tusclient.uploader'],
     include_package_data=True,
     platforms='any',
     classifiers=[

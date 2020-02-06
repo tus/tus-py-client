@@ -9,7 +9,7 @@ class Mixin(unittest.TestCase):
     @responses.activate
     def setUp(self):
         self.client = client.TusClient('http://master.tus.io/files/')
-        url = 'http://master.tus.io/files/15acd89eabdf5738ffc'
-        responses.add(responses.HEAD, url,
+        self.url = 'http://master.tus.io/files/15acd89eabdf5738ffc'
+        responses.add(responses.HEAD, self.url,
                       adding_headers={"upload-offset": "0"})
-        self.uploader = self.client.uploader('./LICENSE', url=url)
+        self.uploader = self.client.uploader('./LICENSE', url=self.url)

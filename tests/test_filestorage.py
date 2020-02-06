@@ -8,7 +8,7 @@ class FileStorageTest(unittest.TestCase):
     def setUp(self):
         self.storage_path = 'storage.json'
         self.storage = filestorage.FileStorage(self.storage_path)
-    
+
     def tearDown(self):
         os.remove(self.storage_path)
 
