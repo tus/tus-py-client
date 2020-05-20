@@ -4,6 +4,7 @@ using the hashlib to generate an md5 hash based on the file content
 """
 from typing import IO
 import hashlib
+import os
 
 from . import interface
 
@@ -22,10 +23,11 @@ class Fingerprint(interface.Fingerprint):
         hasher = hashlib.md5()
         # we encode the content to avoid python 3 uncicode errors
         buf = self._encode_data(fs.read(self.BLOCK_SIZE))
-        while buf:
-            hasher.update(buf)
-            buf = fs.read(self.BLOCK_SIZE)
-        return 'md5:' + hasher.hexdigest()
+        hasher.update(buf)
+        # add in the file size to minimize chances of collision
+        fs.seek(0, os.SEEK_END)
+        file_size = fs.tell()
+        return 'size:{}--md5:{}'.format(file_size, hasher.hexdigest())
 
     def _encode_data(self, data):
         try:
