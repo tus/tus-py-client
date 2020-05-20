@@ -22,9 +22,7 @@ class Fingerprint(interface.Fingerprint):
         hasher = hashlib.md5()
         # we encode the content to avoid python 3 uncicode errors
         buf = self._encode_data(fs.read(self.BLOCK_SIZE))
-        while buf:
-            hasher.update(buf)
-            buf = fs.read(self.BLOCK_SIZE)
+        hasher.update(buf)
         return 'md5:' + hasher.hexdigest()
 
     def _encode_data(self, data):
