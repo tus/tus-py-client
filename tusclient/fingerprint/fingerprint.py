@@ -27,7 +27,7 @@ class Fingerprint(interface.Fingerprint):
         # add in the file size to minimize chances of collision
         fs.seek(0, os.SEEK_END)
         file_size = fs.tell()
-        hasher.update(str(file_size))
+        hasher.update(str(file_size).encode())
         return 'md5:' + hasher.hexdigest()
 
     def _encode_data(self, data):
