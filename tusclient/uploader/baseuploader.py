@@ -65,8 +65,6 @@ class BaseUploader:
             a unique fingerprint for the uploaded file. This is used for url storage when resumability is enabled.
             if store_url is set to true, the default fingerprint module (<tusclient.fingerprint.fingerprint.Fingerprint>)
             would be used. But you can set your own custom fingerprint module by passing it to the constructor.
-        - log_func (<function>):
-            A logging function to be passed diagnostic messages during file uploads
         - upload_checksum (bool):
             Whether or not to supply the Upload-Checksum header along with each
             chunk. Defaults to False.
@@ -83,7 +81,6 @@ class BaseUploader:
         - store_url (Optional[bool])
         - url_storage (Optinal [<tusclient.storage.interface.Storage>])
         - fingerprinter (Optional [<tusclient.fingerprint.interface.Fingerprint>])
-        - log_func (Optional [<function>])
         - upload_checksum (Optional[bool])
     """
     DEFAULT_HEADERS = {"Tus-Resumable": "1.0.0"}
