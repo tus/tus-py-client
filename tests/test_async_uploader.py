@@ -12,8 +12,8 @@ from tusclient import exceptions, client
 class AsyncUploaderTest(unittest.TestCase):
     @responses.activate
     def setUp(self):
-        self.client = client.TusClient('http://master.tus.io/files/')
-        self.url = 'http://master.tus.io/files/15acd89eabdf5738ffc'
+        self.client = client.TusClient('http://tusd.tusdemo.net/files/')
+        self.url = 'http://tusd.tusdemo.net/files/15acd89eabdf5738ffc'
         responses.add(responses.HEAD, self.url,
                       adding_headers={"upload-offset": "0"})
         self.loop = asyncio.new_event_loop()

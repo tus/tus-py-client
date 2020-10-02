@@ -49,7 +49,7 @@ Now you are ready to use the api.
 
     # Set Authorization headers if it is required
     # by the tus server.
-    my_client = client.TusClient('http://master.tus.io/files/',
+    my_client = client.TusClient('http://tusd.tusdemo.net/files/',
                                   headers={'Authorization': 'Basic xxyyZZAAbbCC='})
 
     # set more headers
@@ -84,7 +84,7 @@ uploaders can also be used standalone.
     from tusclient.uploader import Uploader
 
     my_uploader = Uploader('path/to/file.ext',
-                            url='http://master.tus.io/files/abcdef123456',
+                            url='http://tusd.tusdemo.net/files/abcdef123456',
                             chunk_size=200)
 
 URL Storage

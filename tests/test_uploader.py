@@ -50,25 +50,25 @@ class UploaderTest(mixin.Mixin):
     @responses.activate
     def test_create_url_absolute(self):
         responses.add(responses.POST, self.client.url,
-                      adding_headers={"location": 'http://master.tus.io/files/foo'})
-        self.assertEqual(self.uploader.create_url(), 'http://master.tus.io/files/foo')
+                      adding_headers={"location": 'http://tusd.tusdemo.net/files/foo'})
+        self.assertEqual(self.uploader.create_url(), 'http://tusd.tusdemo.net/files/foo')
 
     @responses.activate
     def test_create_url_relative(self):
         responses.add(responses.POST, self.client.url,
                       adding_headers={"location": "/files/foo"})
-        self.assertEqual(self.uploader.create_url(), 'http://master.tus.io/files/foo')
+        self.assertEqual(self.uploader.create_url(), 'http://tusd.tusdemo.net/files/foo')
 
     @responses.activate 
     def test_url(self):
         # test for stored urls
-        responses.add(responses.HEAD, 'http://master.tus.io/files/foo_bar',
+        responses.add(responses.HEAD, 'http://tusd.tusdemo.net/files/foo_bar',
                       adding_headers={"upload-offset": "10"})
         storage_path = '{}/storage_file'.format(os.path.dirname(os.path.abspath(__file__)))
         resumable_uploader = self.client.uploader(
             file_path='./LICENSE', store_url=True, url_storage=filestorage.FileStorage(storage_path)
         )
-        self.assertEqual(resumable_uploader.url, 'http://master.tus.io/files/foo_bar')
+        self.assertEqual(resumable_uploader.url, 'http://tusd.tusdemo.net/files/foo_bar')
         self.assertEqual(resumable_uploader.offset, 10)
 
     def test_request_length(self):

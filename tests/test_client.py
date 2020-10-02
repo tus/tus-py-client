@@ -8,11 +8,11 @@ from tusclient.uploader import Uploader, AsyncUploader
 
 class TusClientTest(unittest.TestCase):
     def setUp(self):
-        self.client = client.TusClient('http://master.tus.io/files/',
+        self.client = client.TusClient('http://tusd.tusdemo.net/files/',
                                        headers={'foo': 'bar'})
 
     def test_instance_attributes(self):
-        self.assertEqual(self.client.url, 'http://master.tus.io/files/')
+        self.assertEqual(self.client.url, 'http://tusd.tusdemo.net/files/')
         self.assertEqual(self.client.headers, {'foo': 'bar'})
 
     def test_set_headers(self):
@@ -25,7 +25,7 @@ class TusClientTest(unittest.TestCase):
 
     @responses.activate
     def test_uploader(self):
-        url = 'http://master.tus.io/files/15acd89eabdf5738ffc'
+        url = 'http://tusd.tusdemo.net/files/15acd89eabdf5738ffc'
         responses.add(responses.HEAD, url,
                       adding_headers={"upload-offset": "0"})
 
@@ -36,7 +36,7 @@ class TusClientTest(unittest.TestCase):
 
     @responses.activate
     def test_async_uploader(self):
-        url = 'http://master.tus.io/files/15acd89eabdf5738ffc'
+        url = 'http://tusd.tusdemo.net/files/15acd89eabdf5738ffc'
         responses.add(responses.HEAD, url,
                       adding_headers={"upload-offset": "0"})
 
