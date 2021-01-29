@@ -11,6 +11,7 @@ from tusclient.uploader.baseuploader import BaseUploader
 from tusclient.exceptions import TusUploadFailed, TusCommunicationError
 from tusclient.request import TusRequest, AsyncTusRequest, catch_requests_error
 
+from tqdm import tqdm
 
 def _verify_upload(request: TusRequest):
     if request.status_code == 204:
@@ -21,7 +22,7 @@ def _verify_upload(request: TusRequest):
 
 
 class Uploader(BaseUploader):
-    def upload(self, stop_at: Optional[int] = None):
+    def upload(self, stop_at: Optional[int] = None, show_progress = True):
         """
         Perform file upload.
 
@@ -32,11 +33,29 @@ class Uploader(BaseUploader):
             - stop_at (Optional[int]):
                 Determines at what offset value the upload should stop. If not specified this
                 defaults to the file size.
+            - show_progress (False)
+                Display current upload percentage while uploading
         """
         self.stop_at = stop_at or self.get_file_size()
 
+
+        if show_progress:
+            progress = tqdm (
+                total=self.stop_at,
+                unit="file",
+                bar_format='{l_bar}{bar} | {n_fmt}/{total_fmt} Bytes [{elapsed}<{remaining}'
+            )
+
+
+        last_progress_offset = 0
         while self.offset < self.stop_at:
             self.upload_chunk()
+            if show_progress:
+                progress.update(self.offset - last_progress_offset)
+                last_progress_offset = self.offset
+
+        if show_progress:
+            progress.close()
 
     def upload_chunk(self):
         """

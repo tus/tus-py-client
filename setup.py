@@ -6,7 +6,7 @@ import tusclient
 
 
 install_requires = [
-    'future>=0.16.0', 'requests>=2.18.4', 'six>=1.11.0', 'tinydb>=3.5.0', 'aiohttp>=3.6.2'
+    'future>=0.16.0', 'requests>=2.18.4', 'six>=1.11.0', 'tinydb>=3.5.0', 'aiohttp>=3.6.2', 'tqdm>=4.56.0'
 ]
 if os.environ.get('READTHEDOCS') != 'True':
     install_requires.append('certifi>=2018.1.18')
