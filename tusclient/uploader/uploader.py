@@ -13,7 +13,7 @@ from tusclient.request import TusRequest, AsyncTusRequest, catch_requests_error
 
 
 def _verify_upload(request: TusRequest):
-    if request.status_code == 204:
+    if 200 <= request.status_code < 300:
         return True
     else:
         raise TusUploadFailed('', request.status_code,
