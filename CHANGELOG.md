@@ -1,3 +1,7 @@
+### 0.2.5/ 2021-04-06 ###
+
+* Fix proxy issue by using requests library everywhere (thank you @adrpar)
+
 ### 0.2.4/ 2019-14-01 ###
 
 * Add support for tus upload-checksum header
