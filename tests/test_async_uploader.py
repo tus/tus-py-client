@@ -20,12 +20,15 @@ class AsyncUploaderTest(unittest.TestCase):
         self.async_uploader = self.client.async_uploader(
             './LICENSE', url=self.url, io_loop=self.loop)
 
-    def _validate_request(self, url, **kwargs):
+    async def _validate_request(self, url, **kwargs):
         self.assertEqual(self.url, str(url))
         req_headers = kwargs['headers']
         self.assertEqual(req_headers.get('Tus-Resumable'), '1.0.0')
 
-        body = kwargs['data']
+        generator = kwargs['data']
+        body = b''
+        async for chunk in generator:
+            body += chunk
         with open('./LICENSE', 'rb') as stream:
             expected_content = stream.read()
             self.assertEqual(expected_content, body)
