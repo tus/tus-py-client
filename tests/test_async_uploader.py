@@ -18,7 +18,7 @@ class AsyncUploaderTest(unittest.TestCase):
                       adding_headers={"upload-offset": "0"})
         self.loop = asyncio.new_event_loop()
         self.async_uploader = self.client.async_uploader(
-            './LICENSE', url=self.url, io_loop=self.loop)
+            './LICENSE', url=self.url)
 
     def _validate_request(self, url, **kwargs):
         self.assertEqual(self.url, str(url))
