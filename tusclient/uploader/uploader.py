@@ -132,7 +132,7 @@ class AsyncUploader(BaseUploader):
                     url = resp.headers.get("location")
                     if url is None:
                         msg = 'Attempt to retrieve create file url with status {}'.format(
-                            resp.status_code)
+                            resp.status)
                         raise TusCommunicationError(msg, resp.status, await resp.content.read())
                     return urljoin(self.client.url, url)
         except aiohttp.ClientError as error:
