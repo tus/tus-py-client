@@ -1,4 +1,4 @@
-# tus-py-client ![Build Status](https://github.com/tus/tus-py-client/actions/workflows/CI.yml/badge.svg)
+# tus-py-client [![Build Status](https://github.com/tus/tus-py-client/actions/workflows/CI.yml/badge.svg)](https://github.com/tus/tus-py-client/actions/workflows/CI.yml)
 
 > **tus** is a protocol based on HTTP for *resumable file uploads*. Resumable
 > means that an upload can be interrupted at any moment and can be resumed without
