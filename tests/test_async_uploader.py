@@ -20,6 +20,9 @@ class AsyncUploaderTest(unittest.TestCase):
         self.async_uploader = self.client.async_uploader(
             './LICENSE', url=self.url)
 
+    def tearDown(self):
+        self.loop.stop()
+
     def _validate_request(self, url, **kwargs):
         self.assertEqual(self.url, str(url))
         req_headers = kwargs['headers']

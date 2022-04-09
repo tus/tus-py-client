@@ -87,7 +87,8 @@ class UploaderTest(mixin.Mixin):
         with open('./AUTHORS', 'rb') as fs:
             self.uploader.file_stream = None
             self.uploader.file_path = './AUTHORS'
-            self.assertEqual(fs.read(), self.uploader.get_file_stream().read())
+            with self.uploader.get_file_stream() as stream:
+                self.assertEqual(fs.read(), stream.read())
 
     def test_file_size(self):
         self.assertEqual(self.uploader.get_file_size(), os.path.getsize(self.uploader.file_path))

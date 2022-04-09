@@ -40,3 +40,9 @@ class FileStorage(interface.Storage):
         Remove/Delete the url value under the unique key from storage.
         """
         self._db.remove(self._urls.key==key)
+
+    def close(self):
+        """
+        Close the file storage and release all opened files.
+        """
+        self._db.close()

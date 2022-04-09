@@ -198,17 +198,21 @@ class BaseUploader:
             self.set_url(url)
 
         if self.store_url and self.url_storage:
-            key = self.fingerprinter.get_fingerprint(self.get_file_stream())
+            key = self._get_fingerprint()
             self.set_url(self.url_storage.get_item(key))
 
         if self.url:
             self.offset = self.get_offset()
 
+    def _get_fingerprint(self):
+        with self.get_file_stream() as stream:
+            return self.fingerprinter.get_fingerprint(stream)
+
     def set_url(self, url: str):
         """Set the upload URL"""
         self.url = url
         if self.store_url and self.url_storage:
-            key = self.fingerprinter.get_fingerprint(self.get_file_stream())
+            key = self._get_fingerprint()
             self.url_storage.set_item(key, url)
 
     def get_request_length(self):
@@ -234,6 +238,6 @@ class BaseUploader:
         """
         Return size of the file.
         """
-        stream = self.get_file_stream()
-        stream.seek(0, os.SEEK_END)
-        return stream.tell()
+        with self.get_file_stream() as stream:
+            stream.seek(0, os.SEEK_END)
+            return stream.tell()

@@ -10,6 +10,7 @@ class FileStorageTest(unittest.TestCase):
         self.storage = filestorage.FileStorage(self.storage_path)
 
     def tearDown(self):
+        self.storage.close()
         os.remove(self.storage_path)
 
     def test_set_get_remove_item(self):
