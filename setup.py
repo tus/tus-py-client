@@ -23,7 +23,7 @@ setup(
             'aioresponses>=0.6.2',
             'coverage>=4.2',
             'pytest>=3.0.3',
-            'pytest-cov>=2.3.1,<2.6'
+            'pytest-cov>=2.3.1,<3.1'
         ],
         'dev': [
             'tox>=2.3.1',
