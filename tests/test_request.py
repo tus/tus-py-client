@@ -42,3 +42,20 @@ class TusRequestTest(mixin.Mixin):
             resps.add_callback(responses.PATCH, self.url, callback=validate_headers)
             tus_request.perform()
             self.assertEqual(sent_checksum, expected_checksum)
+
+    def test_verify_tls_cert(self):
+        self.uploader.verify_tls_cert = False
+        tus_request = request.TusRequest(self.uploader)
+
+        with responses.RequestsMock() as resps:
+            verify = None
+
+            def validate_verify(req):
+                nonlocal verify
+                verify = req.req_kwargs['verify']
+                return (204, {}, None)
+
+            resps.add_callback(responses.PATCH, self.url, callback=validate_verify)
+            tus_request.perform()
+            self.assertEqual(verify, False)
+

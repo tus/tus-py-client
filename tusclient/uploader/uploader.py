@@ -57,7 +57,8 @@ class Uploader(BaseUploader):
         Makes request to tus server to create a new upload url for the required file upload.
         """
         resp = requests.post(
-            self.client.url, headers=self.get_url_creation_headers())
+            self.client.url, headers=self.get_url_creation_headers(),
+            verify=self.verify_tls_cert)
         url = resp.headers.get("location")
         if url is None:
             msg = 'Attempt to retrieve create file url with status {}'.format(
@@ -128,7 +129,9 @@ class AsyncUploader(BaseUploader):
         try:
             async with aiohttp.ClientSession() as session:
                 headers = self.get_url_creation_headers()
-                async with session.post(self.client.url, headers=headers) as resp:
+                ssl = None if self.verify_tls_cert else False
+                async with session.post(
+                        self.client.url, headers=headers, ssl=ssl) as resp:
                     url = resp.headers.get("location")
                     if url is None:
                         msg = 'Attempt to retrieve create file url with status {}'.format(

@@ -42,6 +42,7 @@ class BaseTusRequest:
         self.response_headers = {}
         self.status_code = None
         self.response_content = None
+        self.verify_tls_cert = bool(uploader.verify_tls_cert)
         self.file = uploader.get_file_stream()
         self.file.seek(uploader.offset)
 
@@ -76,7 +77,8 @@ class TusRequest(BaseTusRequest):
             chunk = self.file.read(self._content_length)
             self.add_checksum(chunk)
             resp = requests.patch(self._url, data=chunk,
-                                  headers=self._request_headers)
+                                  headers=self._request_headers,
+                                  verify=self.verify_tls_cert)
             self.status_code = resp.status_code
             self.response_content = resp.content
             self.response_headers = {
@@ -99,7 +101,10 @@ class AsyncTusRequest(BaseTusRequest):
         self.add_checksum(chunk)
         try:
             async with aiohttp.ClientSession(loop=self.io_loop) as session:
-                async with session.patch(self._url, data=chunk, headers=self._request_headers) as resp:
+                ssl = None if self.verify_tls_cert else False
+                async with session.patch(
+                        self._url, data=chunk, headers=self._request_headers,
+                        ssl=ssl) as resp:
                     self.status_code = resp.status
                     self.response_headers = {
                         k.lower(): v for k, v in resp.headers.items()}
