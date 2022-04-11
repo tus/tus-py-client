@@ -43,7 +43,7 @@ class BaseUploader:
             A dictionary containing the upload-metadata. This would be encoded internally
             by the method `encode_metadata` to conform with the tus protocol.
         - metadata_encoding (str):
-            Encoding used for each upload-metadata value. This defaults to 'latin-1'.
+            Encoding used for each upload-metadata value. This defaults to 'utf-8'.
         - offset (int):
             The offset value of the upload indicates the current position of the file upload.
         - stop_at (int):
@@ -93,7 +93,7 @@ class BaseUploader:
     def __init__(self, file_path: Optional[str] = None, file_stream: Optional[IO] = None,
                  url: Optional[str] = None, client: Optional['TusClient'] = None,
                  chunk_size: int = MAXSIZE, metadata: Optional[Dict] = None,
-                 metadata_encoding: Optional[str] = 'latin-1',
+                 metadata_encoding: Optional[str] = 'utf-8',
                  retries: int = 0, retry_delay: int = 30,
                  store_url=False, url_storage: Optional[Storage] = None,
                  fingerprinter: Optional[interface.Fingerprint] = None,
