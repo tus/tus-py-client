@@ -47,6 +47,15 @@ class UploaderTest(mixin.Mixin):
             self.uploader.metadata = {'foo, ': 'bar'}
             self.uploader.encode_metadata()
 
+    def test_encode_metadata_utf8(self):
+        self.uploader.metadata = {'foo': 'bär', 'red': '🔵'}
+        self.uploader.metadata_encoding = 'utf-8'
+        encoded_metadata = [
+            'foo ' + b64encode('bär'.encode('utf-8')).decode('ascii'),
+            'red ' + b64encode('🔵'.encode('utf-8')).decode('ascii')
+        ]
+        self.assertCountEqual(self.uploader.encode_metadata(), encoded_metadata)
+
     @responses.activate
     def test_create_url_absolute(self):
         responses.add(responses.POST, self.client.url,

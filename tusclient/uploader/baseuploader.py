@@ -42,6 +42,8 @@ class BaseUploader:
         - metadata (dict):
             A dictionary containing the upload-metadata. This would be encoded internally
             by the method `encode_metadata` to conform with the tus protocol.
+        - metadata_encoding (str):
+            Encoding used for each upload-metadata value. This defaults to 'utf-8'.
         - offset (int):
             The offset value of the upload indicates the current position of the file upload.
         - stop_at (int):
@@ -79,6 +81,7 @@ class BaseUploader:
         - client (Optional [<tusclient.client.TusClient>])
         - chunk_size (Optional[int])
         - metadata (Optional[dict])
+        - metadata_encoding (Optional[str])
         - retries (Optional[int])
         - retry_delay (Optional[int])
         - verify_tls_cert (Optional[bool])
@@ -94,6 +97,7 @@ class BaseUploader:
     def __init__(self, file_path: Optional[str] = None, file_stream: Optional[IO] = None,
                  url: Optional[str] = None, client: Optional['TusClient'] = None,
                  chunk_size: int = MAXSIZE, metadata: Optional[Dict] = None,
+                 metadata_encoding: Optional[str] = 'utf-8',
                  retries: int = 0, retry_delay: int = 30,
                  verify_tls_cert: bool = True, store_url=False,
                  url_storage: Optional[Storage] = None,
@@ -115,6 +119,7 @@ class BaseUploader:
         self.stop_at = self.get_file_size()
         self.client = client
         self.metadata = metadata or {}
+        self.metadata_encoding = metadata_encoding
         self.store_url = store_url
         self.url_storage = url_storage
         self.fingerprinter = fingerprinter or fingerprint.Fingerprint()
@@ -188,7 +193,7 @@ class BaseUploader:
                 msg = 'Upload-metadata key "{}" cannot be empty nor contain spaces or commas.'
                 raise ValueError(msg.format(key_str))
 
-            value_bytes = value.encode('latin-1')
+            value_bytes = value.encode(self.metadata_encoding)
             encoded_list.append('{} {}'.format(
                 key_str, b64encode(value_bytes).decode('ascii')))
         return encoded_list
