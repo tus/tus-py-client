@@ -54,6 +54,9 @@ class BaseUploader:
         - retry_delay (int):
             How long (in seconds) the uploader should wait before retrying a failed upload attempt.
             If not specified, it defaults to 30.
+        - verify_tls_cert (bool):
+            Whether or not to verify the TLS certificate of the server.
+            If not specified, it defaults to True.
         - store_url (bool):
             Determines whether or not url should be stored, and uploads should be resumed.
         - url_storage (<tusclient.storage.interface.Storage>):
@@ -78,6 +81,7 @@ class BaseUploader:
         - metadata (Optional[dict])
         - retries (Optional[int])
         - retry_delay (Optional[int])
+        - verify_tls_cert (Optional[bool])
         - store_url (Optional[bool])
         - url_storage (Optinal [<tusclient.storage.interface.Storage>])
         - fingerprinter (Optional [<tusclient.fingerprint.interface.Fingerprint>])
@@ -91,7 +95,8 @@ class BaseUploader:
                  url: Optional[str] = None, client: Optional['TusClient'] = None,
                  chunk_size: int = MAXSIZE, metadata: Optional[Dict] = None,
                  retries: int = 0, retry_delay: int = 30,
-                 store_url=False, url_storage: Optional[Storage] = None,
+                 verify_tls_cert: bool = True, store_url=False,
+                 url_storage: Optional[Storage] = None,
                  fingerprinter: Optional[interface.Fingerprint] = None,
                  upload_checksum=False):
         if file_path is None and file_stream is None:
@@ -117,6 +122,7 @@ class BaseUploader:
         self.url = None
         self.__init_url_and_offset(url)
         self.chunk_size = chunk_size
+        self.verify_tls_cert = verify_tls_cert
         self.retries = retries
         self.request = None
         self._retried = 0
