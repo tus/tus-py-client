@@ -249,6 +249,6 @@ class BaseUploader:
         """
         Return size of the file.
         """
-        with self.get_file_stream() as stream:
-            stream.seek(0, os.SEEK_END)
-            return stream.tell()
+        stream = self.get_file_stream() 
+        stream.seek(0, os.SEEK_END)
+        return stream.tell()
