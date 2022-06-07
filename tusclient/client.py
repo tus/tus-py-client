@@ -43,7 +43,7 @@ class TusClient:
         """
         Return uploader instance pointing at current client instance.
 
-        Return uplaoder instance with which you can control the upload of a specific
+        Return uploader instance with which you can control the upload of a specific
         file. The current instance of the tus client is passed to the uploader on creation.
 
         :Args:
