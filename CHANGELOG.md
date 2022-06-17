@@ -1,3 +1,12 @@
+### 1.0.0 / 2022-06-17 ###
+
+* Drop support for Python 2 (https://github.com/tus/tus-py-client/pull/35)
+* Add support for asyncIO using AsyncUploader class (https://github.com/tus/tus-py-client/pull/35)
+* Use only first block of the file for a finger print (https://github.com/tus/tus-py-client/pull/37)
+* Allow all 2XX status code for an upload response (https://github.com/tus/tus-py-client/pull/44)
+
+### 0.2.5 / 2020-06-5 ###
+
 ### 0.2.4/ 2019-14-01 ###
 
 * Add support for tus upload-checksum header
