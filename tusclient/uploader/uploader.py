@@ -35,6 +35,13 @@ class Uploader(BaseUploader):
         """
         self.stop_at = stop_at or self.get_file_size()
 
+        if not self.url:
+            # Ensure the POST request is performed even for empty files.
+            # This ensures even empty files can be uploaded; in this case
+            # only the POST request needs to be performed.
+            self.set_url(self.create_url())
+            self.offset = 0
+
         while self.offset < self.stop_at:
             self.upload_chunk()
 
@@ -43,9 +50,7 @@ class Uploader(BaseUploader):
         Upload chunk of file.
         """
         self._retried = 0
-        if not self.url:
-            self.set_url(self.create_url())
-            self.offset = 0
+
         self._do_request()
         self.offset = int(self.request.response_headers.get('upload-offset'))
 
@@ -106,6 +111,11 @@ class AsyncUploader(BaseUploader):
                 defaults to the file size.
         """
         self.stop_at = stop_at or self.get_file_size()
+
+        if not self.url:
+            self.set_url(await self.create_url())
+            self.offset = 0
+
         while self.offset < self.stop_at:
             await self.upload_chunk()
 
@@ -114,9 +124,7 @@ class AsyncUploader(BaseUploader):
         Upload chunk of file.
         """
         self._retried = 0
-        if not self.url:
-            self.set_url(await self.create_url())
-            self.offset = 0
+
         await self._do_request()
         self.offset = int(self.request.response_headers.get('upload-offset'))
 
