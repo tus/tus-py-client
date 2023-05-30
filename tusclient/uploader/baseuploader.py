@@ -114,6 +114,7 @@ class BaseUploader:
             raise ValueError(
                 "Please specify a storage instance to enable resumablility.")
 
+        self.verify_tls_cert = verify_tls_cert
         self.file_path = file_path
         self.file_stream = file_stream
         self.stop_at = self.get_file_size()
@@ -127,7 +128,6 @@ class BaseUploader:
         self.url = None
         self.__init_url_and_offset(url)
         self.chunk_size = chunk_size
-        self.verify_tls_cert = verify_tls_cert
         self.retries = retries
         self.request = None
         self._retried = 0
@@ -172,7 +172,7 @@ class BaseUploader:
         This is different from the instance attribute 'offset' because this makes an
         http request to the tus server to retrieve the offset.
         """
-        resp = requests.head(self.url, headers=self.get_headers())
+        resp = requests.head(self.url, headers=self.get_headers(), verify=self.verify_tls_cert)
         offset = resp.headers.get('upload-offset')
         if offset is None:
             msg = 'Attempt to retrieve offset fails with status {}'.format(
