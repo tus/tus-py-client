@@ -46,4 +46,6 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Internet :: File Transfer Protocol (FTP)',
         'Topic :: Communications :: File Sharing',
-    ])
+    ],
+    python_requires=">=3.5.3",
+)
