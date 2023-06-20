@@ -1,12 +1,12 @@
 # tus-py-client [![Build Status](https://github.com/tus/tus-py-client/actions/workflows/CI.yml/badge.svg)](https://github.com/tus/tus-py-client/actions/workflows/CI.yml)
 
-> **tus** is a protocol based on HTTP for *resumable file uploads*. Resumable
+> **tus** is a protocol based on HTTP for _resumable file uploads_. Resumable
 > means that an upload can be interrupted at any moment and can be resumed without
 > re-uploading the previous data again. An interruption may happen willingly, if
 > the user wants to pause, or by accident in case of a network issue or server
 > outage.
 
-**tus-py-client** is a Python client for uploading files using the *tus* protocol to any remote server supporting it.
+**tus-py-client** is a Python client for uploading files using the _tus_ protocol to any remote server supporting it.
 
 ## Documentation
 
@@ -20,7 +20,7 @@ pip install tuspy
 
 Now you are ready to use the api.
 
-``` python
+```python
 from tusclient import client
 
 # Set Authorization headers if it is required
@@ -55,13 +55,55 @@ uploader.upload(stop_at=1000)
 
 If the upload url is known and the client headers are not required, uploaders can also be used standalone.
 
-``` python
+```python
 from tusclient.uploader import Uploader
 
 my_uploader = Uploader('path/to/file.ext',
                        url='http://tusd.tusdemo.net/files/abcdef123456',
                        chunk_size=200)
 ```
+
+## Development
+
+If you want to work on tus-py-client internally, follow these few steps:
+
+1. Setup virtual environment and install dependencies
+
+   ```bash
+   python -m venv env/
+   source env/bin/activate
+   pip install -e .[test]
+   ```
+
+2. Running tests
+
+   ```bash
+   pytest
+   ```
+
+3. Releasing a new version (see https://realpython.com/pypi-publish-python-package/)
+
+   ```bash
+   # Update version in tusclient/__init__.py
+   vim tusclient/__init__.py
+
+   # Update changelogs
+   vim CHANGELOG.md
+
+   pytest
+
+   # Commit and tag
+   git commit -m 'v1.2.3'
+   git tag v1.2.3
+
+   # Build and release
+   pip install build twine
+   python -m build
+   twine check dist/*
+   twine upload dist/*
+
+   # Then: make release on GitHub
+   ```
 
 ## License
 
