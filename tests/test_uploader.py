@@ -1,4 +1,5 @@
 import os
+import io
 from base64 import b64encode
 from unittest import mock
 
@@ -136,6 +137,31 @@ class UploaderTest(mixin.Mixin):
         with pytest.raises(exceptions.TusCommunicationError):
             self.uploader.upload_chunk()
         self.assertEqual(self.uploader._retried, num_of_retries)
+
+    @responses.activate
+    def test_upload_empty(self):
+        responses.add(
+            responses.POST, self.client.url,
+            adding_headers={
+                "upload-offset": "0",
+                "location": f"{self.client.url}this-is-not-used"
+            }
+        )
+        responses.add(
+            responses.PATCH,
+            f"{self.client.url}this-is-not-used",
+            body=ValueError("PATCH request not allowed for empty file")
+        )
+
+        # Upload an empty file
+        uploader = self.client.uploader(
+            file_stream=io.BytesIO(b"")
+        )
+        uploader.upload()
+
+        # Upload URL being set means the POST request was sent and the empty
+        # file was uploaded without a single PATCH request.
+        self.assertTrue(uploader.url)
     
     @mock.patch('tusclient.uploader.uploader.TusRequest')
     def test_upload_checksum(self, request_mock):

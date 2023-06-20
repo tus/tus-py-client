@@ -1,3 +1,4 @@
+import io
 import unittest
 from unittest import mock
 import asyncio
@@ -53,6 +54,32 @@ class AsyncUploaderTest(unittest.TestCase):
             self.loop.run_until_complete(self.async_uploader.upload())
             self.assertEqual(self.async_uploader.offset,
                              self.async_uploader.get_file_size())
+
+    def test_upload_empty(self):
+        with aioresponses() as resps:
+            resps.post(
+                self.client.url, status=200,
+                headers={
+                    "upload-offset": "0",
+                    "location": f"{self.client.url}this-is-not-used"
+                }
+            )
+            resps.patch(
+                f"{self.client.url}this-is-not-used",
+                exception=ValueError(
+                    "PATCH request not allowed for empty file"
+                )
+            )
+
+            # Upload an empty file
+            async_uploader = self.client.async_uploader(
+                file_stream=io.BytesIO(b"")
+            )
+            self.loop.run_until_complete(async_uploader.upload())
+
+            # Upload URL being set means the POST request was sent and the empty
+            # file was uploaded without a single PATCH request.
+            self.assertTrue(async_uploader.url)
 
     def test_upload_retry(self):
         num_of_retries = 3
