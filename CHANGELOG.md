@@ -1,3 +1,7 @@
+### 1.0.2 / 2023-11-30
+
+- Expose typing information (PEP 561) [#87](https://github.com/tus/tus-py-client/issues/87)
+
 ### 1.0.1 / 2023-06-20
 
 - Fix bug preventing `verify_tls_cert` from being applied to `HEAD` requests (https://github.com/tus/tus-py-client/pull/80)
