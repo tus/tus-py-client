@@ -1,5 +1,6 @@
 ### 1.0.2 / 2023-11-30
 
+- Remove unnecessary future install requirement [#81](https://github.com/tus/tus-py-client/pulls/81)
 - Expose typing information (PEP 561) [#87](https://github.com/tus/tus-py-client/issues/87)
 
 ### 1.0.1 / 2023-06-20
