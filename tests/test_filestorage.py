@@ -6,7 +6,7 @@ from tusclient.storage import filestorage
 
 class FileStorageTest(unittest.TestCase):
     def setUp(self):
-        self.storage_path = 'storage.json'
+        self.storage_path = "storage.json"
         self.storage = filestorage.FileStorage(self.storage_path)
 
     def tearDown(self):
@@ -14,11 +14,11 @@ class FileStorageTest(unittest.TestCase):
         os.remove(self.storage_path)
 
     def test_set_get_remove_item(self):
-        url = 'http://tusd.tusdemo.net/files/unique_file_id'
-        key = 'unique_key'
+        url = "http://tusd.tusdemo.net/files/unique_file_id"
+        key = "unique_key"
 
-        url_2 = 'http://tusd.tusdemo.net/files/unique_file_id_2'
-        key_2 = 'unique_key_2'
+        url_2 = "http://tusd.tusdemo.net/files/unique_file_id_2"
+        key_2 = "unique_key_2"
         self.storage.set_item(key, url)
         self.storage.set_item(key_2, url_2)
 

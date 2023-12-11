@@ -20,7 +20,7 @@ class FileStorage(interface.Storage):
         :Returns: url[str]
         """
         result = self._db.search(self._urls.key == key)
-        return result[0].get('url') if result else None
+        return result[0].get("url") if result else None
 
     def set_item(self, key: str, url: str):
         """
@@ -31,15 +31,15 @@ class FileStorage(interface.Storage):
             - value[str]: The actual url value to be stored.
         """
         if self._db.search(self._urls.key == key):
-            self._db.update({'url': url}, self._urls.key == key)
+            self._db.update({"url": url}, self._urls.key == key)
         else:
-            self._db.insert({'key': key, 'url': url})
+            self._db.insert({"key": key, "url": url})
 
     def remove_item(self, key: str):
         """
         Remove/Delete the url value under the unique key from storage.
         """
-        self._db.remove(self._urls.key==key)
+        self._db.remove(self._urls.key == key)
 
     def close(self):
         """

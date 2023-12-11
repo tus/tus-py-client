@@ -13,29 +13,30 @@ class TusRequestTest(mixin.Mixin):
         self.request = request.TusRequest(self.uploader)
 
     def test_perform(self):
-        with open('LICENSE', 'rb') as stream, responses.RequestsMock() as resps:
+        with open("LICENSE", "rb") as stream, responses.RequestsMock() as resps:
             size = stream.tell()
-            resps.add(responses.PATCH, self.url,
-                      adding_headers={'upload-offset': str(size)},
-                      status=204)
+            resps.add(
+                responses.PATCH, self.url, adding_headers={"upload-offset": str(size)}, status=204
+            )
 
             self.request.perform()
-            self.assertEqual(str(size), self.request.response_headers['upload-offset'])
+            self.assertEqual(str(size), self.request.response_headers["upload-offset"])
 
     def test_perform_checksum(self):
         self.uploader.upload_checksum = True
         tus_request = request.TusRequest(self.uploader)
 
-        with open('LICENSE', 'rb') as stream, responses.RequestsMock() as resps:
+        with open("LICENSE", "rb") as stream, responses.RequestsMock() as resps:
             license_ = stream.read()
-            expected_checksum = "sha1 " + \
-                base64.standard_b64encode(hashlib.sha1(
-                    license_).digest()).decode("ascii")
+            expected_checksum = "sha1 " + base64.standard_b64encode(
+                hashlib.sha1(license_).digest()
+            ).decode("ascii")
 
-            sent_checksum = ''
+            sent_checksum = ""
+
             def validate_headers(req):
                 nonlocal sent_checksum
-                sent_checksum = req.headers['upload-checksum']
+                sent_checksum = req.headers["upload-checksum"]
                 return (204, {}, None)
 
             resps.add_callback(responses.PATCH, self.url, callback=validate_headers)
@@ -51,10 +52,9 @@ class TusRequestTest(mixin.Mixin):
 
             def validate_verify(req):
                 nonlocal verify
-                verify = req.req_kwargs['verify']
+                verify = req.req_kwargs["verify"]
                 return (204, {}, None)
 
             resps.add_callback(responses.PATCH, self.url, callback=validate_verify)
             tus_request.perform()
             self.assertEqual(verify, False)
-

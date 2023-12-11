@@ -12,12 +12,12 @@ from tests import mixin
 
 
 class UploaderTest(mixin.Mixin):
-
     def mock_request(self, request_mock):
         request_mock = request_mock.return_value
         request_mock.status_code = 204
         request_mock.response_headers = {
-            'upload-offset': self.uploader.offset + self.uploader.get_request_length()}
+            "upload-offset": self.uploader.offset + self.uploader.get_request_length()
+        }
         request_mock.perform.return_value = None
         return request_mock
 
@@ -29,56 +29,62 @@ class UploaderTest(mixin.Mixin):
     def test_headers(self):
         self.assertEqual(self.uploader.get_headers(), {"Tus-Resumable": "1.0.0"})
 
-        self.client.set_headers({'foo': 'bar'})
-        self.assertEqual(self.uploader.get_headers(), {"Tus-Resumable": "1.0.0", 'foo': 'bar'})
+        self.client.set_headers({"foo": "bar"})
+        self.assertEqual(self.uploader.get_headers(), {"Tus-Resumable": "1.0.0", "foo": "bar"})
 
     @responses.activate
     def test_get_offset(self):
-        responses.add(responses.HEAD, self.uploader.url,
-                      adding_headers={"upload-offset": "300"})
+        responses.add(responses.HEAD, self.uploader.url, adding_headers={"upload-offset": "300"})
         self.assertEqual(self.uploader.get_offset(), 300)
 
     def test_encode_metadata(self):
-        self.uploader.metadata = {'foo': 'bar', 'red': 'blue'}
-        encoded_metadata = ['foo' + ' ' + b64encode(b'bar').decode('ascii'),
-                            'red' + ' ' + b64encode(b'blue').decode('ascii')]
+        self.uploader.metadata = {"foo": "bar", "red": "blue"}
+        encoded_metadata = [
+            "foo" + " " + b64encode(b"bar").decode("ascii"),
+            "red" + " " + b64encode(b"blue").decode("ascii"),
+        ]
         self.assertCountEqual(self.uploader.encode_metadata(), encoded_metadata)
 
         with pytest.raises(ValueError):
-            self.uploader.metadata = {'foo, ': 'bar'}
+            self.uploader.metadata = {"foo, ": "bar"}
             self.uploader.encode_metadata()
 
     def test_encode_metadata_utf8(self):
-        self.uploader.metadata = {'foo': 'bär', 'red': '🔵'}
-        self.uploader.metadata_encoding = 'utf-8'
+        self.uploader.metadata = {"foo": "bär", "red": "🔵"}
+        self.uploader.metadata_encoding = "utf-8"
         encoded_metadata = [
-            'foo ' + b64encode('bär'.encode('utf-8')).decode('ascii'),
-            'red ' + b64encode('🔵'.encode('utf-8')).decode('ascii')
+            "foo " + b64encode("bär".encode("utf-8")).decode("ascii"),
+            "red " + b64encode("🔵".encode("utf-8")).decode("ascii"),
         ]
         self.assertCountEqual(self.uploader.encode_metadata(), encoded_metadata)
 
     @responses.activate
     def test_create_url_absolute(self):
-        responses.add(responses.POST, self.client.url,
-                      adding_headers={"location": 'http://tusd.tusdemo.net/files/foo'})
-        self.assertEqual(self.uploader.create_url(), 'http://tusd.tusdemo.net/files/foo')
+        responses.add(
+            responses.POST,
+            self.client.url,
+            adding_headers={"location": "http://tusd.tusdemo.net/files/foo"},
+        )
+        self.assertEqual(self.uploader.create_url(), "http://tusd.tusdemo.net/files/foo")
 
     @responses.activate
     def test_create_url_relative(self):
-        responses.add(responses.POST, self.client.url,
-                      adding_headers={"location": "/files/foo"})
-        self.assertEqual(self.uploader.create_url(), 'http://tusd.tusdemo.net/files/foo')
+        responses.add(responses.POST, self.client.url, adding_headers={"location": "/files/foo"})
+        self.assertEqual(self.uploader.create_url(), "http://tusd.tusdemo.net/files/foo")
 
-    @responses.activate 
+    @responses.activate
     def test_url(self):
         # test for stored urls
-        responses.add(responses.HEAD, 'http://tusd.tusdemo.net/files/foo_bar',
-                      adding_headers={"upload-offset": "10"})
-        storage_path = '{}/storage_file'.format(os.path.dirname(os.path.abspath(__file__)))
-        resumable_uploader = self.client.uploader(
-            file_path='./LICENSE', store_url=True, url_storage=filestorage.FileStorage(storage_path)
+        responses.add(
+            responses.HEAD,
+            "http://tusd.tusdemo.net/files/foo_bar",
+            adding_headers={"upload-offset": "10"},
         )
-        self.assertEqual(resumable_uploader.url, 'http://tusd.tusdemo.net/files/foo_bar')
+        storage_path = "{}/storage_file".format(os.path.dirname(os.path.abspath(__file__)))
+        resumable_uploader = self.client.uploader(
+            file_path="./LICENSE", store_url=True, url_storage=filestorage.FileStorage(storage_path)
+        )
+        self.assertEqual(resumable_uploader.url, "http://tusd.tusdemo.net/files/foo_bar")
         self.assertEqual(resumable_uploader.offset, 10)
 
     def test_request_length(self):
@@ -89,26 +95,26 @@ class UploaderTest(mixin.Mixin):
         self.assertEqual(self.uploader.get_request_length(), self.uploader.get_file_size())
 
     def test_get_file_stream(self):
-        with open('./LICENSE', 'rb') as fs:
+        with open("./LICENSE", "rb") as fs:
             self.uploader.file_stream = fs
             self.uploader.file_path = None
             self.assertEqual(self.uploader.file_stream, self.uploader.get_file_stream())
 
-        with open('./README.md', 'rb') as fs:
+        with open("./README.md", "rb") as fs:
             self.uploader.file_stream = None
-            self.uploader.file_path = './README.md'
+            self.uploader.file_path = "./README.md"
             with self.uploader.get_file_stream() as stream:
                 self.assertEqual(fs.read(), stream.read())
 
     def test_file_size(self):
         self.assertEqual(self.uploader.get_file_size(), os.path.getsize(self.uploader.file_path))
 
-        with open('./README.md', 'rb') as fs:
+        with open("./README.md", "rb") as fs:
             self.uploader.file_stream = fs
             self.uploader.file_path = None
-            self.assertEqual(self.uploader.get_file_size(), os.path.getsize('./README.md'))
+            self.assertEqual(self.uploader.get_file_size(), os.path.getsize("./README.md"))
 
-    @mock.patch('tusclient.uploader.uploader.TusRequest')
+    @mock.patch("tusclient.uploader.uploader.TusRequest")
     def test_upload_chunk(self, request_mock):
         self.mock_request(request_mock)
 
@@ -117,14 +123,14 @@ class UploaderTest(mixin.Mixin):
         self.uploader.upload_chunk()
         self.assertEqual(self.uploader.offset, request_length)
 
-    @mock.patch('tusclient.uploader.uploader.TusRequest')
+    @mock.patch("tusclient.uploader.uploader.TusRequest")
     def test_upload(self, request_mock):
         self.mock_request(request_mock)
 
         self.uploader.upload()
         self.assertEqual(self.uploader.offset, self.uploader.get_file_size())
 
-    @mock.patch('tusclient.uploader.uploader.TusRequest')
+    @mock.patch("tusclient.uploader.uploader.TusRequest")
     def test_upload_retry(self, request_mock):
         num_of_retries = 3
         self.uploader.retries = num_of_retries
@@ -141,29 +147,25 @@ class UploaderTest(mixin.Mixin):
     @responses.activate
     def test_upload_empty(self):
         responses.add(
-            responses.POST, self.client.url,
-            adding_headers={
-                "upload-offset": "0",
-                "location": f"{self.client.url}this-is-not-used"
-            }
+            responses.POST,
+            self.client.url,
+            adding_headers={"upload-offset": "0", "location": f"{self.client.url}this-is-not-used"},
         )
         responses.add(
             responses.PATCH,
             f"{self.client.url}this-is-not-used",
-            body=ValueError("PATCH request not allowed for empty file")
+            body=ValueError("PATCH request not allowed for empty file"),
         )
 
         # Upload an empty file
-        uploader = self.client.uploader(
-            file_stream=io.BytesIO(b"")
-        )
+        uploader = self.client.uploader(file_stream=io.BytesIO(b""))
         uploader.upload()
 
         # Upload URL being set means the POST request was sent and the empty
         # file was uploaded without a single PATCH request.
         self.assertTrue(uploader.url)
-    
-    @mock.patch('tusclient.uploader.uploader.TusRequest')
+
+    @mock.patch("tusclient.uploader.uploader.TusRequest")
     def test_upload_checksum(self, request_mock):
         self.mock_request(request_mock)
         self.uploader.upload_checksum = True

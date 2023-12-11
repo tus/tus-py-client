@@ -49,9 +49,9 @@ class TusClient:
         :Args:
             see tusclient.uploader.Uploader for required and optional arguments.
         """
-        kwargs['client'] = self
+        kwargs["client"] = self
         return Uploader(*args, **kwargs)
 
     def async_uploader(self, *args, **kwargs) -> AsyncUploader:
-        kwargs['client'] = self
+        kwargs["client"] = self
         return AsyncUploader(*args, **kwargs)

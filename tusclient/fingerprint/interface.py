@@ -1,7 +1,7 @@
 """
 Interface module defining a fingerprint generator based on file content.
 """
-from typing import IO
+from typing import BinaryIO
 import abc
 
 
@@ -9,7 +9,7 @@ class Fingerprint(abc.ABC):
     """An interface specifying the requirements of a file fingerprint"""
 
     @abc.abstractmethod
-    def get_fingerprint(self, fs: IO):
+    def get_fingerprint(self, fs: BinaryIO) -> str:
         """
         Return a unique fingerprint string value based on the file stream recevied
 
