@@ -10,26 +10,26 @@ class FileStorageTest(unittest.TestCase):
         self.fingerprinter = fingerprint.Fingerprint()
 
     def test_get_fingerpint(self):
-        with open('./LICENSE') as f:
+        with open('./LICENSE', "rt", encoding="utf8") as f:
             content = f.read()
         buff = six.StringIO()
         buff.write(content)
         buff.seek(0)  # reset buffer postion before reading
 
-        with open('./LICENSE') as f:
+        with open('./LICENSE', "rt", encoding="utf8") as f:
             self.assertEqual(
                 self.fingerprinter.get_fingerprint(buff),
                 self.fingerprinter.get_fingerprint(f)
             )
 
     def test_unique_fingerprint(self):
-        with open('./LICENSE') as f:
+        with open('./LICENSE', "rt", encoding="utf8") as f:
             content = f.read()
         buff = six.StringIO()
         buff.write(content + 's')  # add some salt to change value
         buff.seek(0)  # reset buffer postion before reading
 
-        with open('./LICENSE') as f:
+        with open('./LICENSE', "rt", encoding="utf8") as f:
             self.assertNotEqual(
                 self.fingerprinter.get_fingerprint(buff),
                 self.fingerprinter.get_fingerprint(f)

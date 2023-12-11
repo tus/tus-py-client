@@ -26,12 +26,11 @@ class TusRequestTest(mixin.Mixin):
         self.uploader.upload_checksum = True
         tus_request = request.TusRequest(self.uploader)
 
-        with open('LICENSE', 'r') as stream, responses.RequestsMock() as resps:
+        with open('LICENSE', 'rb') as stream, responses.RequestsMock() as resps:
             license_ = stream.read()
-            encoded_file = license_.encode('utf-8')
             expected_checksum = "sha1 " + \
                 base64.standard_b64encode(hashlib.sha1(
-                    encoded_file).digest()).decode("ascii")
+                    license_).digest()).decode("ascii")
 
             sent_checksum = ''
             def validate_headers(req):
