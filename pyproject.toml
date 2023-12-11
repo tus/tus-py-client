@@ -1,0 +1,81 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tuspy"
+description = "A Python client for the tus resumable upload protocol ->  http://tus.io"
+authors = [
+    {name = "Ifedapo Olarewaju", email="ifedapoolarewaju@gmail.com"},
+]
+
+# Dependency Information
+requires-python = ">=3.5.3"
+dependencies = [
+    "requests>=2.18.4",
+    "six>=1.11.0",
+    "tinydb>=3.5.0",
+    "aiohttp>=3.6.2",
+]
+
+# Extra Information
+readme = "README.md"
+license = {text = "MIT Licence"}
+classifiers = [
+    "Programming Language :: Python",
+    "Natural Language :: English",
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+    "Development Status :: 5 - Production/Stable",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Internet :: File Transfer Protocol (FTP)",
+    "Topic :: Communications :: File Sharing",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.5",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Typing :: Typed",
+]
+
+# Misc
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "http://tus-py-client.readthedocs.io/en/latest/"
+GitHub = "http://github.com/tus/tus-py-client/"
+
+[project.optional-dependencies]
+test = [
+    "responses>=0.5.1",
+    "aioresponses>=0.6.2",
+    "coverage>=4.2",
+    "pytest>=3.0.3",
+    "pytest-cov>=2.3.1,<2.6",
+]
+
+dev = [
+    "tox>=2.3.1",
+    "sphinx-autobuild==2021.3.14",
+    "Sphinx==1.7.1",
+]
+
+[tool.setuptools]
+packages = [
+    "tusclient",
+    "tusclient.fingerprint",
+    "tusclient.storage",
+    "tusclient.uploader",
+]
+include-package-data = true
+platforms = ["any"]
+
+[tool.setuptools.dynamic]
+version = {attr = "tusclient.__version__"}
+

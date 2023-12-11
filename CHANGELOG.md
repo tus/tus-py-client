@@ -1,3 +1,11 @@
+### 1.0.3 / 2023-12-12
+
+- Move to `pyproject.toml` to support dependabot [#56](https://github.com/tus/tus-py-client/issues/56)
+- Remove `AUTHORS`
+- Autogenerate `CONTRIBUTORS` from git history
+- Update licence to refer to `CONTRIBUTORS`
+- Add extra badges to `README.md`
+
 ### 1.0.2 / 2023-11-30
 
 - Remove unnecessary future install requirement [#81](https://github.com/tus/tus-py-client/pulls/81)

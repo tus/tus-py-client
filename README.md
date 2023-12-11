@@ -1,4 +1,10 @@
-# tus-py-client [![Build Status](https://github.com/tus/tus-py-client/actions/workflows/CI.yml/badge.svg)](https://github.com/tus/tus-py-client/actions/workflows/CI.yml)
+# tus-py-client
+[![PyPi](https://img.shields.io/pypi/v/tuspy.svg)](https://pypi.python.org/pypi/tuspy/)
+[![PyPI - Status](https://img.shields.io/pypi/status/tuspy)](https://pypi.python.org/pypi/tuspy/)
+[![Python Versions](https://img.shields.io/pypi/pyversions/tuspy.svg)](https://github.com/tus/tus-py-client)
+[![License](https://img.shields.io/github/license/tus/tus-py-client.svg)](https://github.com/tus/tus-py-client)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/tuspy)
+[![Build Status](https://github.com/tus/tus-py-client/actions/workflows/CI.yml/badge.svg)](https://github.com/tus/tus-py-client/actions/workflows/CI.yml)
 
 > **tus** is a protocol based on HTTP for _resumable file uploads_. Resumable
 > means that an upload can be interrupted at any moment and can be resumed without
@@ -107,4 +113,4 @@ If you want to work on tus-py-client internally, follow these few steps:
 
 ## License
 
-MIT
+This project is licenced under the MIT Licence - see [`LICENCE`](https://github.com/tus/tus-py-client/blob/main/LICENSE).
