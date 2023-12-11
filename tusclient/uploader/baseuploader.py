@@ -250,7 +250,7 @@ class BaseUploader:
         elif self.file_path is not None and os.path.isfile(self.file_path):
             return open(self.file_path, "rb")
         else:
-            raise ValueError(f"invalid file {file_path}")
+            raise ValueError(f"invalid file {self.file_path!r}")
 
     def get_file_size(self) -> int:
         """

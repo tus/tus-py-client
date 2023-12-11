@@ -6,6 +6,7 @@ from tusclient import client
 
 FILEPATH_TEXT = "tests/sample_files/text.txt"
 
+
 class Mixin(unittest.TestCase):
     @responses.activate
     def setUp(self):

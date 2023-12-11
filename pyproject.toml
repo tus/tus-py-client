@@ -58,6 +58,8 @@ test = [
 ]
 
 dev = [
+    "black",
+    "mypy",
     "sphinx-autobuild==2021.3.14",
     "Sphinx==1.7.1",
     "tox>=2.3.1",
