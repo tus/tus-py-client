@@ -183,7 +183,7 @@ class BaseUploader:
         resp = requests.head(self.url, headers=self.get_headers(), verify=self.verify_tls_cert)
         offset = resp.headers.get("upload-offset")
         if offset is None:
-            msg = "Attempt to retrieve offset fails with status {}".format(resp.status_code)
+            msg = f"Attempt to retrieve offset fails with status {resp.status_code}"
             raise TusCommunicationError(msg, resp.status_code, resp.content)
         return int(offset)
 
@@ -197,11 +197,12 @@ class BaseUploader:
 
             # confirm that the key does not contain unwanted characters.
             if re.search(r"^$|[\s,]+", key_str):
-                msg = 'Upload-metadata key "{}" cannot be empty nor contain spaces or commas.'
-                raise ValueError(msg.format(key_str))
+                raise ValueError(
+                    f"Upload-metadata key {key_str!r} cannot be empty nor contain spaces or commas."
+                )
 
             value_bytes = value.encode(self.metadata_encoding)
-            encoded_list.append("{} {}".format(key_str, b64encode(value_bytes).decode("ascii")))
+            encoded_list.append(f"{key_str} {b64encode(value_bytes).decode('ascii')}")
         return encoded_list
 
     def __init_url_and_offset(self, url: Optional[str] = None):
@@ -249,7 +250,7 @@ class BaseUploader:
         elif self.file_path is not None and os.path.isfile(self.file_path):
             return open(self.file_path, "rb")
         else:
-            raise ValueError("invalid file {}".format(self.file_path))
+            raise ValueError(f"invalid file {file_path}")
 
     def get_file_size(self) -> int:
         """

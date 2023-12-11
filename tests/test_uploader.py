@@ -85,6 +85,7 @@ class UploaderTest(mixin.Mixin):
         resumable_uploader = self.client.uploader(
             file_path="./LICENSE", store_url=True, url_storage=filestorage.FileStorage(storage_path)
         )
+        self.assertEqual(resumable_uploader._get_fingerprint(), "1")  # fail to get output on win
         self.assertEqual(resumable_uploader.url, "http://tusd.tusdemo.net/files/foo_bar")
         self.assertEqual(resumable_uploader.offset, 10)
 

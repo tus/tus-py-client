@@ -65,7 +65,7 @@ class Uploader(BaseUploader):
         )
         url = resp.headers.get("location")
         if url is None:
-            msg = "Attempt to retrieve create file url with status {}".format(resp.status_code)
+            msg = f"Attempt to retrieve create file url with status {resp.status_code}"
             raise TusCommunicationError(msg, resp.status_code, resp.content)
         return urljoin(self.client.url, url)
 
@@ -139,9 +139,7 @@ class AsyncUploader(BaseUploader):
                 async with session.post(self.client.url, headers=headers, ssl=ssl) as resp:
                     url = resp.headers.get("location")
                     if url is None:
-                        msg = "Attempt to retrieve create file url with status {}".format(
-                            resp.status
-                        )
+                        msg = f"Attempt to retrieve create file url with status {resp.status}"
                         raise TusCommunicationError(msg, resp.status, await resp.content.read())
                     return urljoin(self.client.url, url)
         except aiohttp.ClientError as error:
