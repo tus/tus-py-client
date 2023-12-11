@@ -1,6 +1,7 @@
 from base64 import b64encode
 import io
 import os
+import pathlib
 from unittest import mock
 
 import responses
@@ -80,7 +81,7 @@ class UploaderTest(mixin.Mixin):
             "http://tusd.tusdemo.net/files/foo_bar",
             adding_headers={"upload-offset": "10"},
         )
-        storage_path = "./tests/storage_file"
+        storage_path = str(pathlib.Path(__file__).parent / "storage_file")
         resumable_uploader = self.client.uploader(
             file_path="./LICENSE", store_url=True, url_storage=filestorage.FileStorage(storage_path)
         )

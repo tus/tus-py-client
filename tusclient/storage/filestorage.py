@@ -7,7 +7,7 @@ from . import interface
 
 
 class FileStorage(interface.Storage):
-    def __init__(self, fp):
+    def __init__(self, fp: str):
         self._db = TinyDB(fp)
         self._urls = Query()
 
