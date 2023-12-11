@@ -94,19 +94,19 @@ class UploaderTest(mixin.Mixin):
             self.uploader.file_path = None
             self.assertEqual(self.uploader.file_stream, self.uploader.get_file_stream())
 
-        with open('./AUTHORS', 'rb') as fs:
+        with open('./README.md', 'rb') as fs:
             self.uploader.file_stream = None
-            self.uploader.file_path = './AUTHORS'
+            self.uploader.file_path = './README.md'
             with self.uploader.get_file_stream() as stream:
                 self.assertEqual(fs.read(), stream.read())
 
     def test_file_size(self):
         self.assertEqual(self.uploader.get_file_size(), os.path.getsize(self.uploader.file_path))
 
-        with open('./AUTHORS', 'rb') as fs:
+        with open('./README.md', 'rb') as fs:
             self.uploader.file_stream = fs
             self.uploader.file_path = None
-            self.assertEqual(self.uploader.get_file_size(), os.path.getsize('./AUTHORS'))
+            self.assertEqual(self.uploader.get_file_size(), os.path.getsize('./README.md'))
 
     @mock.patch('tusclient.uploader.uploader.TusRequest')
     def test_upload_chunk(self, request_mock):
