@@ -22,16 +22,13 @@ dependencies = [
 readme = "README.md"
 license = {text = "MIT Licence"}
 classifiers = [
-    "Programming Language :: Python",
-    "Natural Language :: English",
+    "Development Status :: 5 - Production/Stable",
     "Environment :: Web Environment",
     "Intended Audience :: Developers",
-    "Development Status :: 5 - Production/Stable",
     "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
     "Operating System :: OS Independent",
-    "Topic :: Software Development :: Libraries :: Python Modules",
-    "Topic :: Internet :: File Transfer Protocol (FTP)",
-    "Topic :: Communications :: File Sharing",
+    "Programming Language :: Python",
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.5",
     "Programming Language :: Python :: 3.6",
@@ -41,6 +38,9 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Topic :: Communications :: File Sharing",
+    "Topic :: Internet :: File Transfer Protocol (FTP)",
+    "Topic :: Software Development :: Libraries :: Python Modules",
     "Typing :: Typed",
 ]
 
