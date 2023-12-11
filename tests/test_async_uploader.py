@@ -10,6 +10,9 @@ import pytest
 from tusclient import exceptions, client
 
 
+FILEPATH_TEXT = "tests/sample_files/text.txt"
+
+
 class AsyncUploaderTest(unittest.TestCase):
     @responses.activate
     def setUp(self):
@@ -17,7 +20,7 @@ class AsyncUploaderTest(unittest.TestCase):
         self.url = "http://tusd.tusdemo.net/files/15acd89eabdf5738ffc"
         responses.add(responses.HEAD, self.url, adding_headers={"upload-offset": "0"})
         self.loop = asyncio.new_event_loop()
-        self.async_uploader = self.client.async_uploader("./LICENSE", url=self.url)
+        self.async_uploader = self.client.async_uploader(FILEPATH_TEXT, url=self.url)
 
     def tearDown(self):
         self.loop.stop()
@@ -28,7 +31,7 @@ class AsyncUploaderTest(unittest.TestCase):
         self.assertEqual(req_headers.get("Tus-Resumable"), "1.0.0")
 
         body = kwargs["data"]
-        with open("./LICENSE", "rb") as stream:
+        with open(FILEPATH_TEXT, "rb") as stream:
             expected_content = stream.read()
             self.assertEqual(expected_content, body)
 

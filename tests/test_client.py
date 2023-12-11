@@ -6,6 +6,9 @@ from tusclient import client
 from tusclient.uploader import Uploader, AsyncUploader
 
 
+FILEPATH_TEXT = "tests/sample_files/text.txt"
+
+
 class TusClientTest(unittest.TestCase):
     def setUp(self):
         self.client = client.TusClient("http://tusd.tusdemo.net/files/", headers={"foo": "bar"})
@@ -27,7 +30,7 @@ class TusClientTest(unittest.TestCase):
         url = "http://tusd.tusdemo.net/files/15acd89eabdf5738ffc"
         responses.add(responses.HEAD, url, adding_headers={"upload-offset": "0"})
 
-        uploader = self.client.uploader("./LICENSE", url=url)
+        uploader = self.client.uploader(FILEPATH_TEXT, url=url)
 
         self.assertIsInstance(uploader, Uploader)
         self.assertEqual(uploader.client, self.client)
@@ -37,7 +40,7 @@ class TusClientTest(unittest.TestCase):
         url = "http://tusd.tusdemo.net/files/15acd89eabdf5738ffc"
         responses.add(responses.HEAD, url, adding_headers={"upload-offset": "0"})
 
-        async_uploader = self.client.async_uploader("./LICENSE", url=url)
+        async_uploader = self.client.async_uploader(FILEPATH_TEXT, url=url)
 
         self.assertIsInstance(async_uploader, AsyncUploader)
         self.assertEqual(async_uploader.client, self.client)

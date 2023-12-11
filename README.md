@@ -113,4 +113,4 @@ If you want to work on tus-py-client internally, follow these few steps:
 
 ## License
 
-This project is licenced under the MIT Licence - see [`LICENCE`](https://github.com/tus/tus-py-client/blob/main/LICENSE).
+This project is licenced under the MIT Licence - see [`LICENSE`](https://github.com/tus/tus-py-client/blob/main/LICENSE).
