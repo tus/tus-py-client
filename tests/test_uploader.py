@@ -4,11 +4,16 @@ from base64 import b64encode
 from unittest import mock
 
 import responses
+from parametrize import parametrize
 import pytest
 
 from tusclient import exceptions
 from tusclient.storage import filestorage
 from tests import mixin
+
+
+FILEPATH_TEXT = "tests/sample_files/text.txt"
+FILEPATH_BINARY = "tests/sample_files/binary.png"
 
 
 class UploaderTest(mixin.Mixin):
@@ -69,16 +74,20 @@ class UploaderTest(mixin.Mixin):
                       adding_headers={"location": "/files/foo"})
         self.assertEqual(self.uploader.create_url(), 'http://tusd.tusdemo.net/files/foo')
 
-    @responses.activate 
-    def test_url(self):
+    @parametrize(
+        "filename",
+        [FILEPATH_TEXT, FILEPATH_BINARY],
+    )
+    @responses.activate
+    def test_url(self, filename: str):
         # test for stored urls
         responses.add(responses.HEAD, 'http://tusd.tusdemo.net/files/foo_bar',
                       adding_headers={"upload-offset": "10"})
         storage_path = '{}/storage_file'.format(os.path.dirname(os.path.abspath(__file__)))
         resumable_uploader = self.client.uploader(
-            file_path='./LICENSE', store_url=True, url_storage=filestorage.FileStorage(storage_path)
+            file_path=filename, store_url=True, url_storage=filestorage.FileStorage(storage_path)
         )
-        self.assertEqual(resumable_uploader.url, 'http://tusd.tusdemo.net/files/foo_bar')
+        self.assertEqual(resumable_uploader.url, "http://tusd.tusdemo.net/files/foo_bar")
         self.assertEqual(resumable_uploader.offset, 10)
 
     def test_request_length(self):
@@ -88,25 +97,33 @@ class UploaderTest(mixin.Mixin):
         self.uploader.chunk_size = self.uploader.get_file_size() + 3000
         self.assertEqual(self.uploader.get_request_length(), self.uploader.get_file_size())
 
-    def test_get_file_stream(self):
-        with open('./LICENSE', 'rb') as fs:
+    @parametrize(
+        "filename",
+        [FILEPATH_TEXT, FILEPATH_BINARY],
+    )
+    def test_get_file_stream(self, filename: str):
+        with open(filename, "rb") as fs:
             self.uploader.file_stream = fs
             self.uploader.file_path = None
             self.assertEqual(self.uploader.file_stream, self.uploader.get_file_stream())
 
-        with open('./AUTHORS', 'rb') as fs:
+        with open(filename, "rb") as fs:
             self.uploader.file_stream = None
-            self.uploader.file_path = './AUTHORS'
+            self.uploader.file_path = filename
             with self.uploader.get_file_stream() as stream:
                 self.assertEqual(fs.read(), stream.read())
 
-    def test_file_size(self):
+    @parametrize(
+        "filename",
+        [FILEPATH_TEXT, FILEPATH_BINARY],
+    )
+    def test_file_size(self, filename: str):
         self.assertEqual(self.uploader.get_file_size(), os.path.getsize(self.uploader.file_path))
 
-        with open('./AUTHORS', 'rb') as fs:
+        with open(filename, "rb") as fs:
             self.uploader.file_stream = fs
             self.uploader.file_path = None
-            self.assertEqual(self.uploader.get_file_size(), os.path.getsize('./AUTHORS'))
+            self.assertEqual(self.uploader.get_file_size(), os.path.getsize(filename))
 
     @mock.patch('tusclient.uploader.uploader.TusRequest')
     def test_upload_chunk(self, request_mock):
