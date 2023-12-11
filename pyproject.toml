@@ -10,7 +10,7 @@ authors = [
 ]
 
 # Dependency Information
-requires-python = ">=3.5.3"
+requires-python = ">=3.8"
 dependencies = [
     "requests>=2.18.4",
     "six>=1.11.0",
@@ -30,9 +30,6 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.5",
-    "Programming Language :: Python :: 3.6",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",

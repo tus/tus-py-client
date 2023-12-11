@@ -1,0 +1,67 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# See LICENSE file for licensing details.
+# Author: Jan-Philip Gehrcke -- http://gehrcke.de
+# Contact: jgehrcke@googlemail.com
+
+
+"""
+List the authors of a git repository sorted by the time of their first
+contribution (specifically, by the git data field '%at', also known as
+the "author date").
+
+Stdin is expected to be the output of the following command:
+
+git log --encoding=utf-8 --full-history --reverse "--format=format:%at;%an;%ae"
+
+Write a formatted list of authors to stdout, using UTF-8 encoding and with
+lines separated by a single \n character.
+
+Distinguished by their name only (specifically, by the git data field '%an').
+
+Relevant resources:
+    - http://git-scm.com/docs/git-log
+    - http://stackoverflow.com/a/11857467/145400
+"""
+
+
+import io
+import os
+import sys
+import time
+
+
+if sys.version_info[0] == 3 and sys.version_info < (3, 4):
+    sys.exit("Error: Python 3.4 or newer is required.")
+if sys.version_info < (2, 7):
+    sys.exit("Error: Python 2.7 or newer is required.")
+
+
+usage = ('$ git log --encoding=utf-8 --full-history --reverse '
+    '"--format=format:%at;%an;%ae" | '+ os.path.basename(sys.argv[0]))
+
+
+if sys.stdin.isatty():
+    sys.exit(("Error: this program expects a pipe attached to standard input. "
+        "This looks like a terminal. Recommended usage: \n\n%s" % usage))
+
+
+# Take precise control of the stdin byte stream interpretation, as well as of
+# the byte stream written to stdout, on Python 2 as well as on Python 3, and on
+# Windows as well as on Linux. UTF-8-encoded input with invalid byte sequences
+# and "\n" line separation is expected on stdin. Valid UTF-8 data will be
+# written to stdout; with "\n" line separation (w/o universal newline support).
+kwargs = {"errors": "replace", "encoding": "utf-8", "newline": "\n"}
+stdin = io.open(sys.stdin.fileno(), **kwargs)
+stdout = io.open(sys.stdout.fileno(), mode="w", **kwargs)
+
+
+seen = set()
+for line in stdin:
+    timestamp, name, email = line.strip().split(";")
+    if name not in seen:
+        seen.add(name)
+        day = time.strftime("%Y-%m-%d", time.gmtime(float(timestamp)))
+        stdout.write("%04d (%s): %s (%s)\n" % (len(seen), day, name, email))
+
+
