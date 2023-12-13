@@ -50,6 +50,12 @@ class Uploader(BaseUploader):
         """
         self._retried = 0
 
+        # Ensure that we have a URL, as this is behavior we allowed previously.
+        # See https://github.com/tus/tus-py-client/issues/82.
+        if not self.url:
+            self.set_url(self.create_url())
+            self.offset = 0
+
         self._do_request()
         self.offset = int(self.request.response_headers.get("upload-offset"))
 
@@ -126,6 +132,12 @@ class AsyncUploader(BaseUploader):
         Upload chunk of file.
         """
         self._retried = 0
+
+        # Ensure that we have a URL, as this is behavior we allowed previously.
+        # See https://github.com/tus/tus-py-client/issues/82.
+        if not self.url:
+            self.set_url(await self.create_url())
+            self.offset = 0
 
         await self._do_request()
         self.offset = int(self.request.response_headers.get("upload-offset"))

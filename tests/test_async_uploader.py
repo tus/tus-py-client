@@ -46,6 +46,28 @@ class AsyncUploaderTest(unittest.TestCase):
             request_length = self.async_uploader.get_request_length()
             self.loop.run_until_complete(self.async_uploader.upload_chunk())
             self.assertEqual(self.async_uploader.offset, request_length)
+    
+    def test_upload_chunk_with_creation(self):
+        with aioresponses() as resps:
+            resps.post(
+                self.client.url, status=201,
+                headers={
+                    "location": f"{self.client.url}hello"
+                }
+            )
+            resps.patch(
+                f"{self.client.url}hello",
+                headers={
+                    "upload-offset": "5"
+                }
+            )
+
+            uploader = self.client.async_uploader(
+                file_stream=io.BytesIO(b"hello")
+            )
+            self.loop.run_until_complete(uploader.upload_chunk())
+
+            self.assertEqual(uploader.url, f"{self.client.url}hello")
 
     def test_upload(self):
         with aioresponses() as resps:
