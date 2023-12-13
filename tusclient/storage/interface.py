@@ -2,11 +2,9 @@
 Interface module defining a url storage API.
 """
 import abc
-import six
 
 
-@six.add_metaclass(abc.ABCMeta)
-class Storage(object):
+class Storage(object, metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def get_item(self, key):
         """

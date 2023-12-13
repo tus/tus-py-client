@@ -1,6 +1,5 @@
+import io
 import unittest
-
-import six
 
 from tusclient.fingerprint import fingerprint
 
@@ -12,7 +11,7 @@ class FileStorageTest(unittest.TestCase):
     def test_get_fingerpint(self):
         with open('./LICENSE') as f:
             content = f.read()
-        buff = six.StringIO()
+        buff = io.StringIO()
         buff.write(content)
         buff.seek(0)  # reset buffer postion before reading
 
@@ -25,7 +24,7 @@ class FileStorageTest(unittest.TestCase):
     def test_unique_fingerprint(self):
         with open('./LICENSE') as f:
             content = f.read()
-        buff = six.StringIO()
+        buff = io.StringIO()
         buff.write(content + 's')  # add some salt to change value
         buff.seek(0)  # reset buffer postion before reading
 

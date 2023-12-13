@@ -10,7 +10,6 @@ setup(
     author='Ifedapo Olarewaju',
     install_requires=[
         'requests>=2.18.4',
-        'six>=1.11.0',
         'tinydb>=3.5.0',
         'aiohttp>=3.6.2'
     ],
