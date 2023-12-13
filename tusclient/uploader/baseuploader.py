@@ -90,29 +90,41 @@ class BaseUploader:
         - fingerprinter (Optional [<tusclient.fingerprint.interface.Fingerprint>])
         - upload_checksum (Optional[bool])
     """
+
     DEFAULT_HEADERS = {"Tus-Resumable": "1.0.0"}
     DEFAULT_CHUNK_SIZE = MAXSIZE
-    CHECKSUM_ALGORITHM_PAIR = ("sha1", hashlib.sha1, )
+    CHECKSUM_ALGORITHM_PAIR = (
+        "sha1",
+        hashlib.sha1,
+    )
 
-    def __init__(self, file_path: Optional[str] = None, file_stream: Optional[IO] = None,
-                 url: Optional[str] = None, client: Optional['TusClient'] = None,
-                 chunk_size: int = MAXSIZE, metadata: Optional[Dict] = None,
-                 metadata_encoding: Optional[str] = 'utf-8',
-                 retries: int = 0, retry_delay: int = 30,
-                 verify_tls_cert: bool = True, store_url=False,
-                 url_storage: Optional[Storage] = None,
-                 fingerprinter: Optional[interface.Fingerprint] = None,
-                 upload_checksum=False):
+    def __init__(
+        self,
+        file_path: Optional[str] = None,
+        file_stream: Optional[IO] = None,
+        url: Optional[str] = None,
+        client: Optional["TusClient"] = None,
+        chunk_size: int = MAXSIZE,
+        metadata: Optional[Dict] = None,
+        metadata_encoding: Optional[str] = "utf-8",
+        retries: int = 0,
+        retry_delay: int = 30,
+        verify_tls_cert: bool = True,
+        store_url=False,
+        url_storage: Optional[Storage] = None,
+        fingerprinter: Optional[interface.Fingerprint] = None,
+        upload_checksum=False,
+    ):
         if file_path is None and file_stream is None:
-            raise ValueError(
-                "Either 'file_path' or 'file_stream' cannot be None.")
+            raise ValueError("Either 'file_path' or 'file_stream' cannot be None.")
 
         if url is None and client is None:
             raise ValueError("Either 'url' or 'client' cannot be None.")
 
         if store_url and url_storage is None:
             raise ValueError(
-                "Please specify a storage instance to enable resumablility.")
+                "Please specify a storage instance to enable resumablility."
+            )
 
         self.verify_tls_cert = verify_tls_cert
         self.file_path = file_path
@@ -133,28 +145,29 @@ class BaseUploader:
         self._retried = 0
         self.retry_delay = retry_delay
         self.upload_checksum = upload_checksum
-        self.__checksum_algorithm_name, self.__checksum_algorithm = \
-            self.CHECKSUM_ALGORITHM_PAIR
+        (
+            self.__checksum_algorithm_name,
+            self.__checksum_algorithm,
+        ) = self.CHECKSUM_ALGORITHM_PAIR
 
     def get_headers(self):
         """
         Return headers of the uploader instance. This would include the headers of the
         client instance.
         """
-        client_headers = getattr(self.client, 'headers', {})
+        client_headers = getattr(self.client, "headers", {})
         return dict(self.DEFAULT_HEADERS, **client_headers)
 
     def get_url_creation_headers(self):
         """Return headers required to create upload url"""
         headers = self.get_headers()
-        headers['upload-length'] = str(self.get_file_size())
-        headers['upload-metadata'] = ','.join(self.encode_metadata())
+        headers["upload-length"] = str(self.get_file_size())
+        headers["upload-metadata"] = ",".join(self.encode_metadata())
         return headers
 
     @property
     def checksum_algorithm(self):
-        """The checksum algorithm to be used for the Upload-Checksum extension. 
-        """
+        """The checksum algorithm to be used for the Upload-Checksum extension."""
         return self.__checksum_algorithm
 
     @property
@@ -172,11 +185,14 @@ class BaseUploader:
         This is different from the instance attribute 'offset' because this makes an
         http request to the tus server to retrieve the offset.
         """
-        resp = requests.head(self.url, headers=self.get_headers(), verify=self.verify_tls_cert)
-        offset = resp.headers.get('upload-offset')
+        resp = requests.head(
+            self.url, headers=self.get_headers(), verify=self.verify_tls_cert
+        )
+        offset = resp.headers.get("upload-offset")
         if offset is None:
-            msg = 'Attempt to retrieve offset fails with status {}'.format(
-                resp.status_code)
+            msg = "Attempt to retrieve offset fails with status {}".format(
+                resp.status_code
+            )
             raise TusCommunicationError(msg, resp.status_code, resp.content)
         return int(offset)
 
@@ -189,13 +205,14 @@ class BaseUploader:
             key_str = str(key)  # dict keys may be of any object type.
 
             # confirm that the key does not contain unwanted characters.
-            if re.search(r'^$|[\s,]+', key_str):
+            if re.search(r"^$|[\s,]+", key_str):
                 msg = 'Upload-metadata key "{}" cannot be empty nor contain spaces or commas.'
                 raise ValueError(msg.format(key_str))
 
             value_bytes = value.encode(self.metadata_encoding)
-            encoded_list.append('{} {}'.format(
-                key_str, b64encode(value_bytes).decode('ascii')))
+            encoded_list.append(
+                "{} {}".format(key_str, b64encode(value_bytes).decode("ascii"))
+            )
         return encoded_list
 
     def __init_url_and_offset(self, url: Optional[str] = None):
@@ -241,7 +258,7 @@ class BaseUploader:
             self.file_stream.seek(0)
             return self.file_stream
         elif os.path.isfile(self.file_path):
-            return open(self.file_path, 'rb')
+            return open(self.file_path, "rb")
         else:
             raise ValueError("invalid file {}".format(self.file_path))
 
@@ -249,6 +266,6 @@ class BaseUploader:
         """
         Return size of the file.
         """
-        stream = self.get_file_stream() 
+        stream = self.get_file_stream()
         stream.seek(0, os.SEEK_END)
         return stream.tell()

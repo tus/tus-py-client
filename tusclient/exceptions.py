@@ -20,8 +20,11 @@ class TusCommunicationError(Exception):
         - status_code (Optional[int])
         - response_content (Optional[str])
     """
+
     def __init__(self, message, status_code=None, response_content=None):
-        default_message = 'Communication with tus server failed with status {}'.format(status_code)
+        default_message = "Communication with tus server failed with status {}".format(
+            status_code
+        )
         message = message or default_message
         super(TusCommunicationError, self).__init__(message)
         self.status_code = status_code

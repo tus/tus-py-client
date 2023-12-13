@@ -27,11 +27,11 @@ class Fingerprint(interface.Fingerprint):
         # add in the file size to minimize chances of collision
         fs.seek(0, os.SEEK_END)
         file_size = fs.tell()
-        return 'size:{}--md5:{}'.format(file_size, hasher.hexdigest())
+        return "size:{}--md5:{}".format(file_size, hasher.hexdigest())
 
     def _encode_data(self, data):
         try:
-            return data.encode('utf-8')
+            return data.encode("utf-8")
         except AttributeError:
             # in case the content is already binary, this failure would happen.
             return data
