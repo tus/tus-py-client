@@ -1,6 +1,5 @@
+import io
 import unittest
-
-import six
 
 from parametrize import parametrize
 
@@ -21,7 +20,7 @@ class FileStorageTest(unittest.TestCase):
     def test_get_fingerpint(self, filename: str):
         with open(filename, "rb") as f:
             content = f.read()
-        buff = six.BytesIO()
+        buff = io.BytesIO()
         buff.write(content)
         buff.seek(0)  # reset buffer postion before reading
 
@@ -38,7 +37,7 @@ class FileStorageTest(unittest.TestCase):
     def test_unique_fingerprint(self, filename: str):
         with open(filename, "rb") as f:
             content = f.read()
-        buff = six.BytesIO()
+        buff = io.BytesIO()
         buff.write(content + b's')  # add some salt to change value
         buff.seek(0)  # reset buffer postion before reading
 
