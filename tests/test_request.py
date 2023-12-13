@@ -1,10 +1,15 @@
 import base64
 import hashlib
 
+from parametrize import parametrize
 import responses
 
 from tusclient import request
 from tests import mixin
+
+
+FILEPATH_TEXT = "tests/sample_files/text.txt"
+FILEPATH_BINARY = "tests/sample_files/binary.png"
 
 
 class TusRequestTest(mixin.Mixin):
@@ -12,8 +17,12 @@ class TusRequestTest(mixin.Mixin):
         super(TusRequestTest, self).setUp()
         self.request = request.TusRequest(self.uploader)
 
-    def test_perform(self):
-        with open('LICENSE', 'rb') as stream, responses.RequestsMock() as resps:
+    @parametrize(
+        "filename",
+        [FILEPATH_TEXT, FILEPATH_BINARY],
+    )
+    def test_perform(self, filename: str):
+        with open(FILEPATH_TEXT, "rb") as stream, responses.RequestsMock() as resps:
             size = stream.tell()
             resps.add(responses.PATCH, self.url,
                       adding_headers={'upload-offset': str(size)},
@@ -26,12 +35,11 @@ class TusRequestTest(mixin.Mixin):
         self.uploader.upload_checksum = True
         tus_request = request.TusRequest(self.uploader)
 
-        with open('LICENSE', 'r') as stream, responses.RequestsMock() as resps:
-            license_ = stream.read()
-            encoded_file = license_.encode('utf-8')
+        with open(FILEPATH_TEXT, "rb") as stream, responses.RequestsMock() as resps:
+            content = stream.read()
             expected_checksum = "sha1 " + \
                 base64.standard_b64encode(hashlib.sha1(
-                    encoded_file).digest()).decode("ascii")
+                    content).digest()).decode("ascii")
 
             sent_checksum = ''
             def validate_headers(req):
