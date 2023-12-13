@@ -134,6 +134,29 @@ class UploaderTest(mixin.Mixin):
         self.uploader.upload_chunk()
         self.assertEqual(self.uploader.offset, request_length)
 
+    @responses.activate
+    def test_upload_chunk_with_creation(self):
+        responses.add(
+            responses.POST, self.client.url,
+            adding_headers={
+                "location": f"{self.client.url}hello"
+            }
+        )
+        responses.add(
+            responses.PATCH,
+            f"{self.client.url}hello",
+            adding_headers={
+                "upload-offset": "5"
+            }
+        )
+
+        uploader = self.client.uploader(
+            file_stream=io.BytesIO(b"hello")
+        )
+        uploader.upload_chunk()
+
+        self.assertEqual(uploader.url, f"{self.client.url}hello")
+
     @mock.patch('tusclient.uploader.uploader.TusRequest')
     def test_upload(self, request_mock):
         self.mock_request(request_mock)
