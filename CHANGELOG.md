@@ -1,3 +1,9 @@
+### 1.0.3 / 2023-12-13
+
+- Add explicit test fixtures to fix tests on Windows by @nhairs in https://github.com/tus/tus-py-client/pull/91
+- Remove unneeded `six` dependency (was used for Python 2) by @a-detiste in https://github.com/tus/tus-py-client/pull/90
+- Fix calls to `upload_chunk` by @Acconut in https://github.com/tus/tus-py-client/pull/92
+
 ### 1.0.2 / 2023-11-30
 
 - Remove unnecessary future install requirement [#81](https://github.com/tus/tus-py-client/pulls/81)
