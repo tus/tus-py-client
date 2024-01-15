@@ -46,6 +46,7 @@ class BaseTusRequest:
         self.verify_tls_cert = bool(uploader.verify_tls_cert)
         self.file = uploader.get_file_stream()
         self.file.seek(uploader.offset)
+        self.client_cert = uploader.client_cert
 
         self._request_headers = {
             "upload-offset": str(uploader.offset),
@@ -79,12 +80,10 @@ class TusRequest(BaseTusRequest):
         try:
             chunk = self.file.read(self._content_length)
             self.add_checksum(chunk)
-            resp = requests.patch(
-                self._url,
-                data=chunk,
-                headers=self._request_headers,
-                verify=self.verify_tls_cert,
-            )
+            resp = requests.patch(self._url, data=chunk,
+                                  headers=self._request_headers,
+                                  verify=self.verify_tls_cert,
+                                  cert=self.client_cert,)
             self.status_code = resp.status_code
             self.response_content = resp.content
             self.response_headers = {k.lower(): v for k, v in resp.headers.items()}

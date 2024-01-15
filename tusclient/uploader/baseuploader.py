@@ -1,4 +1,4 @@
-from typing import Optional, IO, Dict, TYPE_CHECKING
+from typing import Optional, IO, Dict, Tuple, TYPE_CHECKING, Union
 import os
 import re
 from base64 import b64encode
@@ -114,6 +114,7 @@ class BaseUploader:
         url_storage: Optional[Storage] = None,
         fingerprinter: Optional[interface.Fingerprint] = None,
         upload_checksum=False,
+        client_cert: Optional[Tuple[str, str]] = None,
     ):
         if file_path is None and file_stream is None:
             raise ValueError("Either 'file_path' or 'file_stream' cannot be None.")
@@ -131,6 +132,7 @@ class BaseUploader:
         self.file_stream = file_stream
         self.stop_at = self.get_file_size()
         self.client = client
+        self.client_cert = client_cert
         self.metadata = metadata or {}
         self.metadata_encoding = metadata_encoding
         self.store_url = store_url
@@ -186,7 +188,7 @@ class BaseUploader:
         http request to the tus server to retrieve the offset.
         """
         resp = requests.head(
-            self.url, headers=self.get_headers(), verify=self.verify_tls_cert
+            self.url, headers=self.get_headers(), verify=self.verify_tls_cert, cert=self.client_cert
         )
         offset = resp.headers.get("upload-offset")
         if offset is None:

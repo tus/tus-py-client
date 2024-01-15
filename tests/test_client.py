@@ -44,3 +44,32 @@ class TusClientTest(unittest.TestCase):
 
         self.assertIsInstance(async_uploader, AsyncUploader)
         self.assertEqual(async_uploader.client, self.client)
+
+class TusClientTestWithClientCertificate(unittest.TestCase):
+    def setUp(self):
+        self.client_cert=("/tmp/client.crt.pem")
+        self.client = client.TusClient('http://tusd.tusdemo.net/files/',
+                                       headers={'foo': 'bar'},
+                                       client_cert=self.client_cert)
+
+    @responses.activate
+    def test_uploader(self):
+        url = 'http://tusd.tusdemo.net/files/15acd89eabdf5738ffc'
+        responses.add(responses.HEAD, url,
+                      adding_headers={"upload-offset": "0"})
+        uploader = self.client.uploader('./LICENSE', url=url)
+
+        self.assertIsInstance(uploader, Uploader)
+        self.assertEqual(uploader.client, self.client)
+        self.assertEqual(uploader.client_cert, self.client_cert)
+
+    @responses.activate
+    def test_async_uploader(self):
+        url = 'http://tusd.tusdemo.net/files/15acd89eabdf5738ffc'
+        responses.add(responses.HEAD, url,
+                      adding_headers={"upload-offset": "0"})
+        async_uploader = self.client.async_uploader('./LICENSE', url=url)
+
+        self.assertIsInstance(async_uploader, AsyncUploader)
+        self.assertEqual(async_uploader.client, self.client)
+        self.assertEqual(async_uploader.client_cert, self.client_cert)

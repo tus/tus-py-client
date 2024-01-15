@@ -70,6 +70,7 @@ class Uploader(BaseUploader):
             self.client.url,
             headers=self.get_url_creation_headers(),
             verify=self.verify_tls_cert,
+            cert=self.client_cert,
         )
         url = resp.headers.get("location")
         if url is None:
