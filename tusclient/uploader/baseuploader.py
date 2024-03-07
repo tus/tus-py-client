@@ -1,4 +1,4 @@
-from typing import Optional, IO, Dict, TYPE_CHECKING
+from typing import Optional, IO, Dict, Tuple, TYPE_CHECKING, Union
 import os
 import re
 from base64 import b64encode
@@ -177,6 +177,11 @@ class BaseUploader:
         """
         return self.__checksum_algorithm_name
 
+    @property
+    def client_cert(self):
+        """The client certificate used for the configured client"""
+        return self.client.client_cert if self.client is not None else None
+
     @catch_requests_error
     def get_offset(self):
         """
@@ -186,7 +191,7 @@ class BaseUploader:
         http request to the tus server to retrieve the offset.
         """
         resp = requests.head(
-            self.url, headers=self.get_headers(), verify=self.verify_tls_cert
+            self.url, headers=self.get_headers(), verify=self.verify_tls_cert, cert=self.client_cert
         )
         offset = resp.headers.get("upload-offset")
         if offset is None:
