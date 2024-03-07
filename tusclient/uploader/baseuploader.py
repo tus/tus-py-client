@@ -114,7 +114,6 @@ class BaseUploader:
         url_storage: Optional[Storage] = None,
         fingerprinter: Optional[interface.Fingerprint] = None,
         upload_checksum=False,
-        client_cert: Optional[Tuple[str, str]] = None,
     ):
         if file_path is None and file_stream is None:
             raise ValueError("Either 'file_path' or 'file_stream' cannot be None.")
@@ -132,7 +131,6 @@ class BaseUploader:
         self.file_stream = file_stream
         self.stop_at = self.get_file_size()
         self.client = client
-        self.client_cert = client_cert
         self.metadata = metadata or {}
         self.metadata_encoding = metadata_encoding
         self.store_url = store_url
@@ -178,6 +176,11 @@ class BaseUploader:
         extension.
         """
         return self.__checksum_algorithm_name
+
+    @property
+    def client_cert(self):
+        """The client certificate used for the configured client"""
+        return self.client.client_cert if self.client is not None else None
 
     @catch_requests_error
     def get_offset(self):

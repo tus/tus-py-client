@@ -5,6 +5,7 @@ from functools import wraps
 
 import requests
 import aiohttp
+import ssl
 
 from tusclient.exceptions import TusUploadFailed, TusCommunicationError
 
@@ -80,10 +81,14 @@ class TusRequest(BaseTusRequest):
         try:
             chunk = self.file.read(self._content_length)
             self.add_checksum(chunk)
-            resp = requests.patch(self._url, data=chunk,
-                                  headers=self._request_headers,
-                                  verify=self.verify_tls_cert,
-                                  cert=self.client_cert,)
+            resp = requests.patch(
+                self._url,
+                data=chunk,
+                headers=self._request_headers,
+                verify=self.verify_tls_cert,
+                stream=True,
+                cert=self.client_cert
+            )
             self.status_code = resp.status_code
             self.response_content = resp.content
             self.response_headers = {k.lower(): v for k, v in resp.headers.items()}
@@ -107,10 +112,17 @@ class AsyncTusRequest(BaseTusRequest):
         chunk = self.file.read(self._content_length)
         self.add_checksum(chunk)
         try:
-            async with aiohttp.ClientSession(loop=self.io_loop) as session:
-                ssl = None if self.verify_tls_cert else False
+            ssl_ctx = ssl.create_default_context()
+            if (self.client_cert is not None):
+                if self.client_cert is str:
+                    ssl_ctx.load_cert_chain(certfile=self.client_cert)
+                else:
+                    ssl_ctx.load_cert_chain(certfile=self.client_cert[0], keyfile=self.client_cert[1])
+            conn = aiohttp.TCPConnector(ssl=ssl_ctx)
+            async with aiohttp.ClientSession(loop=self.io_loop, connector=conn) as session:
+                verify_tls_cert = None if self.verify_tls_cert else False
                 async with session.patch(
-                    self._url, data=chunk, headers=self._request_headers, ssl=ssl
+                    self._url, data=chunk, headers=self._request_headers, ssl=verify_tls_cert
                 ) as resp:
                     self.status_code = resp.status
                     self.response_headers = {
