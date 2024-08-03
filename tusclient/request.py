@@ -51,6 +51,8 @@ class BaseTusRequest:
             "upload-offset": str(uploader.offset),
             "Content-Type": "application/offset+octet-stream",
         }
+        if not uploader.length_declared:
+            self._request_headers["upload-length"] = str(uploader.file_size)
         self._request_headers.update(uploader.get_headers())
         self._content_length = uploader.get_request_length()
         self._upload_checksum = uploader.upload_checksum

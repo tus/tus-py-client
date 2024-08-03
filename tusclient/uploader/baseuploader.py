@@ -73,6 +73,8 @@ class BaseUploader:
         - upload_checksum (bool):
             Whether or not to supply the Upload-Checksum header along with each
             chunk. Defaults to False.
+        - length_declared (bool):
+            Wherher or not to declare length on next request using Upload-Length header.
 
     :Constructor Args:
         - file_path (str)
@@ -89,6 +91,7 @@ class BaseUploader:
         - url_storage (Optinal [<tusclient.storage.interface.Storage>])
         - fingerprinter (Optional [<tusclient.fingerprint.interface.Fingerprint>])
         - upload_checksum (Optional[bool])
+        - length_declared (Optional[bool])
     """
 
     DEFAULT_HEADERS = {"Tus-Resumable": "1.0.0"}
@@ -114,6 +117,7 @@ class BaseUploader:
         url_storage: Optional[Storage] = None,
         fingerprinter: Optional[interface.Fingerprint] = None,
         upload_checksum=False,
+        length_declared=True,
     ):
         if file_path is None and file_stream is None:
             raise ValueError("Either 'file_path' or 'file_stream' cannot be None.")
@@ -129,7 +133,8 @@ class BaseUploader:
         self.verify_tls_cert = verify_tls_cert
         self.file_path = file_path
         self.file_stream = file_stream
-        self.stop_at = self.get_file_size()
+        self.file_size = self.get_file_size()
+        self.stop_at = self.file_size
         self.client = client
         self.metadata = metadata or {}
         self.metadata_encoding = metadata_encoding
@@ -145,6 +150,7 @@ class BaseUploader:
         self._retried = 0
         self.retry_delay = retry_delay
         self.upload_checksum = upload_checksum
+        self.length_declared = length_declared
         (
             self.__checksum_algorithm_name,
             self.__checksum_algorithm,
@@ -161,7 +167,7 @@ class BaseUploader:
     def get_url_creation_headers(self):
         """Return headers required to create upload url"""
         headers = self.get_headers()
-        headers["upload-length"] = str(self.get_file_size())
+        headers["upload-length"] = str(self.file_size)
         headers["upload-metadata"] = ",".join(self.encode_metadata())
         return headers
 
@@ -195,6 +201,35 @@ class BaseUploader:
             )
             raise TusCommunicationError(msg, resp.status_code, resp.content)
         return int(offset)
+
+    @catch_requests_error
+    def declare_length(self):
+        """
+        Declare length to tus server and returns whether it was actually declared.
+        
+        Makes empty patch request with Upload-Length header in order to declare length.
+        """
+        resp = requests.head(
+            self.url, headers=self.get_headers(), verify=self.verify_tls_cert
+        )
+        resp.raise_for_status()
+        if resp.headers.get('Upload-Defer-Length') == '1':
+            headers = {
+                "upload-offset": str(self.offset),
+                "upload-length": str(self.file_size),
+                "Content-Type": "application/offset+octet-stream",
+            }
+            headers.update(self.get_headers())
+            resp = requests.patch(
+                self.url,
+                headers=headers,
+                verify=self.verify_tls_cert,
+            )
+            resp.raise_for_status()
+            self.length_declared = True
+            return True
+        self.length_declared = True
+        return False
 
     def encode_metadata(self):
         """
@@ -247,8 +282,7 @@ class BaseUploader:
         """
         Return length of next chunk upload.
         """
-        remainder = self.stop_at - self.offset
-        return self.chunk_size if remainder > self.chunk_size else remainder
+        return min(self.chunk_size, self.stop_at - self.offset)
 
     def get_file_stream(self):
         """
