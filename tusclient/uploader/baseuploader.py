@@ -208,7 +208,7 @@ class BaseUploader:
     @catch_requests_error
     def declare_length(self):
         """
-        Declare length to tus server and returns whether it was actually declared.
+        Declare length to tus server and return whether it was actually declared.
         
         Makes empty patch request with Upload-Length header in order to declare length.
         """
@@ -217,6 +217,8 @@ class BaseUploader:
         )
         resp.raise_for_status()
         if resp.headers.get('Upload-Defer-Length') == '1':
+            if self.file_size is None:
+                self.file_size = self.get_file_size()
             headers = {
                 "upload-offset": str(self.offset),
                 "upload-length": str(self.file_size),
@@ -229,9 +231,8 @@ class BaseUploader:
                 verify=self.verify_tls_cert,
             )
             resp.raise_for_status()
-            self.length_declared = True
+            self.upload_length_deferred = False
             return True
-        self.length_declared = True
         return False
 
     def encode_metadata(self):
