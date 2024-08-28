@@ -40,13 +40,9 @@ class Uploader(BaseUploader):
             # only the POST request needs to be performed.
             self.set_url(self.create_url())
             self.offset = 0
-            self.length_declared = True
 
-        while self.offset < self.stop_at:
+        while self.stop_at is None or (self.offset < self.stop_at):
             self.upload_chunk()
-        
-        if not self.length_declared:
-            self.declare_length()
 
     def upload_chunk(self):
         """
@@ -59,11 +55,11 @@ class Uploader(BaseUploader):
         if not self.url:
             self.set_url(self.create_url())
             self.offset = 0
-            self.length_declared = True
 
         self._do_request()
         self.offset = int(self.request.response_headers.get("upload-offset"))
-        self.length_declared = True
+        if self.upload_length_deferred and self.request.stream_eof:
+            self.stop_at = self.offset
 
     @catch_requests_error
     def create_url(self):
@@ -129,13 +125,9 @@ class AsyncUploader(BaseUploader):
         if not self.url:
             self.set_url(await self.create_url())
             self.offset = 0
-            self.length_declared = True
 
-        while self.offset < self.stop_at:
+        while self.stop_at is None or (self.offset < self.stop_at):
             await self.upload_chunk()
-        
-        if not self.length_declared:
-            self.declare_length()
 
     async def upload_chunk(self):
         """
@@ -148,11 +140,11 @@ class AsyncUploader(BaseUploader):
         if not self.url:
             self.set_url(await self.create_url())
             self.offset = 0
-            self.length_declared = True
 
         await self._do_request()
         self.offset = int(self.request.response_headers.get("upload-offset"))
-        self.length_declared = True
+        if self.upload_length_deferred and self.request.stream_eof:
+            self.stop_at = self.offset
 
     async def create_url(self):
         """

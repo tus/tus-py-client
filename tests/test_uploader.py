@@ -227,24 +227,42 @@ class UploaderTest(mixin.Mixin):
         self.uploader.upload()
         self.assertEqual(self.uploader.offset, self.uploader.get_file_size())
     
+    @parametrize(
+        "chunk_size",
+        [1, 2, 3, 4, 5, 6],
+    )
     @responses.activate
-    def test_upload_auto_declare_length(self):
-        upload_url = f"{self.client.url}test_auto_declare_length"
+    def test_upload_length_deferred(self, chunk_size: int):
+        upload_url = f"{self.client.url}test_upload_length_deferred"
         
         responses.head(
             upload_url,
-            adding_headers={"upload-offset": "0"}
+            adding_headers={"upload-offset": "0"},
         )
         uploader = self.client.uploader(
             file_stream=io.BytesIO(b"hello"),
             url=upload_url,
-            length_declared=False)
-        self.assertTrue(not uploader.length_declared)
+            chunk_size=chunk_size,
+            upload_length_deferred=True,
+        )
+        self.assertTrue(uploader.upload_length_deferred)
+        self.assertTrue(uploader.stop_at is None)
         
+        offset = 0
+        while not (offset + chunk_size > 5):
+            next_offset = min(offset + chunk_size, 5)
+            responses.patch(
+                upload_url,
+                adding_headers={"upload-offset": str(next_offset)},
+                match=[matchers.header_matcher({"upload-offset": str(offset)})],
+            )
+            offset = next_offset
         responses.patch(
             upload_url,
-            adding_headers={"upload-offset": "5"},
-            match=[matchers.header_matcher({"upload-length": "5"})],
+            adding_headers={"upload-offset": '5'},
+            match=[matchers.header_matcher({"upload-offset": str(offset), 'upload-length': '5'})],
         )
+        
         uploader.upload()
-        self.assertTrue(uploader.length_declared)
+        self.assertEqual(uploader.offset, 5)
+        self.assertEqual(uploader.stop_at, 5)
