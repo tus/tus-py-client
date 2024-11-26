@@ -5,6 +5,7 @@ from urllib.parse import urljoin
 
 import requests
 import aiohttp
+import ssl
 
 from tusclient.uploader.baseuploader import BaseUploader
 
@@ -70,6 +71,7 @@ class Uploader(BaseUploader):
             self.client.url,
             headers=self.get_url_creation_headers(),
             verify=self.verify_tls_cert,
+            cert=self.client_cert,
         )
         url = resp.headers.get("location")
         if url is None:
@@ -149,11 +151,18 @@ class AsyncUploader(BaseUploader):
         Makes request to tus server to create a new upload url for the required file upload.
         """
         try:
-            async with aiohttp.ClientSession() as session:
+            ssl_ctx = ssl.create_default_context()
+            if (self.client_cert is not None):
+                if self.client_cert is str:
+                    ssl_ctx.load_cert_chain(certfile=self.client_cert)
+                else:
+                    ssl_ctx.load_cert_chain(certfile=self.client_cert[0], keyfile=self.client_cert[1])
+            conn = aiohttp.TCPConnector(ssl=ssl_ctx)
+            async with aiohttp.ClientSession(connector=conn) as session:
                 headers = self.get_url_creation_headers()
-                ssl = None if self.verify_tls_cert else False
+                verify_tls_cert = None if self.verify_tls_cert else False
                 async with session.post(
-                    self.client.url, headers=headers, ssl=ssl
+                    self.client.url, headers=headers, ssl=verify_tls_cert
                 ) as resp:
                     url = resp.headers.get("location")
                     if url is None:
