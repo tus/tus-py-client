@@ -1,3 +1,7 @@
+### 1.1.0 / 2024-11-29
+
+- Add support for specifying client certificates for TLS by @quality-leftovers in [#85](https://github.com/tus/tus-py-client/pulls/85)
+
 ### 1.0.3 / 2023-12-13
 
 - Add explicit test fixtures to fix tests on Windows by @nhairs in https://github.com/tus/tus-py-client/pull/91
