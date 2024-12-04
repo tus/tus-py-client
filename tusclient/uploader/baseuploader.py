@@ -74,7 +74,9 @@ class BaseUploader:
             Whether or not to supply the Upload-Checksum header along with each
             chunk. Defaults to False.
         - upload_length_deferred (bool):
-            Wherher or not to declare length only when finished reading the given file stream.
+            Whether or not to declare the upload length when finished reading the file stream instead of when the upload is started. This is useful
+            when uploading from a streaming resource, where the total file size isn't available when the upload is created
+            but only becomes known when the stream finishes. The server must support the `creation-defer-length` extension.
 
     :Constructor Args:
         - file_path (str)
