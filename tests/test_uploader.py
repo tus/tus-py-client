@@ -4,6 +4,7 @@ from base64 import b64encode
 from unittest import mock
 
 import responses
+from responses import matchers
 from parametrize import parametrize
 import pytest
 
@@ -209,3 +210,42 @@ class UploaderTest(mixin.Mixin):
         self.uploader.upload_checksum = True
         self.uploader.upload()
         self.assertEqual(self.uploader.offset, self.uploader.get_file_size())
+    
+    @parametrize("chunk_size", [1, 2, 3, 4, 5, 6])
+    @responses.activate
+    def test_upload_length_deferred(self, chunk_size: int):
+        upload_url = f"{self.client.url}test_upload_length_deferred"
+        
+        responses.head(
+            upload_url,
+            adding_headers={"upload-offset": "0", "Upload-Defer-Length": "1"},
+        )
+        uploader = self.client.uploader(
+            file_stream=io.BytesIO(b"hello"),
+            url=upload_url,
+            chunk_size=chunk_size,
+            upload_length_deferred=True,
+        )
+        self.assertTrue(uploader.upload_length_deferred)
+        self.assertTrue(uploader.stop_at is None)
+        
+        offset = 0
+        while not (offset + chunk_size > 5):
+            next_offset = min(offset + chunk_size, 5)
+            responses.patch(
+                upload_url,
+                adding_headers={"upload-offset": str(next_offset)},
+                match=[matchers.header_matcher({"upload-offset": str(offset)})],
+            )
+            offset = next_offset
+        last_req_headers = {"upload-offset": str(offset)}
+        last_req_headers["upload-length"] = "5"
+        responses.patch(
+            upload_url,
+            adding_headers={"upload-offset": "5"},
+            match=[matchers.header_matcher(last_req_headers)],
+        )
+        
+        uploader.upload()
+        self.assertEqual(uploader.offset, 5)
+        self.assertEqual(uploader.stop_at, 5)

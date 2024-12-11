@@ -33,7 +33,7 @@ class Uploader(BaseUploader):
                 Determines at what offset value the upload should stop. If not specified this
                 defaults to the file size.
         """
-        self.stop_at = stop_at or self.get_file_size()
+        self.stop_at = stop_at or self.file_size
 
         if not self.url:
             # Ensure the POST request is performed even for empty files.
@@ -42,7 +42,7 @@ class Uploader(BaseUploader):
             self.set_url(self.create_url())
             self.offset = 0
 
-        while self.offset < self.stop_at:
+        while self.stop_at is None or (self.offset < self.stop_at):
             self.upload_chunk()
 
     def upload_chunk(self):
@@ -59,6 +59,8 @@ class Uploader(BaseUploader):
 
         self._do_request()
         self.offset = int(self.request.response_headers.get("upload-offset"))
+        if self.upload_length_deferred and self.request.stream_eof:
+            self.stop_at = self.offset
 
     @catch_requests_error
     def create_url(self):
@@ -120,13 +122,13 @@ class AsyncUploader(BaseUploader):
                 Determines at what offset value the upload should stop. If not specified this
                 defaults to the file size.
         """
-        self.stop_at = stop_at or self.get_file_size()
+        self.stop_at = stop_at or self.file_size
 
         if not self.url:
             self.set_url(await self.create_url())
             self.offset = 0
 
-        while self.offset < self.stop_at:
+        while self.stop_at is None or (self.offset < self.stop_at):
             await self.upload_chunk()
 
     async def upload_chunk(self):
@@ -143,6 +145,8 @@ class AsyncUploader(BaseUploader):
 
         await self._do_request()
         self.offset = int(self.request.response_headers.get("upload-offset"))
+        if self.upload_length_deferred and self.request.stream_eof:
+            self.stop_at = self.offset
 
     async def create_url(self):
         """

@@ -41,9 +41,10 @@ class BaseTusRequest:
 
     def __init__(self, uploader):
         self._url = uploader.url
-        self.response_headers = {}
         self.status_code = None
+        self.response_headers = {}
         self.response_content = None
+        self.stream_eof = False
         self.verify_tls_cert = bool(uploader.verify_tls_cert)
         self.file = uploader.get_file_stream()
         self.file.seek(uploader.offset)
@@ -53,6 +54,8 @@ class BaseTusRequest:
             "upload-offset": str(uploader.offset),
             "Content-Type": "application/offset+octet-stream",
         }
+        self._offset = uploader.offset
+        self._upload_length_deferred = uploader.upload_length_deferred
         self._request_headers.update(uploader.get_headers())
         self._content_length = uploader.get_request_length()
         self._upload_checksum = uploader.upload_checksum
@@ -80,11 +83,15 @@ class TusRequest(BaseTusRequest):
         """
         try:
             chunk = self.file.read(self._content_length)
+            stream_eof = len(chunk) < self._content_length
             self.add_checksum(chunk)
+            headers = self._request_headers
+            if stream_eof and self._upload_length_deferred:
+                headers["upload-length"] = str(self._offset + len(chunk))
             resp = requests.patch(
                 self._url,
                 data=chunk,
-                headers=self._request_headers,
+                headers=headers,
                 verify=self.verify_tls_cert,
                 stream=True,
                 cert=self.client_cert
@@ -92,6 +99,7 @@ class TusRequest(BaseTusRequest):
             self.status_code = resp.status_code
             self.response_content = resp.content
             self.response_headers = {k.lower(): v for k, v in resp.headers.items()}
+            self.stream_eof = stream_eof
         except requests.exceptions.RequestException as error:
             raise TusUploadFailed(error)
 

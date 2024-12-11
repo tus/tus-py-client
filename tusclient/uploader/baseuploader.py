@@ -73,6 +73,10 @@ class BaseUploader:
         - upload_checksum (bool):
             Whether or not to supply the Upload-Checksum header along with each
             chunk. Defaults to False.
+        - upload_length_deferred (bool):
+            Whether or not to declare the upload length when finished reading the file stream instead of when the upload is started. This is useful
+            when uploading from a streaming resource, where the total file size isn't available when the upload is created
+            but only becomes known when the stream finishes. The server must support the `creation-defer-length` extension.
 
     :Constructor Args:
         - file_path (str)
@@ -89,6 +93,7 @@ class BaseUploader:
         - url_storage (Optinal [<tusclient.storage.interface.Storage>])
         - fingerprinter (Optional [<tusclient.fingerprint.interface.Fingerprint>])
         - upload_checksum (Optional[bool])
+        - upload_length_deferred (Optional[bool])
     """
 
     DEFAULT_HEADERS = {"Tus-Resumable": "1.0.0"}
@@ -114,6 +119,7 @@ class BaseUploader:
         url_storage: Optional[Storage] = None,
         fingerprinter: Optional[interface.Fingerprint] = None,
         upload_checksum=False,
+        upload_length_deferred=False,
     ):
         if file_path is None and file_stream is None:
             raise ValueError("Either 'file_path' or 'file_stream' cannot be None.")
@@ -129,7 +135,8 @@ class BaseUploader:
         self.verify_tls_cert = verify_tls_cert
         self.file_path = file_path
         self.file_stream = file_stream
-        self.stop_at = self.get_file_size()
+        self.file_size = self.get_file_size() if not upload_length_deferred else None
+        self.stop_at = self.file_size
         self.client = client
         self.metadata = metadata or {}
         self.metadata_encoding = metadata_encoding
@@ -145,6 +152,7 @@ class BaseUploader:
         self._retried = 0
         self.retry_delay = retry_delay
         self.upload_checksum = upload_checksum
+        self.upload_length_deferred = upload_length_deferred
         (
             self.__checksum_algorithm_name,
             self.__checksum_algorithm,
@@ -161,7 +169,10 @@ class BaseUploader:
     def get_url_creation_headers(self):
         """Return headers required to create upload url"""
         headers = self.get_headers()
-        headers["upload-length"] = str(self.get_file_size())
+        if self.upload_length_deferred:
+            headers['upload-defer-length'] = '1'
+        else:
+            headers["upload-length"] = str(self.file_size)
         headers["upload-metadata"] = ",".join(self.encode_metadata())
         return headers
 
@@ -252,8 +263,9 @@ class BaseUploader:
         """
         Return length of next chunk upload.
         """
-        remainder = self.stop_at - self.offset
-        return self.chunk_size if remainder > self.chunk_size else remainder
+        if self.stop_at is None:
+            return self.chunk_size
+        return min(self.chunk_size, self.stop_at - self.offset)
 
     def get_file_stream(self):
         """
