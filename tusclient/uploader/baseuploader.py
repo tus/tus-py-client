@@ -207,36 +207,6 @@ class BaseUploader:
             raise TusCommunicationError(msg, resp.status_code, resp.content)
         return int(offset)
 
-    @catch_requests_error
-    def declare_length(self):
-        """
-        Declare length to tus server and return whether it was actually declared.
-        
-        Makes empty patch request with Upload-Length header in order to declare length.
-        """
-        resp = requests.head(
-            self.url, headers=self.get_headers(), verify=self.verify_tls_cert
-        )
-        resp.raise_for_status()
-        if resp.headers.get('Upload-Defer-Length') == '1':
-            if self.file_size is None:
-                self.file_size = self.get_file_size()
-            headers = {
-                "upload-offset": str(self.offset),
-                "upload-length": str(self.file_size),
-                "Content-Type": "application/offset+octet-stream",
-            }
-            headers.update(self.get_headers())
-            resp = requests.patch(
-                self.url,
-                headers=headers,
-                verify=self.verify_tls_cert,
-            )
-            resp.raise_for_status()
-            self.upload_length_deferred = False
-            return True
-        return False
-
     def encode_metadata(self):
         """
         Return list of encoded metadata as defined by the Tus protocol.
