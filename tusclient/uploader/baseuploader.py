@@ -238,6 +238,7 @@ class BaseUploader:
         If resumability is enabled, this would try to get the url from storage if available,
         otherwise it would request a new upload url from the tus server.
         """
+        key = None
         if url:
             self.set_url(url)
 
@@ -246,7 +247,21 @@ class BaseUploader:
             self.set_url(self.url_storage.get_item(key))
 
         if self.url:
-            self.offset = self.get_offset()
+            try:
+                self.offset = self.get_offset()
+            except TusCommunicationError as error:
+                # Special cases where url is still considered valid with given response code.
+                special_case_codes = [423]
+                # Process case where stored url is no longer valid.
+                if (
+                    key
+                    and 400 <= error.status_code <= 499
+                    and error.status_code not in special_case_codes
+                ):
+                    self.url = None
+                    self.url_storage.remove_item(key)
+                else:
+                    raise error
 
     def _get_fingerprint(self):
         with self.get_file_stream() as stream:
