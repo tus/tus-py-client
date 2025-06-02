@@ -1,5 +1,6 @@
 import os
 import io
+import tempfile
 from base64 import b64encode
 from unittest import mock
 
@@ -90,6 +91,51 @@ class UploaderTest(mixin.Mixin):
         )
         self.assertEqual(resumable_uploader.url, "http://tusd.tusdemo.net/files/foo_bar")
         self.assertEqual(resumable_uploader.offset, 10)
+
+    @parametrize(
+        "filename",
+        [FILEPATH_TEXT, FILEPATH_BINARY],
+    )
+    @responses.activate
+    def test_url_voided(self, filename: str):
+        # Test that voided stored url are cleared
+        responses.add(
+            responses.POST,
+            self.client.url,
+            adding_headers={"location": "http://tusd.tusdemo.net/files/foo"},
+        )
+        responses.add(
+            responses.HEAD,
+            "http://tusd.tusdemo.net/files/foo",
+            status=404,
+        )
+
+        # Create temporary storage file.
+        temp_fp = tempfile.NamedTemporaryFile(delete=False)
+        storage = filestorage.FileStorage(temp_fp.name)
+        uploader = self.client.uploader(
+            file_path=filename, store_url=True, url_storage=storage
+        )
+
+        # Conduct only POST creation so that we'd get a storage entry.
+        uploader.upload(stop_at=-1)
+        key = uploader._get_fingerprint()
+        # First ensure that an entry was created and stored.
+        self.assertIsNotNone(uploader.url)
+        self.assertIsNotNone(storage.get_item(key))
+
+        # Now start a new upload, resuming where we left off.
+        resumed_uploader = self.client.uploader(
+            file_path=filename, store_url=True, url_storage=storage
+        )
+        # HEAD response was 404 so url and storage has to be voided.
+        self.assertIsNone(resumed_uploader.url)
+        self.assertIsNone(storage.get_item(key))
+
+        # Remove the temporary storage file.
+        storage.close()
+        temp_fp.close()
+        os.remove(temp_fp.name)
 
     def test_request_length(self):
         self.uploader.chunk_size = 200
@@ -203,19 +249,19 @@ class UploaderTest(mixin.Mixin):
         # Upload URL being set means the POST request was sent and the empty
         # file was uploaded without a single PATCH request.
         self.assertTrue(uploader.url)
-    
+
     @mock.patch('tusclient.uploader.uploader.TusRequest')
     def test_upload_checksum(self, request_mock):
         self.mock_request(request_mock)
         self.uploader.upload_checksum = True
         self.uploader.upload()
         self.assertEqual(self.uploader.offset, self.uploader.get_file_size())
-    
+
     @parametrize("chunk_size", [1, 2, 3, 4, 5, 6])
     @responses.activate
     def test_upload_length_deferred(self, chunk_size: int):
         upload_url = f"{self.client.url}test_upload_length_deferred"
-        
+
         responses.head(
             upload_url,
             adding_headers={"upload-offset": "0", "Upload-Defer-Length": "1"},
@@ -228,7 +274,7 @@ class UploaderTest(mixin.Mixin):
         )
         self.assertTrue(uploader.upload_length_deferred)
         self.assertTrue(uploader.stop_at is None)
-        
+
         offset = 0
         while not (offset + chunk_size > 5):
             next_offset = min(offset + chunk_size, 5)
@@ -245,7 +291,7 @@ class UploaderTest(mixin.Mixin):
             adding_headers={"upload-offset": "5"},
             match=[matchers.header_matcher(last_req_headers)],
         )
-        
+
         uploader.upload()
         self.assertEqual(uploader.offset, 5)
         self.assertEqual(uploader.stop_at, 5)
