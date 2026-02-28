@@ -24,7 +24,7 @@ setup(
         ],
         'dev': [
             'tox>=2.3.1',
-            'sphinx-autobuild==2021.3.14',
+            'sphinx-autobuild==2024.10.3',
             'Sphinx==1.7.1'
         ]
     },
