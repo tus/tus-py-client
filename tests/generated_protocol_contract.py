@@ -100,6 +100,49 @@ TUS_PROTOCOL_OPERATIONS = [
                         },
                     ],
                 },
+                {
+                    'fields': [
+                        {
+                            'displayName': 'Tus-Resumable',
+                            'name': 'tus-resumable',
+                            'required': True,
+                        },
+                        {
+                            'displayName': 'Upload-Concat',
+                            'name': 'upload-concat',
+                            'required': True,
+                        },
+                        {
+                            'displayName': 'Upload-Length',
+                            'name': 'upload-length',
+                            'required': True,
+                        },
+                        {
+                            'displayName': 'Upload-Metadata',
+                            'name': 'upload-metadata',
+                            'required': False,
+                        },
+                    ],
+                },
+                {
+                    'fields': [
+                        {
+                            'displayName': 'Tus-Resumable',
+                            'name': 'tus-resumable',
+                            'required': True,
+                        },
+                        {
+                            'displayName': 'Upload-Concat',
+                            'name': 'upload-concat',
+                            'required': True,
+                        },
+                        {
+                            'displayName': 'Upload-Metadata',
+                            'name': 'upload-metadata',
+                            'required': False,
+                        },
+                    ],
+                },
             ],
         },
         'responses': [
@@ -321,11 +364,78 @@ TUS_CLIENT_FEATURES = [
         ],
     },
     {
+        'featureId': 'resumeUpload',
+        'operationIds': [
+            'getTusUploadOffset',
+            'patchTusUpload',
+        ],
+        'primitives': [
+            'fingerprint-input',
+            'resume-from-previous-upload',
+            'store-resume-url',
+        ],
+    },
+    {
+        'featureId': 'deferredLengthUpload',
+        'operationIds': [
+            'createTusUpload',
+            'patchTusUpload',
+        ],
+        'primitives': [
+            'defer-upload-length',
+            'emit-progress',
+        ],
+    },
+    {
+        'featureId': 'creationWithUpload',
+        'operationIds': [
+            'createTusUpload',
+        ],
+        'primitives': [
+            'upload-during-creation',
+            'emit-progress',
+        ],
+    },
+    {
+        'featureId': 'overridePatchMethod',
+        'operationIds': [
+            'getTusUploadOffset',
+            'patchTusUpload',
+        ],
+        'primitives': [
+            'override-patch-method',
+        ],
+    },
+    {
+        'featureId': 'parallelUploadConcat',
+        'operationIds': [
+            'createTusUpload',
+            'patchTusUpload',
+        ],
+        'primitives': [
+            'concatenate-partial-uploads',
+            'emit-progress',
+        ],
+    },
+    {
+        'featureId': 'retryOffsetRecovery',
+        'operationIds': [
+            'createTusUpload',
+            'getTusUploadOffset',
+            'patchTusUpload',
+        ],
+        'primitives': [
+            'retry-with-backoff',
+            'recover-offset-after-error',
+        ],
+    },
+    {
         'featureId': 'terminateUpload',
         'operationIds': [
             'terminateTusUpload',
         ],
         'primitives': [
+            'terminate-upload',
             'retry-with-backoff',
         ],
     },
