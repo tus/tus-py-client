@@ -10,6 +10,7 @@ from parametrize import parametrize
 import pytest
 
 from tusclient import exceptions
+from tusclient.fingerprint import fingerprint
 from tusclient.storage import filestorage
 from tests import mixin
 
@@ -85,9 +86,16 @@ class UploaderTest(mixin.Mixin):
         # test for stored urls
         responses.add(responses.HEAD, 'http://tusd.tusdemo.net/files/foo_bar',
                       adding_headers={"upload-offset": "10"})
-        storage_path = '{}/storage_file'.format(os.path.dirname(os.path.abspath(__file__)))
+        temp_fp = tempfile.NamedTemporaryFile(delete=False)
+        temp_fp.close()
+        storage = filestorage.FileStorage(temp_fp.name)
+        self.addCleanup(lambda: os.path.exists(temp_fp.name) and os.remove(temp_fp.name))
+        self.addCleanup(storage.close)
+        with open(filename, "rb") as stream:
+            key = fingerprint.Fingerprint().get_fingerprint(stream)
+        storage.set_item(key, "http://tusd.tusdemo.net/files/foo_bar")
         resumable_uploader = self.client.uploader(
-            file_path=filename, store_url=True, url_storage=filestorage.FileStorage(storage_path)
+            file_path=filename, store_url=True, url_storage=storage
         )
         self.assertEqual(resumable_uploader.url, "http://tusd.tusdemo.net/files/foo_bar")
         self.assertEqual(resumable_uploader.offset, 10)
