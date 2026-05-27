@@ -490,6 +490,35 @@ TUS_CLIENT_FEATURES = [
     {
         'conformance': {
             'scenarioIds': [
+                'uploadBodyHeaders',
+            ],
+            'status': 'covered-by-generated-scenario',
+        },
+        'description': 'Send protocol-specific upload body headers whenever the client transmits file bytes.',
+        'featureId': 'uploadBodyHeaders',
+        'flow': [
+            {
+                'kind': 'primitive',
+                'primitive': 'send-upload-body-headers',
+                'summary': 'Attach the protocol-specific upload body content type when a request has bytes.',
+            },
+            {
+                'kind': 'operation',
+                'operationId': 'patchTusUpload',
+                'summary': 'Upload bytes with the protocol-specific body headers.',
+            },
+        ],
+        'operationIds': [
+            'createTusUpload',
+            'patchTusUpload',
+        ],
+        'primitives': [
+            'send-upload-body-headers',
+        ],
+    },
+    {
+        'conformance': {
+            'scenarioIds': [
                 'overridePatchMethod',
             ],
             'status': 'covered-by-generated-scenario',
