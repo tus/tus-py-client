@@ -707,8 +707,11 @@ TUS_CLIENT_FEATURES = [
     },
     {
         'conformance': {
-            'scenarioIds': [],
-            'status': 'needs-generated-scenario',
+            'scenarioIds': [
+                'requestLifecycleHooks',
+                'retryPatchAfterOffsetRecovery',
+            ],
+            'status': 'covered-by-generated-scenario',
         },
         'description': 'Run before-request, after-response, and custom retry hooks around transport.',
         'featureId': 'requestLifecycleHooks',
