@@ -672,8 +672,12 @@ TUS_CLIENT_FEATURES = [
     },
     {
         'conformance': {
-            'scenarioIds': [],
-            'status': 'needs-generated-scenario',
+            'scenarioIds': [
+                'singleUploadLifecycle',
+                'creationWithUpload',
+                'resumeFromPreviousUpload',
+            ],
+            'status': 'covered-by-generated-scenario',
         },
         'description': 'Expose progress and accepted-chunk callbacks from runtime upload activity.',
         'featureId': 'uploadCallbacks',
