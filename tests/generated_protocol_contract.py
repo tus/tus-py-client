@@ -625,6 +625,37 @@ TUS_CLIENT_FEATURES = [
     {
         'conformance': {
             'scenarioIds': [
+                'retryPatchAfterOffsetRecovery',
+            ],
+            'status': 'covered-by-generated-scenario',
+        },
+        'description': 'Schedule retry timers and reset retry attempts after accepted progress.',
+        'featureId': 'retryStateTransitions',
+        'flow': [
+            {
+                'kind': 'primitive',
+                'primitive': 'schedule-retry-timer',
+                'summary': 'Consume the current retry delay and restart the upload after that timer fires.',
+            },
+            {
+                'kind': 'primitive',
+                'primitive': 'reset-retry-attempt-after-progress',
+                'summary': 'Reset retry attempts once a later retry observes server-side offset progress.',
+            },
+        ],
+        'operationIds': [
+            'getTusUploadOffset',
+            'patchTusUpload',
+        ],
+        'primitives': [
+            'retry-with-backoff',
+            'schedule-retry-timer',
+            'reset-retry-attempt-after-progress',
+        ],
+    },
+    {
+        'conformance': {
+            'scenarioIds': [
                 'terminateWithRetry',
             ],
             'status': 'covered-by-generated-scenario',
