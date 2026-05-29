@@ -737,8 +737,11 @@ TUS_CLIENT_FEATURES = [
     },
     {
         'conformance': {
-            'scenarioIds': [],
-            'status': 'needs-generated-scenario',
+            'scenarioIds': [
+                'singleUploadLifecycle',
+                'resumeFromPreviousUpload',
+            ],
+            'status': 'covered-by-generated-scenario',
         },
         'description': 'Persist, find, resume, and optionally remove upload URLs by fingerprint.',
         'featureId': 'resumeUrlStorage',
