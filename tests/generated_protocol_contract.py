@@ -856,8 +856,10 @@ TUS_CLIENT_FEATURES = [
     },
     {
         'conformance': {
-            'scenarioIds': [],
-            'status': 'needs-generated-scenario',
+            'scenarioIds': [
+                'relativeLocationResolution',
+            ],
+            'status': 'covered-by-generated-scenario',
         },
         'description': 'Normalize relative Location headers against the request endpoint.',
         'featureId': 'relativeLocationResolution',
