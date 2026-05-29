@@ -922,8 +922,18 @@ TUS_CLIENT_FEATURES = [
     },
     {
         'conformance': {
-            'scenarioIds': [],
-            'status': 'needs-generated-scenario',
+            'scenarioIds': [
+                'startValidationMissingInput',
+                'startValidationMissingEndpointOrUploadUrl',
+                'startValidationUnsupportedProtocol',
+                'startValidationRetryDelaysNotArray',
+                'startValidationParallelUploadsWithUploadUrl',
+                'startValidationParallelUploadsWithUploadSize',
+                'startValidationParallelUploadsWithDeferredLength',
+                'startValidationParallelBoundariesWithoutParallelUploads',
+                'startValidationParallelBoundariesLengthMismatch',
+            ],
+            'status': 'covered-by-generated-scenario',
         },
         'description': 'Validate option combinations before starting runtime work.',
         'featureId': 'startOptionValidation',
