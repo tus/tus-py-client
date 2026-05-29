@@ -873,8 +873,11 @@ TUS_CLIENT_FEATURES = [
     },
     {
         'conformance': {
-            'scenarioIds': [],
-            'status': 'needs-generated-scenario',
+            'scenarioIds': [
+                'ietfDraft05CreationWithUpload',
+                'ietfDraft03ResumeWithoutKnownLength',
+            ],
+            'status': 'covered-by-generated-scenario',
         },
         'description': 'Select between tus v1 and supported IETF draft client protocol modes.',
         'featureId': 'protocolVersionSelection',
