@@ -653,8 +653,10 @@ TUS_CLIENT_FEATURES = [
     },
     {
         'conformance': {
-            'scenarioIds': [],
-            'status': 'needs-generated-scenario',
+            'scenarioIds': [
+                'abortUpload',
+            ],
+            'status': 'covered-by-generated-scenario',
         },
         'description': 'Abort the active request, pending retry timer, and any partial uploads.',
         'featureId': 'abortUpload',
