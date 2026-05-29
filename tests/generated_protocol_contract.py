@@ -771,8 +771,14 @@ TUS_CLIENT_FEATURES = [
     },
     {
         'conformance': {
-            'scenarioIds': [],
-            'status': 'needs-generated-scenario',
+            'scenarioIds': [
+                'arrayBufferInput',
+                'arrayBufferViewInput',
+                'webReadableStreamInput',
+                'nodeReadableStreamInput',
+                'nodePathInput',
+            ],
+            'status': 'covered-by-generated-scenario',
         },
         'description': 'Support the reference client input/source families across runtimes.',
         'featureId': 'inputSources',
