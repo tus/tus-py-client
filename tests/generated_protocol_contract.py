@@ -845,8 +845,11 @@ TUS_CLIENT_FEATURES = [
     },
     {
         'conformance': {
-            'scenarioIds': [],
-            'status': 'needs-generated-scenario',
+            'scenarioIds': [
+                'webStorageUrlStorageBackend',
+                'fileUrlStorageBackend',
+            ],
+            'status': 'covered-by-generated-scenario',
         },
         'description': 'Support browser and file-backed URL storage implementations.',
         'featureId': 'urlStorageBackends',
