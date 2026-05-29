@@ -951,8 +951,11 @@ TUS_CLIENT_FEATURES = [
     },
     {
         'conformance': {
-            'scenarioIds': [],
-            'status': 'needs-generated-scenario',
+            'scenarioIds': [
+                'detailedCreateResponseError',
+                'detailedCreateRequestError',
+            ],
+            'status': 'covered-by-generated-scenario',
         },
         'description': 'Attach request, response, status, body, and request ID context to errors.',
         'featureId': 'detailedErrors',
