@@ -1024,6 +1024,11 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'kind': 'success',
             'uploadUrl': 'https://tus.io/uploads/generated-contract',
         },
+        'eventPolicy': {
+            'matching': 'ordered-subsequence',
+            'progress': 'milestone',
+            'transportProgress': 'may-emit-extra-samples',
+        },
         'featureId': 'singleUploadLifecycle',
         'input': {
             'content': 'hello world',
@@ -1127,6 +1132,11 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'kind': 'success',
             'uploadUrl': 'https://tus.io/uploads/creation-with-upload-contract',
         },
+        'eventPolicy': {
+            'matching': 'ordered-subsequence',
+            'progress': 'milestone',
+            'transportProgress': 'may-emit-extra-samples',
+        },
         'featureId': 'creationWithUpload',
         'input': {
             'content': 'hello world',
@@ -1195,6 +1205,11 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'completion': {
             'kind': 'success',
             'uploadUrl': 'https://tus.io/uploads/creation-with-upload-partial-contract',
+        },
+        'eventPolicy': {
+            'matching': 'ordered-subsequence',
+            'progress': 'milestone',
+            'transportProgress': 'may-emit-extra-samples',
         },
         'featureId': 'creationWithUpload',
         'input': {
@@ -1337,6 +1352,11 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'kind': 'success',
             'uploadUrl': 'https://tus.io/uploads/ietf-draft-05-contract',
         },
+        'eventPolicy': {
+            'matching': 'ordered-subsequence',
+            'progress': 'milestone',
+            'transportProgress': 'may-emit-extra-samples',
+        },
         'featureId': 'protocolVersionSelection',
         'input': {
             'content': 'hello world',
@@ -1412,6 +1432,11 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'completion': {
             'kind': 'success',
             'uploadUrl': 'https://tus.io/uploads/ietf-draft-03-resume-contract',
+        },
+        'eventPolicy': {
+            'matching': 'ordered-subsequence',
+            'progress': 'milestone',
+            'transportProgress': 'may-emit-extra-samples',
         },
         'featureId': 'protocolVersionSelection',
         'input': {
@@ -1939,6 +1964,11 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'kind': 'success',
             'uploadUrl': 'https://tus.io/uploads/resume-contract',
         },
+        'eventPolicy': {
+            'matching': 'ordered-subsequence',
+            'progress': 'milestone',
+            'transportProgress': 'may-emit-extra-samples',
+        },
         'featureId': 'resumeUpload',
         'input': {
             'content': 'hello world',
@@ -2048,6 +2078,11 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'completion': {
             'kind': 'success',
             'uploadUrl': 'https://tus.io/files/relative-contract',
+        },
+        'eventPolicy': {
+            'matching': 'ordered-subsequence',
+            'progress': 'milestone',
+            'transportProgress': 'may-emit-extra-samples',
         },
         'featureId': 'relativeLocationResolution',
         'input': {
@@ -2498,6 +2533,11 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'kind': 'success',
             'uploadUrl': 'https://tus.io/uploads/deferred-contract',
         },
+        'eventPolicy': {
+            'matching': 'ordered-subsequence',
+            'progress': 'milestone',
+            'transportProgress': 'may-emit-extra-samples',
+        },
         'featureId': 'deferredLengthUpload',
         'input': {
             'chunkSize': 100,
@@ -2645,6 +2685,11 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'completion': {
             'kind': 'success',
             'uploadUrl': 'https://tus.io/uploads/parallel-final',
+        },
+        'eventPolicy': {
+            'matching': 'ordered-subsequence',
+            'progress': 'milestone',
+            'transportProgress': 'may-emit-extra-samples',
         },
         'featureId': 'parallelUploadConcat',
         'input': {
