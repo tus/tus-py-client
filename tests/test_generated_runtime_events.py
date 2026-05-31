@@ -28,6 +28,9 @@ CASES = [
         'removeFingerprintOnSuccess': False,
         'requests': [
             {
+                'headers': {
+                    'Upload-Length': '11',
+                },
                 'method': 'POST',
                 'responseHeaders': {
                     'Location': 'https://tus.io/uploads/generated-contract',
@@ -36,6 +39,9 @@ CASES = [
                 'url': 'endpoint',
             },
             {
+                'headers': {
+                    'Upload-Offset': '0',
+                },
                 'method': 'PATCH',
                 'responseHeaders': {
                     'Upload-Offset': '11',
@@ -62,6 +68,7 @@ CASES = [
         'removeFingerprintOnSuccess': True,
         'requests': [
             {
+                'headers': {},
                 'method': 'HEAD',
                 'responseHeaders': {
                     'Upload-Length': '11',
@@ -71,6 +78,9 @@ CASES = [
                 'url': 'upload',
             },
             {
+                'headers': {
+                    'Upload-Offset': '5',
+                },
                 'method': 'PATCH',
                 'responseHeaders': {
                     'Upload-Offset': '11',
@@ -103,6 +113,9 @@ CASES = [
         'removeFingerprintOnSuccess': False,
         'requests': [
             {
+                'headers': {
+                    'Upload-Length': '11',
+                },
                 'method': 'POST',
                 'responseHeaders': {
                     'Location': 'relative-contract',
@@ -111,6 +124,9 @@ CASES = [
                 'url': 'endpoint',
             },
             {
+                'headers': {
+                    'Upload-Offset': '0',
+                },
                 'method': 'PATCH',
                 'responseHeaders': {
                     'Upload-Offset': '11',
@@ -139,6 +155,9 @@ CASES = [
         'removeFingerprintOnSuccess': False,
         'requests': [
             {
+                'headers': {
+                    'Upload-Defer-Length': '1',
+                },
                 'method': 'POST',
                 'responseHeaders': {
                     'Location': 'https://tus.io/uploads/deferred-contract',
@@ -147,6 +166,10 @@ CASES = [
                 'url': 'endpoint',
             },
             {
+                'headers': {
+                    'Upload-Length': '11',
+                    'Upload-Offset': '0',
+                },
                 'method': 'PATCH',
                 'responseHeaders': {
                     'Upload-Offset': '11',
@@ -216,6 +239,7 @@ class GeneratedTusRuntimeEventsTest(unittest.TestCase):
             events = []
             client = TusClient(case['endpointUrl'])
             storage = storage_for(case)
+            first_call_index = len(responses.calls)
 
             for request in case['requests']:
                 url = case['endpointUrl'] if request['url'] == 'endpoint' else case['uploadUrl']
@@ -241,6 +265,7 @@ class GeneratedTusRuntimeEventsTest(unittest.TestCase):
             uploader.upload()
 
             self.assertEqual(events, case['eventKeys'], case['scenarioId'])
+            assert_request_sequence(self, case, responses.calls[first_call_index:])
             assert_stored_upload_state(self, case, storage)
 
 
@@ -258,6 +283,27 @@ def fingerprinter_for(case):
         return None
 
     return GeneratedTusFingerprinter(case['storedUpload']['fingerprint'])
+
+
+def request_header(request, name):
+    return request.headers.get(name) or request.headers.get(name.lower())
+
+
+def assert_request_sequence(test, case, calls):
+    test.assertEqual(len(calls), len(case['requests']), case['scenarioId'])
+
+    for index, expected_request in enumerate(case['requests']):
+        actual_request = calls[index].request
+        expected_url = (
+            case['endpointUrl']
+            if expected_request['url'] == 'endpoint'
+            else case['uploadUrl']
+        )
+
+        test.assertEqual(actual_request.method, expected_request['method'], case['scenarioId'])
+        test.assertEqual(actual_request.url, expected_url, case['scenarioId'])
+        for name, value in expected_request['headers'].items():
+            test.assertEqual(request_header(actual_request, name), value, case['scenarioId'])
 
 
 def assert_stored_upload_state(test, case, storage):

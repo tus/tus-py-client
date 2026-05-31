@@ -618,6 +618,7 @@ TUS_CLIENT_FEATURES = [
             'patchTusUpload',
         ],
         'primitives': [
+            'abort-current-request',
             'concatenate-partial-uploads',
             'emit-progress',
             'split-parallel-upload-boundaries',
