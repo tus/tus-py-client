@@ -124,6 +124,42 @@ CASES = [
         'uploadLengthDeferred': False,
         'uploadUrl': 'https://tus.io/files/relative-contract',
     },
+    {
+        'chunkSize': 100,
+        'content': 'hello world',
+        'endpointUrl': 'https://tus.io/uploads',
+        'eventKeys': [
+            'progress:0:11',
+            'progress:11:11',
+            'chunk-complete:11:11:11',
+        ],
+        'metadata': {
+            'filename': 'hello.txt',
+        },
+        'removeFingerprintOnSuccess': False,
+        'requests': [
+            {
+                'method': 'POST',
+                'responseHeaders': {
+                    'Location': 'https://tus.io/uploads/deferred-contract',
+                },
+                'statusCode': 201,
+                'url': 'endpoint',
+            },
+            {
+                'method': 'PATCH',
+                'responseHeaders': {
+                    'Upload-Offset': '11',
+                },
+                'statusCode': 204,
+                'url': 'upload',
+            },
+        ],
+        'scenarioId': 'deferredLengthUpload',
+        'storedUpload': None,
+        'uploadLengthDeferred': True,
+        'uploadUrl': 'https://tus.io/uploads/deferred-contract',
+    },
 ]
 
 
@@ -198,6 +234,7 @@ class GeneratedTusRuntimeEventsTest(unittest.TestCase):
                 url_storage=storage,
                 fingerprinter=fingerprinter_for(case),
                 remove_fingerprint_on_success=case['removeFingerprintOnSuccess'],
+                upload_length_deferred=case['uploadLengthDeferred'],
                 on_progress=record_progress(events),
                 on_chunk_complete=record_chunk_complete(events),
             )
