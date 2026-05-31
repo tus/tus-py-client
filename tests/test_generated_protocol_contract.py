@@ -5,6 +5,7 @@ from urllib.parse import urljoin
 import responses
 
 from tests.generated_protocol_contract import (
+    TUS_CLIENT_CONFORMANCE_SCENARIOS,
     TUS_CLIENT_FEATURES,
     TUS_PROTOCOL_OPERATIONS,
     TUS_WIRE_VERSIONS,
@@ -32,6 +33,13 @@ def client_feature(feature_id):
         if feature["featureId"] == feature_id:
             return feature
     raise AssertionError("Missing generated TUS client feature: {}".format(feature_id))
+
+
+def client_scenario(scenario_id):
+    for scenario in TUS_CLIENT_CONFORMANCE_SCENARIOS:
+        if scenario["scenarioId"] == scenario_id:
+            return scenario
+    raise AssertionError("Missing generated TUS client scenario: {}".format(scenario_id))
 
 
 def response_for(operation, status_code):
@@ -150,3 +158,17 @@ class GeneratedProtocolContractTest(unittest.TestCase):
         self.assertEqual(patch_request.body, b"hello")
         self.assertEqual(uploader.url, upload_url)
         self.assertEqual(uploader.offset, 5)
+
+    def test_conformance_scenarios_include_projected_event_keys(self):
+        feature = client_feature("creationWithUpload")
+        scenario = client_scenario("creationWithUploadPartialChunk")
+        event_keys = [event["key"] for event in scenario["events"]]
+
+        self.assertIn(scenario["scenarioId"], feature["conformance"]["scenarioIds"])
+        self.assertEqual(scenario["behavior"], "creation-with-upload-partial-chunk")
+        self.assertEqual(scenario["completion"]["kind"], "success")
+        self.assertIn("createTusUpload", scenario["operationIds"])
+        self.assertIn("patchTusUpload", scenario["operationIds"])
+        self.assertIn("upload-during-creation", scenario["primitives"])
+        self.assertIn("chunk-complete:5:10:11", event_keys)
+        self.assertIn("chunk-complete:1:11:11", event_keys)

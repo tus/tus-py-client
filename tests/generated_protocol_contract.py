@@ -462,6 +462,7 @@ TUS_CLIENT_FEATURES = [
         'conformance': {
             'scenarioIds': [
                 'creationWithUpload',
+                'creationWithUploadPartialChunk',
             ],
             'status': 'covered-by-generated-scenario',
         },
@@ -481,6 +482,7 @@ TUS_CLIENT_FEATURES = [
         ],
         'operationIds': [
             'createTusUpload',
+            'patchTusUpload',
         ],
         'primitives': [
             'upload-during-creation',
@@ -514,6 +516,40 @@ TUS_CLIENT_FEATURES = [
         ],
         'primitives': [
             'send-upload-body-headers',
+        ],
+    },
+    {
+        'conformance': {
+            'scenarioIds': [
+                'customRequestHeaders',
+            ],
+            'status': 'covered-by-generated-scenario',
+        },
+        'description': 'Apply user-provided request headers to every upload request.',
+        'featureId': 'customRequestHeaders',
+        'flow': [
+            {
+                'kind': 'primitive',
+                'primitive': 'apply-custom-request-headers',
+                'summary': 'Merge user-provided headers after protocol headers are prepared.',
+            },
+            {
+                'kind': 'operation',
+                'operationId': 'createTusUpload',
+                'summary': 'Create uploads with the configured custom headers.',
+            },
+            {
+                'kind': 'operation',
+                'operationId': 'patchTusUpload',
+                'summary': 'Upload bytes with the configured custom headers.',
+            },
+        ],
+        'operationIds': [
+            'createTusUpload',
+            'patchTusUpload',
+        ],
+        'primitives': [
+            'apply-custom-request-headers',
         ],
     },
     {
@@ -554,10 +590,11 @@ TUS_CLIENT_FEATURES = [
         'conformance': {
             'scenarioIds': [
                 'parallelUploadConcat',
+                'parallelUploadAbortCleanup',
             ],
             'status': 'covered-by-generated-scenario',
         },
-        'description': 'Split one input into partial uploads and concatenate their upload URLs.',
+        'description': 'Split one input into partial uploads, run the parts concurrently, clean up aborted parts, and concatenate their upload URLs.',
         'featureId': 'parallelUploadConcat',
         'flow': [
             {
@@ -584,6 +621,7 @@ TUS_CLIENT_FEATURES = [
             'concatenate-partial-uploads',
             'emit-progress',
             'split-parallel-upload-boundaries',
+            'terminate-upload',
         ],
     },
     {
@@ -686,6 +724,7 @@ TUS_CLIENT_FEATURES = [
         'conformance': {
             'scenarioIds': [
                 'abortUpload',
+                'abortUploadAfterStoredUrl',
             ],
             'status': 'covered-by-generated-scenario',
         },
@@ -698,9 +737,12 @@ TUS_CLIENT_FEATURES = [
                 'summary': 'Cancel in-flight transport work without emitting user callbacks after abort.',
             },
         ],
-        'operationIds': [],
+        'operationIds': [
+            'terminateTusUpload',
+        ],
         'primitives': [
             'abort-current-request',
+            'terminate-upload',
         ],
     },
     {
@@ -930,6 +972,7 @@ TUS_CLIENT_FEATURES = [
                 'startValidationParallelUploadsWithUploadUrl',
                 'startValidationParallelUploadsWithUploadSize',
                 'startValidationParallelUploadsWithDeferredLength',
+                'startValidationParallelUploadsWithUploadDataDuringCreation',
                 'startValidationParallelBoundariesWithoutParallelUploads',
                 'startValidationParallelBoundariesLengthMismatch',
             ],
@@ -970,5 +1013,2282 @@ TUS_CLIENT_FEATURES = [
         'primitives': [
             'report-detailed-errors',
         ],
+    },
+]
+
+TUS_CLIENT_CONFORMANCE_SCENARIOS = [
+    {
+        'behavior': 'single-upload-lifecycle',
+        'completion': {
+            'kind': 'success',
+            'uploadUrl': 'https://tus.io/uploads/generated-contract',
+        },
+        'featureId': 'singleUploadLifecycle',
+        'input': {
+            'content': 'hello world',
+            'endpointUrl': 'https://tus.io/uploads',
+            'fingerprint': 'contract-single-fingerprint',
+            'kind': 'blob',
+            'metadata': {
+                'filename': 'hello.txt',
+            },
+        },
+        'operationIds': [
+            'createTusUpload',
+            'patchTusUpload',
+        ],
+        'primitives': [
+            'open-input-source',
+            'fingerprint-input',
+            'store-resume-url',
+            'retry-with-backoff',
+            'emit-progress',
+            'abort-current-request',
+        ],
+        'requests': [
+            {
+                'headers': {
+                    'Upload-Length': '11',
+                },
+                'operationId': 'createTusUpload',
+                'response': {
+                    'headers': {
+                        'Location': 'https://tus.io/uploads/generated-contract',
+                    },
+                    'statusCode': 201,
+                },
+                'url': 'endpoint',
+            },
+            {
+                'bodySize': 11,
+                'headers': {
+                    'Upload-Offset': '0',
+                },
+                'operationId': 'patchTusUpload',
+                'response': {
+                    'headers': {
+                        'Upload-Offset': '11',
+                    },
+                    'statusCode': 204,
+                },
+                'url': 'upload',
+            },
+        ],
+        'scenarioId': 'singleUploadLifecycle',
+        'events': [
+            {
+                'fingerprint': 'contract-single-fingerprint',
+                'kind': 'fingerprint',
+                'key': 'fingerprint:contract-single-fingerprint',
+            },
+            {
+                'kind': 'upload-url-available',
+                'key': 'upload-url-available',
+            },
+            {
+                'fingerprint': 'contract-single-fingerprint',
+                'kind': 'url-storage-add',
+                'uploadUrl': 'https://tus.io/uploads/generated-contract',
+                'key': 'url-storage-add:contract-single-fingerprint:https://tus.io/uploads/generated-contract',
+            },
+            {
+                'bytesSent': 0,
+                'bytesTotal': 11,
+                'kind': 'progress',
+                'key': 'progress:0:11',
+            },
+            {
+                'bytesSent': 11,
+                'bytesTotal': 11,
+                'kind': 'progress',
+                'key': 'progress:11:11',
+            },
+            {
+                'bytesAccepted': 11,
+                'bytesTotal': 11,
+                'chunkSize': 11,
+                'kind': 'chunk-complete',
+                'key': 'chunk-complete:11:11:11',
+            },
+            {
+                'kind': 'success',
+                'key': 'success',
+            },
+            {
+                'kind': 'source-close',
+                'key': 'source-close',
+            },
+        ],
+    },
+    {
+        'behavior': 'creation-with-upload',
+        'completion': {
+            'kind': 'success',
+            'uploadUrl': 'https://tus.io/uploads/creation-with-upload-contract',
+        },
+        'featureId': 'creationWithUpload',
+        'input': {
+            'content': 'hello world',
+            'endpointUrl': 'https://tus.io/uploads',
+            'kind': 'blob',
+            'metadata': {
+                'filename': 'hello.txt',
+            },
+            'uploadDataDuringCreation': True,
+        },
+        'operationIds': [
+            'createTusUpload',
+        ],
+        'primitives': [
+            'upload-during-creation',
+            'emit-progress',
+        ],
+        'requests': [
+            {
+                'bodySize': 11,
+                'headers': {
+                    'Content-Type': 'application/offset+octet-stream',
+                    'Upload-Length': '11',
+                },
+                'operationId': 'createTusUpload',
+                'response': {
+                    'headers': {
+                        'Location': 'https://tus.io/uploads/creation-with-upload-contract',
+                        'Upload-Offset': '11',
+                    },
+                    'statusCode': 201,
+                },
+                'url': 'endpoint',
+            },
+        ],
+        'scenarioId': 'creationWithUpload',
+        'events': [
+            {
+                'bytesSent': 0,
+                'bytesTotal': 11,
+                'kind': 'progress',
+                'key': 'progress:0:11',
+            },
+            {
+                'bytesSent': 11,
+                'bytesTotal': 11,
+                'kind': 'progress',
+                'key': 'progress:11:11',
+            },
+            {
+                'kind': 'upload-url-available',
+                'key': 'upload-url-available',
+            },
+            {
+                'kind': 'success',
+                'key': 'success',
+            },
+            {
+                'kind': 'source-close',
+                'key': 'source-close',
+            },
+        ],
+    },
+    {
+        'behavior': 'creation-with-upload-partial-chunk',
+        'completion': {
+            'kind': 'success',
+            'uploadUrl': 'https://tus.io/uploads/creation-with-upload-partial-contract',
+        },
+        'featureId': 'creationWithUpload',
+        'input': {
+            'chunkSize': 5,
+            'content': 'hello world',
+            'endpointUrl': 'https://tus.io/uploads',
+            'kind': 'blob',
+            'metadata': {
+                'filename': 'hello.txt',
+            },
+            'uploadDataDuringCreation': True,
+        },
+        'operationIds': [
+            'createTusUpload',
+            'patchTusUpload',
+        ],
+        'primitives': [
+            'upload-during-creation',
+            'emit-progress',
+        ],
+        'requests': [
+            {
+                'bodySize': 5,
+                'headers': {
+                    'Content-Type': 'application/offset+octet-stream',
+                    'Upload-Length': '11',
+                },
+                'operationId': 'createTusUpload',
+                'response': {
+                    'headers': {
+                        'Location': 'https://tus.io/uploads/creation-with-upload-partial-contract',
+                        'Upload-Offset': '5',
+                    },
+                    'statusCode': 201,
+                },
+                'url': 'endpoint',
+            },
+            {
+                'bodySize': 5,
+                'headers': {
+                    'Content-Type': 'application/offset+octet-stream',
+                    'Upload-Offset': '5',
+                },
+                'operationId': 'patchTusUpload',
+                'response': {
+                    'headers': {
+                        'Upload-Offset': '10',
+                    },
+                    'statusCode': 204,
+                },
+                'uploadUrl': 'https://tus.io/uploads/creation-with-upload-partial-contract',
+                'url': 'upload',
+            },
+            {
+                'bodySize': 1,
+                'headers': {
+                    'Content-Type': 'application/offset+octet-stream',
+                    'Upload-Offset': '10',
+                },
+                'operationId': 'patchTusUpload',
+                'response': {
+                    'headers': {
+                        'Upload-Offset': '11',
+                    },
+                    'statusCode': 204,
+                },
+                'uploadUrl': 'https://tus.io/uploads/creation-with-upload-partial-contract',
+                'url': 'upload',
+            },
+        ],
+        'scenarioId': 'creationWithUploadPartialChunk',
+        'events': [
+            {
+                'bytesSent': 0,
+                'bytesTotal': 11,
+                'kind': 'progress',
+                'key': 'progress:0:11',
+            },
+            {
+                'bytesSent': 5,
+                'bytesTotal': 11,
+                'kind': 'progress',
+                'key': 'progress:5:11',
+            },
+            {
+                'kind': 'upload-url-available',
+                'key': 'upload-url-available',
+            },
+            {
+                'bytesSent': 5,
+                'bytesTotal': 11,
+                'kind': 'progress',
+                'key': 'progress:5:11',
+            },
+            {
+                'bytesSent': 10,
+                'bytesTotal': 11,
+                'kind': 'progress',
+                'key': 'progress:10:11',
+            },
+            {
+                'bytesAccepted': 10,
+                'bytesTotal': 11,
+                'chunkSize': 5,
+                'kind': 'chunk-complete',
+                'key': 'chunk-complete:5:10:11',
+            },
+            {
+                'bytesSent': 10,
+                'bytesTotal': 11,
+                'kind': 'progress',
+                'key': 'progress:10:11',
+            },
+            {
+                'bytesSent': 11,
+                'bytesTotal': 11,
+                'kind': 'progress',
+                'key': 'progress:11:11',
+            },
+            {
+                'bytesAccepted': 11,
+                'bytesTotal': 11,
+                'chunkSize': 1,
+                'kind': 'chunk-complete',
+                'key': 'chunk-complete:1:11:11',
+            },
+            {
+                'kind': 'success',
+                'key': 'success',
+            },
+            {
+                'kind': 'source-close',
+                'key': 'source-close',
+            },
+        ],
+    },
+    {
+        'behavior': 'creation-with-upload',
+        'completion': {
+            'kind': 'success',
+            'uploadUrl': 'https://tus.io/uploads/ietf-draft-05-contract',
+        },
+        'featureId': 'protocolVersionSelection',
+        'input': {
+            'content': 'hello world',
+            'endpointUrl': 'https://tus.io/uploads',
+            'kind': 'blob',
+            'metadata': {
+                'filename': 'hello.txt',
+            },
+            'protocol': 'ietf-draft-05',
+            'uploadDataDuringCreation': True,
+        },
+        'operationIds': [
+            'createTusUpload',
+        ],
+        'primitives': [
+            'select-client-protocol',
+        ],
+        'requests': [
+            {
+                'absentHeaders': [
+                    'Tus-Resumable',
+                ],
+                'bodySize': 11,
+                'headerMode': 'exact',
+                'headers': {
+                    'Content-Type': 'application/partial-upload',
+                    'Upload-Complete': '?1',
+                    'Upload-Draft-Interop-Version': '6',
+                    'Upload-Length': '11',
+                },
+                'operationId': 'createTusUpload',
+                'response': {
+                    'headerMode': 'exact',
+                    'headers': {
+                        'Location': 'https://tus.io/uploads/ietf-draft-05-contract',
+                        'Upload-Offset': '11',
+                    },
+                    'statusCode': 201,
+                },
+                'url': 'endpoint',
+            },
+        ],
+        'scenarioId': 'ietfDraft05CreationWithUpload',
+        'events': [
+            {
+                'bytesSent': 0,
+                'bytesTotal': 11,
+                'kind': 'progress',
+                'key': 'progress:0:11',
+            },
+            {
+                'bytesSent': 11,
+                'bytesTotal': 11,
+                'kind': 'progress',
+                'key': 'progress:11:11',
+            },
+            {
+                'kind': 'upload-url-available',
+                'key': 'upload-url-available',
+            },
+            {
+                'kind': 'success',
+                'key': 'success',
+            },
+            {
+                'kind': 'source-close',
+                'key': 'source-close',
+            },
+        ],
+    },
+    {
+        'behavior': 'upload-body-headers',
+        'completion': {
+            'kind': 'success',
+            'uploadUrl': 'https://tus.io/uploads/ietf-draft-03-resume-contract',
+        },
+        'featureId': 'protocolVersionSelection',
+        'input': {
+            'chunkSize': 6,
+            'content': 'hello world',
+            'endpointUrl': 'https://tus.io/uploads',
+            'kind': 'blob',
+            'protocol': 'ietf-draft-03',
+            'uploadUrl': 'https://tus.io/uploads/ietf-draft-03-resume-contract',
+        },
+        'operationIds': [
+            'getTusUploadOffset',
+            'patchTusUpload',
+        ],
+        'primitives': [
+            'select-client-protocol',
+        ],
+        'requests': [
+            {
+                'absentHeaders': [
+                    'Tus-Resumable',
+                ],
+                'headerMode': 'exact',
+                'headers': {
+                    'Upload-Draft-Interop-Version': '5',
+                },
+                'operationId': 'getTusUploadOffset',
+                'response': {
+                    'headerMode': 'exact',
+                    'headers': {
+                        'Upload-Offset': '5',
+                    },
+                    'statusCode': 200,
+                },
+                'url': 'upload',
+            },
+            {
+                'absentHeaders': [
+                    'Content-Type',
+                    'Tus-Resumable',
+                ],
+                'bodySize': 6,
+                'headerMode': 'exact',
+                'headers': {
+                    'Upload-Complete': '?1',
+                    'Upload-Draft-Interop-Version': '5',
+                    'Upload-Offset': '5',
+                },
+                'operationId': 'patchTusUpload',
+                'response': {
+                    'headerMode': 'exact',
+                    'headers': {
+                        'Upload-Offset': '11',
+                    },
+                    'statusCode': 204,
+                },
+                'url': 'upload',
+            },
+        ],
+        'scenarioId': 'ietfDraft03ResumeWithoutKnownLength',
+        'events': [
+            {
+                'kind': 'upload-url-available',
+                'key': 'upload-url-available',
+            },
+            {
+                'bytesSent': 5,
+                'bytesTotal': 11,
+                'kind': 'progress',
+                'key': 'progress:5:11',
+            },
+            {
+                'bytesSent': 11,
+                'bytesTotal': 11,
+                'kind': 'progress',
+                'key': 'progress:11:11',
+            },
+            {
+                'bytesAccepted': 11,
+                'bytesTotal': 11,
+                'chunkSize': 6,
+                'kind': 'chunk-complete',
+                'key': 'chunk-complete:6:11:11',
+            },
+            {
+                'kind': 'success',
+                'key': 'success',
+            },
+            {
+                'kind': 'source-close',
+                'key': 'source-close',
+            },
+        ],
+    },
+    {
+        'behavior': 'start-option-validation',
+        'completion': {
+            'kind': 'error',
+            'message': 'tus: no file or stream to upload provided',
+            'reason': 'missingInput',
+        },
+        'featureId': 'startOptionValidation',
+        'input': {
+            'content': '',
+            'endpointUrl': 'https://tus.io/uploads',
+            'kind': 'none',
+        },
+        'operationIds': [],
+        'primitives': [
+            'validate-start-options',
+        ],
+        'requests': [],
+        'scenarioId': 'startValidationMissingInput',
+    },
+    {
+        'behavior': 'start-option-validation',
+        'completion': {
+            'kind': 'error',
+            'message': 'tus: neither an endpoint or an upload URL is provided',
+            'reason': 'missingEndpointOrUploadUrl',
+        },
+        'featureId': 'startOptionValidation',
+        'input': {
+            'content': 'hello world',
+            'kind': 'blob',
+        },
+        'operationIds': [],
+        'primitives': [
+            'validate-start-options',
+        ],
+        'requests': [],
+        'scenarioId': 'startValidationMissingEndpointOrUploadUrl',
+    },
+    {
+        'behavior': 'start-option-validation',
+        'completion': {
+            'kind': 'error',
+            'message': 'tus: unsupported protocol tus-v9',
+            'reason': 'unsupportedProtocol',
+        },
+        'featureId': 'startOptionValidation',
+        'input': {
+            'content': 'hello world',
+            'endpointUrl': 'https://tus.io/uploads',
+            'kind': 'blob',
+            'protocol': 'tus-v9',
+        },
+        'operationIds': [],
+        'primitives': [
+            'validate-start-options',
+        ],
+        'requests': [],
+        'scenarioId': 'startValidationUnsupportedProtocol',
+    },
+    {
+        'behavior': 'start-option-validation',
+        'completion': {
+            'kind': 'error',
+            'message': 'tus: the `retryDelays` option must either be an array or null',
+            'reason': 'retryDelaysNotArray',
+        },
+        'featureId': 'startOptionValidation',
+        'input': {
+            'content': 'hello world',
+            'endpointUrl': 'https://tus.io/uploads',
+            'kind': 'blob',
+            'rawOptions': {
+                'retryDelays': 44,
+            },
+        },
+        'operationIds': [],
+        'primitives': [
+            'validate-start-options',
+        ],
+        'requests': [],
+        'scenarioId': 'startValidationRetryDelaysNotArray',
+    },
+    {
+        'behavior': 'start-option-validation',
+        'completion': {
+            'kind': 'error',
+            'message': 'tus: cannot use the `uploadUrl` option when parallelUploads is enabled',
+            'reason': 'parallelUploadsWithUploadUrl',
+        },
+        'featureId': 'startOptionValidation',
+        'input': {
+            'content': 'hello world',
+            'endpointUrl': 'https://tus.io/uploads',
+            'kind': 'blob',
+            'parallelUploads': 2,
+            'uploadUrl': 'https://tus.io/uploads/start-validation-upload-url',
+        },
+        'operationIds': [],
+        'primitives': [
+            'validate-start-options',
+        ],
+        'requests': [],
+        'scenarioId': 'startValidationParallelUploadsWithUploadUrl',
+    },
+    {
+        'behavior': 'start-option-validation',
+        'completion': {
+            'kind': 'error',
+            'message': 'tus: cannot use the `uploadSize` option when parallelUploads is enabled',
+            'reason': 'parallelUploadsWithUploadSize',
+        },
+        'featureId': 'startOptionValidation',
+        'input': {
+            'content': 'hello world',
+            'endpointUrl': 'https://tus.io/uploads',
+            'kind': 'blob',
+            'parallelUploads': 2,
+            'uploadSize': 11,
+        },
+        'operationIds': [],
+        'primitives': [
+            'validate-start-options',
+        ],
+        'requests': [],
+        'scenarioId': 'startValidationParallelUploadsWithUploadSize',
+    },
+    {
+        'behavior': 'start-option-validation',
+        'completion': {
+            'kind': 'error',
+            'message': 'tus: cannot use the `uploadLengthDeferred` option when parallelUploads is enabled',
+            'reason': 'parallelUploadsWithDeferredLength',
+        },
+        'featureId': 'startOptionValidation',
+        'input': {
+            'content': 'hello world',
+            'endpointUrl': 'https://tus.io/uploads',
+            'kind': 'blob',
+            'parallelUploads': 2,
+            'uploadLengthDeferred': True,
+        },
+        'operationIds': [],
+        'primitives': [
+            'validate-start-options',
+        ],
+        'requests': [],
+        'scenarioId': 'startValidationParallelUploadsWithDeferredLength',
+    },
+    {
+        'behavior': 'start-option-validation',
+        'completion': {
+            'kind': 'error',
+            'message': 'tus: cannot use the `uploadDataDuringCreation` option when parallelUploads is enabled',
+            'reason': 'parallelUploadsWithUploadDataDuringCreation',
+        },
+        'featureId': 'startOptionValidation',
+        'input': {
+            'content': 'hello world',
+            'endpointUrl': 'https://tus.io/uploads',
+            'kind': 'blob',
+            'parallelUploads': 2,
+            'uploadDataDuringCreation': True,
+        },
+        'operationIds': [],
+        'primitives': [
+            'validate-start-options',
+        ],
+        'requests': [],
+        'scenarioId': 'startValidationParallelUploadsWithUploadDataDuringCreation',
+    },
+    {
+        'behavior': 'start-option-validation',
+        'completion': {
+            'kind': 'error',
+            'message': 'tus: cannot use the `parallelUploadBoundaries` option when `parallelUploads` is disabled',
+            'reason': 'parallelBoundariesWithoutParallelUploads',
+        },
+        'featureId': 'startOptionValidation',
+        'input': {
+            'content': 'hello world',
+            'endpointUrl': 'https://tus.io/uploads',
+            'kind': 'blob',
+            'parallelUploadBoundaries': [
+                {
+                    'end': 5,
+                    'start': 0,
+                },
+            ],
+        },
+        'operationIds': [],
+        'primitives': [
+            'validate-start-options',
+        ],
+        'requests': [],
+        'scenarioId': 'startValidationParallelBoundariesWithoutParallelUploads',
+    },
+    {
+        'behavior': 'start-option-validation',
+        'completion': {
+            'kind': 'error',
+            'message': 'tus: the `parallelUploadBoundaries` must have the same length as the value of `parallelUploads`',
+            'reason': 'parallelBoundariesLengthMismatch',
+        },
+        'featureId': 'startOptionValidation',
+        'input': {
+            'content': 'hello world',
+            'endpointUrl': 'https://tus.io/uploads',
+            'kind': 'blob',
+            'parallelUploadBoundaries': [
+                {
+                    'end': 5,
+                    'start': 0,
+                },
+            ],
+            'parallelUploads': 2,
+        },
+        'operationIds': [],
+        'primitives': [
+            'validate-start-options',
+        ],
+        'requests': [],
+        'scenarioId': 'startValidationParallelBoundariesLengthMismatch',
+    },
+    {
+        'behavior': 'detailed-error',
+        'completion': {
+            'kind': 'error',
+            'message': 'tus: unexpected response while creating upload, originated from request (method: POST, url: https://tus.io/uploads, response code: 500, response text: server_error, request id: contract-request-id)',
+            'reason': 'unexpectedCreateResponse',
+        },
+        'featureId': 'detailedErrors',
+        'input': {
+            'content': 'hello world',
+            'endpointUrl': 'https://tus.io/uploads',
+            'headers': {
+                'X-Request-ID': 'contract-request-id',
+            },
+            'kind': 'blob',
+            'metadata': {
+                'filename': 'hello.txt',
+            },
+            'rawOptions': {
+                'retryDelays': None,
+            },
+        },
+        'operationIds': [
+            'createTusUpload',
+        ],
+        'primitives': [
+            'report-detailed-errors',
+        ],
+        'requests': [
+            {
+                'headers': {
+                    'Upload-Length': '11',
+                    'X-Request-ID': 'contract-request-id',
+                },
+                'operationId': 'createTusUpload',
+                'response': {
+                    'body': 'server_error',
+                    'statusCode': 500,
+                },
+                'url': 'endpoint',
+            },
+        ],
+        'scenarioId': 'detailedCreateResponseError',
+    },
+    {
+        'behavior': 'detailed-error',
+        'completion': {
+            'kind': 'error',
+            'message': 'tus: failed to create upload, caused by Error: socket down, originated from request (method: POST, url: https://tus.io/uploads, response code: n/a, response text: n/a, request id: contract-request-id)',
+            'reason': 'createUploadRequestFailed',
+        },
+        'featureId': 'detailedErrors',
+        'input': {
+            'content': 'hello world',
+            'endpointUrl': 'https://tus.io/uploads',
+            'headers': {
+                'X-Request-ID': 'contract-request-id',
+            },
+            'kind': 'blob',
+            'metadata': {
+                'filename': 'hello.txt',
+            },
+            'rawOptions': {
+                'retryDelays': None,
+            },
+        },
+        'operationIds': [
+            'createTusUpload',
+        ],
+        'primitives': [
+            'report-detailed-errors',
+        ],
+        'requests': [
+            {
+                'error': {
+                    'message': 'socket down',
+                },
+                'headers': {
+                    'Upload-Length': '11',
+                    'X-Request-ID': 'contract-request-id',
+                },
+                'operationId': 'createTusUpload',
+                'url': 'endpoint',
+            },
+        ],
+        'scenarioId': 'detailedCreateRequestError',
+    },
+    {
+        'behavior': 'upload-body-headers',
+        'completion': {
+            'kind': 'success',
+            'uploadUrl': 'https://tus.io/uploads/upload-body-headers-contract',
+        },
+        'featureId': 'uploadBodyHeaders',
+        'input': {
+            'content': 'hello world',
+            'endpointUrl': 'https://tus.io/uploads',
+            'kind': 'blob',
+            'metadata': {
+                'filename': 'hello.txt',
+            },
+        },
+        'operationIds': [
+            'createTusUpload',
+            'patchTusUpload',
+        ],
+        'primitives': [
+            'send-upload-body-headers',
+        ],
+        'requests': [
+            {
+                'headers': {
+                    'Upload-Length': '11',
+                },
+                'operationId': 'createTusUpload',
+                'response': {
+                    'headers': {
+                        'Location': 'https://tus.io/uploads/upload-body-headers-contract',
+                    },
+                    'statusCode': 201,
+                },
+                'url': 'endpoint',
+            },
+            {
+                'bodySize': 11,
+                'headers': {
+                    'Content-Type': 'application/offset+octet-stream',
+                    'Upload-Offset': '0',
+                },
+                'operationId': 'patchTusUpload',
+                'response': {
+                    'headers': {
+                        'Upload-Offset': '11',
+                    },
+                    'statusCode': 204,
+                },
+                'url': 'upload',
+            },
+        ],
+        'scenarioId': 'uploadBodyHeaders',
+    },
+    {
+        'behavior': 'custom-request-headers',
+        'completion': {
+            'kind': 'success',
+            'uploadUrl': 'https://tus.io/uploads/custom-headers-contract',
+        },
+        'featureId': 'customRequestHeaders',
+        'input': {
+            'content': 'hello world',
+            'endpointUrl': 'https://tus.io/uploads',
+            'headers': {
+                'X-Tus-Contract': 'custom-header',
+                'X-Tus-Trace': 'trace-123',
+            },
+            'kind': 'blob',
+            'metadata': {
+                'filename': 'hello.txt',
+            },
+        },
+        'operationIds': [
+            'createTusUpload',
+            'patchTusUpload',
+        ],
+        'primitives': [
+            'apply-custom-request-headers',
+        ],
+        'requests': [
+            {
+                'headers': {
+                    'Upload-Length': '11',
+                    'X-Tus-Contract': 'custom-header',
+                    'X-Tus-Trace': 'trace-123',
+                },
+                'operationId': 'createTusUpload',
+                'response': {
+                    'headers': {
+                        'Location': 'https://tus.io/uploads/custom-headers-contract',
+                    },
+                    'statusCode': 201,
+                },
+                'url': 'endpoint',
+            },
+            {
+                'bodySize': 11,
+                'headers': {
+                    'Content-Type': 'application/offset+octet-stream',
+                    'Upload-Offset': '0',
+                    'X-Tus-Contract': 'custom-header',
+                    'X-Tus-Trace': 'trace-123',
+                },
+                'operationId': 'patchTusUpload',
+                'response': {
+                    'headers': {
+                        'Upload-Offset': '11',
+                    },
+                    'statusCode': 204,
+                },
+                'url': 'upload',
+            },
+        ],
+        'scenarioId': 'customRequestHeaders',
+    },
+    {
+        'behavior': 'resume-from-previous-upload',
+        'completion': {
+            'kind': 'success',
+            'uploadUrl': 'https://tus.io/uploads/resume-contract',
+        },
+        'featureId': 'resumeUpload',
+        'input': {
+            'content': 'hello world',
+            'endpointUrl': 'https://tus.io/uploads',
+            'kind': 'blob',
+            'removeFingerprintOnSuccess': True,
+            'storedUpload': {
+                'fingerprint': 'contract-resume-fingerprint',
+                'uploadUrl': 'https://tus.io/uploads/resume-contract',
+                'urlStorageKey': 'tus::contract-resume-fingerprint::1337',
+            },
+        },
+        'operationIds': [
+            'getTusUploadOffset',
+            'patchTusUpload',
+        ],
+        'primitives': [
+            'fingerprint-input',
+            'resume-from-previous-upload',
+            'store-resume-url',
+        ],
+        'requests': [
+            {
+                'operationId': 'getTusUploadOffset',
+                'response': {
+                    'headers': {
+                        'Upload-Length': '11',
+                        'Upload-Offset': '5',
+                    },
+                    'statusCode': 200,
+                },
+                'url': 'upload',
+            },
+            {
+                'bodySize': 6,
+                'headers': {
+                    'Upload-Offset': '5',
+                },
+                'operationId': 'patchTusUpload',
+                'response': {
+                    'headers': {
+                        'Upload-Offset': '11',
+                    },
+                    'statusCode': 204,
+                },
+                'url': 'upload',
+            },
+        ],
+        'scenarioId': 'resumeFromPreviousUpload',
+        'events': [
+            {
+                'fingerprint': 'contract-resume-fingerprint',
+                'kind': 'fingerprint',
+                'key': 'fingerprint:contract-resume-fingerprint',
+            },
+            {
+                'count': 1,
+                'fingerprint': 'contract-resume-fingerprint',
+                'kind': 'url-storage-find',
+                'key': 'url-storage-find:contract-resume-fingerprint:1',
+            },
+            {
+                'fingerprint': 'contract-resume-fingerprint',
+                'kind': 'fingerprint',
+                'key': 'fingerprint:contract-resume-fingerprint',
+            },
+            {
+                'kind': 'upload-url-available',
+                'key': 'upload-url-available',
+            },
+            {
+                'bytesSent': 5,
+                'bytesTotal': 11,
+                'kind': 'progress',
+                'key': 'progress:5:11',
+            },
+            {
+                'bytesSent': 11,
+                'bytesTotal': 11,
+                'kind': 'progress',
+                'key': 'progress:11:11',
+            },
+            {
+                'bytesAccepted': 11,
+                'bytesTotal': 11,
+                'chunkSize': 6,
+                'kind': 'chunk-complete',
+                'key': 'chunk-complete:6:11:11',
+            },
+            {
+                'kind': 'url-storage-remove',
+                'urlStorageKey': 'tus::contract-resume-fingerprint::1337',
+                'key': 'url-storage-remove:tus::contract-resume-fingerprint::1337',
+            },
+            {
+                'kind': 'success',
+                'key': 'success',
+            },
+            {
+                'kind': 'source-close',
+                'key': 'source-close',
+            },
+        ],
+    },
+    {
+        'behavior': 'relative-location-resolution',
+        'completion': {
+            'kind': 'success',
+            'uploadUrl': 'https://tus.io/files/relative-contract',
+        },
+        'featureId': 'relativeLocationResolution',
+        'input': {
+            'content': 'hello world',
+            'endpointUrl': 'https://tus.io/files/',
+            'kind': 'blob',
+            'metadata': {
+                'filename': 'hello.txt',
+            },
+        },
+        'operationIds': [
+            'createTusUpload',
+            'patchTusUpload',
+        ],
+        'primitives': [
+            'resolve-relative-location',
+        ],
+        'requests': [
+            {
+                'headers': {
+                    'Upload-Length': '11',
+                },
+                'operationId': 'createTusUpload',
+                'response': {
+                    'headers': {
+                        'Location': 'relative-contract',
+                    },
+                    'statusCode': 201,
+                },
+                'url': 'endpoint',
+            },
+            {
+                'bodySize': 11,
+                'headers': {
+                    'Upload-Offset': '0',
+                },
+                'operationId': 'patchTusUpload',
+                'response': {
+                    'headers': {
+                        'Upload-Offset': '11',
+                    },
+                    'statusCode': 204,
+                },
+                'url': 'upload',
+            },
+        ],
+        'scenarioId': 'relativeLocationResolution',
+        'events': [
+            {
+                'kind': 'upload-url-available',
+                'key': 'upload-url-available',
+            },
+            {
+                'bytesSent': 0,
+                'bytesTotal': 11,
+                'kind': 'progress',
+                'key': 'progress:0:11',
+            },
+            {
+                'bytesSent': 11,
+                'bytesTotal': 11,
+                'kind': 'progress',
+                'key': 'progress:11:11',
+            },
+            {
+                'bytesAccepted': 11,
+                'bytesTotal': 11,
+                'chunkSize': 11,
+                'kind': 'chunk-complete',
+                'key': 'chunk-complete:11:11:11',
+            },
+            {
+                'kind': 'success',
+                'key': 'success',
+            },
+            {
+                'kind': 'source-close',
+                'key': 'source-close',
+            },
+        ],
+    },
+    {
+        'behavior': 'array-buffer-input',
+        'completion': {
+            'kind': 'success',
+            'uploadUrl': 'https://tus.io/uploads/array-buffer-contract',
+        },
+        'featureId': 'inputSources',
+        'input': {
+            'content': 'hello world',
+            'endpointUrl': 'https://tus.io/uploads',
+            'kind': 'array-buffer',
+            'metadata': {
+                'filename': 'hello.txt',
+            },
+        },
+        'operationIds': [
+            'createTusUpload',
+            'patchTusUpload',
+        ],
+        'primitives': [
+            'read-browser-file',
+        ],
+        'requests': [
+            {
+                'headers': {
+                    'Upload-Length': '11',
+                },
+                'operationId': 'createTusUpload',
+                'response': {
+                    'headers': {
+                        'Location': 'https://tus.io/uploads/array-buffer-contract',
+                    },
+                    'statusCode': 201,
+                },
+                'url': 'endpoint',
+            },
+            {
+                'bodySize': 11,
+                'headers': {
+                    'Upload-Offset': '0',
+                },
+                'operationId': 'patchTusUpload',
+                'response': {
+                    'headers': {
+                        'Upload-Offset': '11',
+                    },
+                    'statusCode': 204,
+                },
+                'url': 'upload',
+            },
+        ],
+        'scenarioId': 'arrayBufferInput',
+        'events': [
+            {
+                'inputKind': 'array-buffer',
+                'kind': 'source-open',
+                'size': 11,
+                'key': 'source-open:array-buffer:11',
+            },
+            {
+                'kind': 'success',
+                'key': 'success',
+            },
+            {
+                'kind': 'source-close',
+                'key': 'source-close',
+            },
+        ],
+    },
+    {
+        'behavior': 'array-buffer-view-input',
+        'completion': {
+            'kind': 'success',
+            'uploadUrl': 'https://tus.io/uploads/array-buffer-view-contract',
+        },
+        'featureId': 'inputSources',
+        'input': {
+            'content': 'hello world',
+            'endpointUrl': 'https://tus.io/uploads',
+            'kind': 'array-buffer-view',
+            'metadata': {
+                'filename': 'hello.txt',
+            },
+        },
+        'operationIds': [
+            'createTusUpload',
+            'patchTusUpload',
+        ],
+        'primitives': [
+            'read-browser-file',
+        ],
+        'requests': [
+            {
+                'headers': {
+                    'Upload-Length': '11',
+                },
+                'operationId': 'createTusUpload',
+                'response': {
+                    'headers': {
+                        'Location': 'https://tus.io/uploads/array-buffer-view-contract',
+                    },
+                    'statusCode': 201,
+                },
+                'url': 'endpoint',
+            },
+            {
+                'bodySize': 11,
+                'headers': {
+                    'Upload-Offset': '0',
+                },
+                'operationId': 'patchTusUpload',
+                'response': {
+                    'headers': {
+                        'Upload-Offset': '11',
+                    },
+                    'statusCode': 204,
+                },
+                'url': 'upload',
+            },
+        ],
+        'scenarioId': 'arrayBufferViewInput',
+        'events': [
+            {
+                'inputKind': 'array-buffer-view',
+                'kind': 'source-open',
+                'size': 11,
+                'key': 'source-open:array-buffer-view:11',
+            },
+            {
+                'kind': 'success',
+                'key': 'success',
+            },
+            {
+                'kind': 'source-close',
+                'key': 'source-close',
+            },
+        ],
+    },
+    {
+        'behavior': 'web-readable-stream-input',
+        'completion': {
+            'kind': 'success',
+            'uploadUrl': 'https://tus.io/uploads/web-stream-contract',
+        },
+        'featureId': 'inputSources',
+        'input': {
+            'chunkSize': 100,
+            'content': 'hello world',
+            'endpointUrl': 'https://tus.io/uploads',
+            'kind': 'web-readable-stream',
+            'metadata': {
+                'filename': 'hello.txt',
+            },
+            'uploadLengthDeferred': True,
+        },
+        'operationIds': [
+            'createTusUpload',
+            'patchTusUpload',
+        ],
+        'primitives': [
+            'read-web-stream',
+        ],
+        'requests': [
+            {
+                'absentHeaders': [
+                    'Upload-Length',
+                ],
+                'headers': {
+                    'Upload-Defer-Length': '1',
+                },
+                'operationId': 'createTusUpload',
+                'response': {
+                    'headers': {
+                        'Location': 'https://tus.io/uploads/web-stream-contract',
+                    },
+                    'statusCode': 201,
+                },
+                'url': 'endpoint',
+            },
+            {
+                'bodySize': 11,
+                'headers': {
+                    'Upload-Length': '11',
+                    'Upload-Offset': '0',
+                },
+                'operationId': 'patchTusUpload',
+                'response': {
+                    'headers': {
+                        'Upload-Offset': '11',
+                    },
+                    'statusCode': 204,
+                },
+                'url': 'upload',
+            },
+        ],
+        'scenarioId': 'webReadableStreamInput',
+        'events': [
+            {
+                'inputKind': 'web-readable-stream',
+                'kind': 'source-open',
+                'size': None,
+                'key': 'source-open:web-readable-stream:null',
+            },
+            {
+                'kind': 'success',
+                'key': 'success',
+            },
+            {
+                'kind': 'source-close',
+                'key': 'source-close',
+            },
+        ],
+    },
+    {
+        'behavior': 'node-readable-stream-input',
+        'completion': {
+            'kind': 'success',
+            'uploadUrl': 'https://tus.io/uploads/node-stream-contract',
+        },
+        'featureId': 'inputSources',
+        'input': {
+            'chunkSize': 100,
+            'content': 'hello world',
+            'endpointUrl': 'https://tus.io/uploads',
+            'kind': 'node-readable-stream',
+            'metadata': {
+                'filename': 'hello.txt',
+            },
+            'uploadLengthDeferred': True,
+        },
+        'operationIds': [
+            'createTusUpload',
+            'patchTusUpload',
+        ],
+        'primitives': [
+            'read-node-stream',
+        ],
+        'requests': [
+            {
+                'absentHeaders': [
+                    'Upload-Length',
+                ],
+                'headers': {
+                    'Upload-Defer-Length': '1',
+                },
+                'operationId': 'createTusUpload',
+                'response': {
+                    'headers': {
+                        'Location': 'https://tus.io/uploads/node-stream-contract',
+                    },
+                    'statusCode': 201,
+                },
+                'url': 'endpoint',
+            },
+            {
+                'bodySize': 11,
+                'headers': {
+                    'Upload-Length': '11',
+                    'Upload-Offset': '0',
+                },
+                'operationId': 'patchTusUpload',
+                'response': {
+                    'headers': {
+                        'Upload-Offset': '11',
+                    },
+                    'statusCode': 204,
+                },
+                'url': 'upload',
+            },
+        ],
+        'runtimes': [
+            'node',
+        ],
+        'scenarioId': 'nodeReadableStreamInput',
+        'events': [
+            {
+                'inputKind': 'node-readable-stream',
+                'kind': 'source-open',
+                'size': None,
+                'key': 'source-open:node-readable-stream:null',
+            },
+            {
+                'kind': 'success',
+                'key': 'success',
+            },
+            {
+                'kind': 'source-close',
+                'key': 'source-close',
+            },
+        ],
+    },
+    {
+        'behavior': 'node-path-input',
+        'completion': {
+            'kind': 'success',
+            'uploadUrl': 'https://tus.io/uploads/node-path-contract',
+        },
+        'featureId': 'inputSources',
+        'input': {
+            'content': 'hello world',
+            'endpointUrl': 'https://tus.io/uploads',
+            'kind': 'node-path-reference',
+            'metadata': {
+                'filename': 'hello.txt',
+            },
+        },
+        'operationIds': [
+            'createTusUpload',
+            'patchTusUpload',
+        ],
+        'primitives': [
+            'read-node-file',
+        ],
+        'requests': [
+            {
+                'headers': {
+                    'Upload-Length': '11',
+                },
+                'operationId': 'createTusUpload',
+                'response': {
+                    'headers': {
+                        'Location': 'https://tus.io/uploads/node-path-contract',
+                    },
+                    'statusCode': 201,
+                },
+                'url': 'endpoint',
+            },
+            {
+                'bodySize': 11,
+                'headers': {
+                    'Upload-Offset': '0',
+                },
+                'operationId': 'patchTusUpload',
+                'response': {
+                    'headers': {
+                        'Upload-Offset': '11',
+                    },
+                    'statusCode': 204,
+                },
+                'url': 'upload',
+            },
+        ],
+        'runtimes': [
+            'node',
+        ],
+        'scenarioId': 'nodePathInput',
+        'events': [
+            {
+                'inputKind': 'node-path-reference',
+                'kind': 'source-open',
+                'size': 11,
+                'key': 'source-open:node-path-reference:11',
+            },
+            {
+                'kind': 'success',
+                'key': 'success',
+            },
+            {
+                'kind': 'source-close',
+                'key': 'source-close',
+            },
+        ],
+    },
+    {
+        'behavior': 'deferred-length-upload',
+        'completion': {
+            'kind': 'success',
+            'uploadUrl': 'https://tus.io/uploads/deferred-contract',
+        },
+        'featureId': 'deferredLengthUpload',
+        'input': {
+            'chunkSize': 100,
+            'content': 'hello world',
+            'endpointUrl': 'https://tus.io/uploads',
+            'kind': 'web-readable-stream',
+            'metadata': {
+                'filename': 'hello.txt',
+            },
+            'uploadLengthDeferred': True,
+        },
+        'operationIds': [
+            'createTusUpload',
+            'patchTusUpload',
+        ],
+        'primitives': [
+            'defer-upload-length',
+            'emit-progress',
+        ],
+        'requests': [
+            {
+                'absentHeaders': [
+                    'Upload-Length',
+                ],
+                'headers': {
+                    'Upload-Defer-Length': '1',
+                },
+                'operationId': 'createTusUpload',
+                'response': {
+                    'headers': {
+                        'Location': 'https://tus.io/uploads/deferred-contract',
+                    },
+                    'statusCode': 201,
+                },
+                'url': 'endpoint',
+            },
+            {
+                'bodySize': 11,
+                'headers': {
+                    'Upload-Length': '11',
+                    'Upload-Offset': '0',
+                },
+                'operationId': 'patchTusUpload',
+                'response': {
+                    'headers': {
+                        'Upload-Offset': '11',
+                    },
+                    'statusCode': 204,
+                },
+                'url': 'upload',
+            },
+        ],
+        'scenarioId': 'deferredLengthUpload',
+        'events': [
+            {
+                'kind': 'upload-url-available',
+                'key': 'upload-url-available',
+            },
+            {
+                'bytesSent': 0,
+                'bytesTotal': 11,
+                'kind': 'progress',
+                'key': 'progress:0:11',
+            },
+            {
+                'bytesSent': 11,
+                'bytesTotal': 11,
+                'kind': 'progress',
+                'key': 'progress:11:11',
+            },
+            {
+                'bytesAccepted': 11,
+                'bytesTotal': 11,
+                'chunkSize': 11,
+                'kind': 'chunk-complete',
+                'key': 'chunk-complete:11:11:11',
+            },
+            {
+                'kind': 'success',
+                'key': 'success',
+            },
+            {
+                'kind': 'source-close',
+                'key': 'source-close',
+            },
+        ],
+    },
+    {
+        'behavior': 'override-patch-method',
+        'completion': {
+            'kind': 'success',
+            'uploadUrl': 'https://tus.io/uploads/override-contract',
+        },
+        'featureId': 'overridePatchMethod',
+        'input': {
+            'content': 'hello world',
+            'endpointUrl': 'https://tus.io/uploads',
+            'kind': 'blob',
+            'overridePatchMethod': True,
+            'uploadUrl': 'https://tus.io/uploads/override-contract',
+        },
+        'operationIds': [
+            'getTusUploadOffset',
+            'patchTusUpload',
+        ],
+        'primitives': [
+            'override-patch-method',
+        ],
+        'requests': [
+            {
+                'operationId': 'getTusUploadOffset',
+                'response': {
+                    'headers': {
+                        'Upload-Length': '11',
+                        'Upload-Offset': '3',
+                    },
+                    'statusCode': 200,
+                },
+                'uploadUrl': 'https://tus.io/uploads/override-contract',
+                'url': 'upload',
+            },
+            {
+                'bodySize': 8,
+                'headers': {
+                    'Content-Type': 'application/offset+octet-stream',
+                    'Upload-Offset': '3',
+                    'X-HTTP-Method-Override': 'PATCH',
+                },
+                'method': 'POST',
+                'operationId': 'patchTusUpload',
+                'response': {
+                    'headers': {
+                        'Upload-Offset': '11',
+                    },
+                    'statusCode': 204,
+                },
+                'uploadUrl': 'https://tus.io/uploads/override-contract',
+                'url': 'upload',
+            },
+        ],
+        'scenarioId': 'overridePatchMethod',
+    },
+    {
+        'behavior': 'parallel-upload-concat',
+        'completion': {
+            'kind': 'success',
+            'uploadUrl': 'https://tus.io/uploads/parallel-final',
+        },
+        'featureId': 'parallelUploadConcat',
+        'input': {
+            'content': 'hello world',
+            'endpointUrl': 'https://tus.io/uploads',
+            'kind': 'blob',
+            'metadata': {
+                'foo': 'hello',
+            },
+            'metadataForPartialUploads': {
+                'test': 'world',
+            },
+            'parallelUploads': 2,
+        },
+        'operationIds': [
+            'createTusUpload',
+            'createTusUpload',
+            'patchTusUpload',
+            'patchTusUpload',
+            'createTusUpload',
+        ],
+        'primitives': [
+            'concatenate-partial-uploads',
+            'emit-progress',
+        ],
+        'requests': [
+            {
+                'headers': {
+                    'Upload-Concat': 'partial',
+                    'Upload-Length': '5',
+                    'Upload-Metadata': 'test d29ybGQ=',
+                },
+                'operationId': 'createTusUpload',
+                'response': {
+                    'headers': {
+                        'Location': 'https://tus.io/uploads/parallel-part-1',
+                    },
+                    'statusCode': 201,
+                },
+                'url': 'endpoint',
+            },
+            {
+                'headers': {
+                    'Upload-Concat': 'partial',
+                    'Upload-Length': '6',
+                    'Upload-Metadata': 'test d29ybGQ=',
+                },
+                'operationId': 'createTusUpload',
+                'response': {
+                    'headers': {
+                        'Location': 'https://tus.io/uploads/parallel-part-2',
+                    },
+                    'statusCode': 201,
+                },
+                'url': 'endpoint',
+            },
+            {
+                'bodySize': 5,
+                'headers': {
+                    'Upload-Offset': '0',
+                },
+                'operationId': 'patchTusUpload',
+                'response': {
+                    'headers': {
+                        'Upload-Offset': '5',
+                    },
+                    'statusCode': 204,
+                },
+                'uploadUrl': 'https://tus.io/uploads/parallel-part-1',
+                'url': 'upload',
+            },
+            {
+                'bodySize': 6,
+                'headers': {
+                    'Upload-Offset': '0',
+                },
+                'operationId': 'patchTusUpload',
+                'response': {
+                    'headers': {
+                        'Upload-Offset': '6',
+                    },
+                    'statusCode': 204,
+                },
+                'uploadUrl': 'https://tus.io/uploads/parallel-part-2',
+                'url': 'upload',
+            },
+            {
+                'absentHeaders': [
+                    'Upload-Length',
+                ],
+                'headers': {
+                    'Upload-Concat': 'final;https://tus.io/uploads/parallel-part-1 https://tus.io/uploads/parallel-part-2',
+                    'Upload-Metadata': 'foo aGVsbG8=',
+                },
+                'operationId': 'createTusUpload',
+                'response': {
+                    'headers': {
+                        'Location': 'https://tus.io/uploads/parallel-final',
+                    },
+                    'statusCode': 201,
+                },
+                'url': 'endpoint',
+            },
+        ],
+        'scenarioId': 'parallelUploadConcat',
+        'events': [
+            {
+                'bytesSent': 5,
+                'bytesTotal': 11,
+                'kind': 'progress',
+                'key': 'progress:5:11',
+            },
+            {
+                'bytesAccepted': 5,
+                'bytesTotal': 11,
+                'chunkSize': 5,
+                'kind': 'chunk-complete',
+                'key': 'chunk-complete:5:5:11',
+            },
+            {
+                'bytesSent': 11,
+                'bytesTotal': 11,
+                'kind': 'progress',
+                'key': 'progress:11:11',
+            },
+            {
+                'bytesAccepted': 11,
+                'bytesTotal': 11,
+                'chunkSize': 6,
+                'kind': 'chunk-complete',
+                'key': 'chunk-complete:6:11:11',
+            },
+        ],
+    },
+    {
+        'behavior': 'parallel-upload-abort-cleanup',
+        'completion': {
+            'kind': 'aborted',
+        },
+        'featureId': 'parallelUploadConcat',
+        'input': {
+            'content': 'hello world',
+            'endpointUrl': 'https://tus.io/uploads',
+            'fingerprint': 'contract-parallel-cleanup-fingerprint',
+            'headers': {
+                'X-Tus-Contract': 'parallel-cleanup-policy',
+                'X-Tus-Trace': 'parallel-cleanup-trace-123',
+            },
+            'kind': 'blob',
+            'metadataForPartialUploads': {
+                'test': 'world',
+            },
+            'overridePatchMethod': True,
+            'parallelUploads': 2,
+            'terminateUploadOnAbort': True,
+        },
+        'operationIds': [
+            'createTusUpload',
+            'createTusUpload',
+            'patchTusUpload',
+            'patchTusUpload',
+            'terminateTusUpload',
+            'terminateTusUpload',
+        ],
+        'primitives': [
+            'abort-current-request',
+            'terminate-upload',
+            'concatenate-partial-uploads',
+        ],
+        'requests': [
+            {
+                'headers': {
+                    'Upload-Concat': 'partial',
+                    'Upload-Length': '5',
+                    'Upload-Metadata': 'test d29ybGQ=',
+                    'X-Tus-Contract': 'parallel-cleanup-policy',
+                    'X-Tus-Trace': 'parallel-cleanup-trace-123',
+                },
+                'operationId': 'createTusUpload',
+                'response': {
+                    'headers': {
+                        'Location': 'https://tus.io/uploads/parallel-cleanup-part-1',
+                    },
+                    'statusCode': 201,
+                },
+                'url': 'endpoint',
+            },
+            {
+                'headers': {
+                    'Upload-Concat': 'partial',
+                    'Upload-Length': '6',
+                    'Upload-Metadata': 'test d29ybGQ=',
+                    'X-Tus-Contract': 'parallel-cleanup-policy',
+                    'X-Tus-Trace': 'parallel-cleanup-trace-123',
+                },
+                'operationId': 'createTusUpload',
+                'response': {
+                    'headers': {
+                        'Location': 'https://tus.io/uploads/parallel-cleanup-part-2',
+                    },
+                    'statusCode': 201,
+                },
+                'url': 'endpoint',
+            },
+            {
+                'bodySize': 5,
+                'headers': {
+                    'Content-Type': 'application/offset+octet-stream',
+                    'Upload-Offset': '0',
+                    'X-HTTP-Method-Override': 'PATCH',
+                    'X-Tus-Contract': 'parallel-cleanup-policy',
+                    'X-Tus-Trace': 'parallel-cleanup-trace-123',
+                },
+                'method': 'POST',
+                'operationId': 'patchTusUpload',
+                'response': {
+                    'statusCode': 500,
+                },
+                'uploadUrl': 'https://tus.io/uploads/parallel-cleanup-part-1',
+                'url': 'upload',
+            },
+            {
+                'abort': True,
+                'bodySize': 6,
+                'headers': {
+                    'Content-Type': 'application/offset+octet-stream',
+                    'Upload-Offset': '0',
+                    'X-HTTP-Method-Override': 'PATCH',
+                    'X-Tus-Contract': 'parallel-cleanup-policy',
+                    'X-Tus-Trace': 'parallel-cleanup-trace-123',
+                },
+                'method': 'POST',
+                'operationId': 'patchTusUpload',
+                'uploadUrl': 'https://tus.io/uploads/parallel-cleanup-part-2',
+                'url': 'upload',
+            },
+            {
+                'headers': {
+                    'X-Tus-Contract': 'parallel-cleanup-policy',
+                    'X-Tus-Trace': 'parallel-cleanup-trace-123',
+                },
+                'operationId': 'terminateTusUpload',
+                'response': {
+                    'statusCode': 204,
+                },
+                'uploadUrl': 'https://tus.io/uploads/parallel-cleanup-part-1',
+                'url': 'upload',
+            },
+            {
+                'headers': {
+                    'X-Tus-Contract': 'parallel-cleanup-policy',
+                    'X-Tus-Trace': 'parallel-cleanup-trace-123',
+                },
+                'operationId': 'terminateTusUpload',
+                'response': {
+                    'statusCode': 204,
+                },
+                'uploadUrl': 'https://tus.io/uploads/parallel-cleanup-part-2',
+                'url': 'upload',
+            },
+        ],
+        'scenarioId': 'parallelUploadAbortCleanup',
+        'events': [
+            {
+                'kind': 'request-abort',
+                'requestIndex': 3,
+                'key': 'request-abort:3',
+            },
+        ],
+    },
+    {
+        'behavior': 'retry-patch-after-offset-recovery',
+        'completion': {
+            'kind': 'success',
+            'uploadUrl': 'https://tus.io/uploads/retry-contract',
+        },
+        'featureId': 'retryOffsetRecovery',
+        'input': {
+            'content': 'hello world',
+            'endpointUrl': 'https://tus.io/uploads',
+            'kind': 'blob',
+            'metadata': {
+                'filename': 'hello.txt',
+            },
+            'retryDelays': [
+                0,
+            ],
+        },
+        'operationIds': [
+            'createTusUpload',
+            'patchTusUpload',
+            'getTusUploadOffset',
+            'patchTusUpload',
+            'getTusUploadOffset',
+            'patchTusUpload',
+        ],
+        'primitives': [
+            'retry-with-backoff',
+            'recover-offset-after-error',
+        ],
+        'requests': [
+            {
+                'headers': {
+                    'Upload-Length': '11',
+                },
+                'operationId': 'createTusUpload',
+                'response': {
+                    'headers': {
+                        'Location': 'https://tus.io/uploads/retry-contract',
+                    },
+                    'statusCode': 201,
+                },
+                'url': 'endpoint',
+            },
+            {
+                'bodySize': 11,
+                'headers': {
+                    'Upload-Offset': '0',
+                },
+                'operationId': 'patchTusUpload',
+                'response': {
+                    'statusCode': 500,
+                },
+                'url': 'upload',
+            },
+            {
+                'operationId': 'getTusUploadOffset',
+                'response': {
+                    'headers': {
+                        'Upload-Length': '11',
+                        'Upload-Offset': '5',
+                    },
+                    'statusCode': 200,
+                },
+                'url': 'upload',
+            },
+            {
+                'bodySize': 6,
+                'headers': {
+                    'Upload-Offset': '5',
+                },
+                'operationId': 'patchTusUpload',
+                'response': {
+                    'statusCode': 500,
+                },
+                'url': 'upload',
+            },
+            {
+                'operationId': 'getTusUploadOffset',
+                'response': {
+                    'headers': {
+                        'Upload-Length': '11',
+                        'Upload-Offset': '5',
+                    },
+                    'statusCode': 200,
+                },
+                'url': 'upload',
+            },
+            {
+                'bodySize': 6,
+                'headers': {
+                    'Upload-Offset': '5',
+                },
+                'operationId': 'patchTusUpload',
+                'response': {
+                    'headers': {
+                        'Upload-Offset': '11',
+                    },
+                    'statusCode': 204,
+                },
+                'url': 'upload',
+            },
+        ],
+        'scenarioId': 'retryPatchAfterOffsetRecovery',
+        'events': [
+            {
+                'decision': True,
+                'kind': 'should-retry',
+                'retryAttempt': 0,
+                'key': 'should-retry:0:true',
+            },
+            {
+                'delay': 0,
+                'kind': 'retry-schedule',
+                'key': 'retry-schedule:0',
+            },
+            {
+                'decision': True,
+                'kind': 'should-retry',
+                'retryAttempt': 0,
+                'key': 'should-retry:0:true',
+            },
+            {
+                'delay': 0,
+                'kind': 'retry-schedule',
+                'key': 'retry-schedule:0',
+            },
+        ],
+    },
+    {
+        'behavior': 'request-lifecycle-hooks',
+        'completion': {
+            'kind': 'success',
+            'uploadUrl': 'https://tus.io/uploads/request-hooks-contract',
+        },
+        'featureId': 'requestLifecycleHooks',
+        'input': {
+            'content': 'hello world',
+            'endpointUrl': 'https://tus.io/uploads',
+            'kind': 'blob',
+            'uploadUrl': 'https://tus.io/uploads/request-hooks-contract',
+        },
+        'operationIds': [
+            'getTusUploadOffset',
+        ],
+        'primitives': [
+            'run-request-hooks',
+        ],
+        'requests': [
+            {
+                'operationId': 'getTusUploadOffset',
+                'response': {
+                    'headers': {
+                        'Upload-Length': '11',
+                        'Upload-Offset': '11',
+                    },
+                    'statusCode': 200,
+                },
+                'url': 'upload',
+            },
+        ],
+        'scenarioId': 'requestLifecycleHooks',
+        'events': [
+            {
+                'kind': 'before-request',
+                'requestIndex': 0,
+                'key': 'before-request:0',
+            },
+            {
+                'kind': 'after-response',
+                'requestIndex': 0,
+                'key': 'after-response:0',
+            },
+            {
+                'kind': 'success',
+                'key': 'success',
+            },
+            {
+                'kind': 'source-close',
+                'key': 'source-close',
+            },
+        ],
+    },
+    {
+        'behavior': 'abort-upload',
+        'completion': {
+            'kind': 'aborted',
+        },
+        'featureId': 'abortUpload',
+        'input': {
+            'content': 'hello world',
+            'endpointUrl': 'https://tus.io/uploads',
+            'kind': 'blob',
+            'metadata': {
+                'filename': 'hello.txt',
+            },
+        },
+        'operationIds': [
+            'createTusUpload',
+        ],
+        'primitives': [
+            'abort-current-request',
+        ],
+        'requests': [
+            {
+                'abort': True,
+                'headers': {
+                    'Upload-Length': '11',
+                },
+                'operationId': 'createTusUpload',
+                'url': 'endpoint',
+            },
+        ],
+        'scenarioId': 'abortUpload',
+        'events': [
+            {
+                'kind': 'request-abort',
+                'requestIndex': 0,
+                'key': 'request-abort:0',
+            },
+        ],
+    },
+    {
+        'behavior': 'abort-upload-after-stored-url',
+        'completion': {
+            'kind': 'aborted',
+            'uploadUrl': 'https://tus.io/uploads/abort-terminate-contract',
+        },
+        'featureId': 'abortUpload',
+        'input': {
+            'content': 'hello world',
+            'endpointUrl': 'https://tus.io/uploads',
+            'fingerprint': 'contract-abort-terminate-fingerprint',
+            'headers': {
+                'X-Tus-Contract': 'abort-policy',
+                'X-Tus-Trace': 'abort-trace-123',
+            },
+            'kind': 'blob',
+            'metadata': {
+                'filename': 'hello.txt',
+            },
+            'overridePatchMethod': True,
+            'terminateUploadOnAbort': True,
+        },
+        'operationIds': [
+            'createTusUpload',
+            'patchTusUpload',
+            'terminateTusUpload',
+        ],
+        'primitives': [
+            'abort-current-request',
+            'terminate-upload',
+        ],
+        'requests': [
+            {
+                'headers': {
+                    'Upload-Length': '11',
+                },
+                'operationId': 'createTusUpload',
+                'response': {
+                    'headers': {
+                        'Location': 'https://tus.io/uploads/abort-terminate-contract',
+                    },
+                    'statusCode': 201,
+                },
+                'url': 'endpoint',
+            },
+            {
+                'abort': True,
+                'bodySize': 11,
+                'headers': {
+                    'Content-Type': 'application/offset+octet-stream',
+                    'Upload-Offset': '0',
+                    'X-HTTP-Method-Override': 'PATCH',
+                    'X-Tus-Contract': 'abort-policy',
+                    'X-Tus-Trace': 'abort-trace-123',
+                },
+                'method': 'POST',
+                'operationId': 'patchTusUpload',
+                'url': 'upload',
+            },
+            {
+                'headers': {
+                    'X-Tus-Contract': 'abort-policy',
+                    'X-Tus-Trace': 'abort-trace-123',
+                },
+                'operationId': 'terminateTusUpload',
+                'response': {
+                    'statusCode': 204,
+                },
+                'url': 'upload',
+            },
+        ],
+        'scenarioId': 'abortUploadAfterStoredUrl',
+        'events': [
+            {
+                'kind': 'request-abort',
+                'requestIndex': 1,
+                'key': 'request-abort:1',
+            },
+        ],
+    },
+    {
+        'behavior': 'terminate-with-retry',
+        'completion': {
+            'kind': 'terminated',
+            'uploadUrl': 'https://tus.io/uploads/terminate-contract',
+        },
+        'featureId': 'terminateUpload',
+        'input': {
+            'chunkSize': 5,
+            'content': 'hello world',
+            'endpointUrl': 'https://tus.io/uploads',
+            'kind': 'blob',
+            'metadata': {
+                'filename': 'hello.txt',
+            },
+            'retryDelays': [
+                0,
+                0,
+            ],
+        },
+        'operationIds': [
+            'createTusUpload',
+            'patchTusUpload',
+            'terminateTusUpload',
+            'terminateTusUpload',
+        ],
+        'primitives': [
+            'terminate-upload',
+            'retry-with-backoff',
+        ],
+        'requests': [
+            {
+                'headers': {
+                    'Upload-Length': '11',
+                },
+                'operationId': 'createTusUpload',
+                'response': {
+                    'headers': {
+                        'Location': 'https://tus.io/uploads/terminate-contract',
+                    },
+                    'statusCode': 201,
+                },
+                'url': 'endpoint',
+            },
+            {
+                'bodySize': 5,
+                'headers': {
+                    'Upload-Offset': '0',
+                },
+                'operationId': 'patchTusUpload',
+                'response': {
+                    'headers': {
+                        'Upload-Offset': '5',
+                    },
+                    'statusCode': 204,
+                },
+                'url': 'upload',
+            },
+            {
+                'operationId': 'terminateTusUpload',
+                'response': {
+                    'statusCode': 423,
+                },
+                'url': 'upload',
+            },
+            {
+                'operationId': 'terminateTusUpload',
+                'response': {
+                    'statusCode': 204,
+                },
+                'url': 'upload',
+            },
+        ],
+        'scenarioId': 'terminateWithRetry',
     },
 ]
