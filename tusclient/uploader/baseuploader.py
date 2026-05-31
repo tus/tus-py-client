@@ -62,6 +62,8 @@ class BaseUploader:
             If not specified, it defaults to True.
         - store_url (bool):
             Determines whether or not url should be stored, and uploads should be resumed.
+        - remove_fingerprint_on_success (bool):
+            Determines whether the stored upload URL should be removed after a successful upload.
         - url_storage (<tusclient.storage.interface.Storage>):
             An implementation of <tusclient.storage.interface.Storage> which is an API for URL storage.
             This value must be set if store_url is set to true. A ready to use implementation exists atbe used out of the box. But you can
@@ -95,6 +97,7 @@ class BaseUploader:
         - retry_delay (Optional[int])
         - verify_tls_cert (Optional[bool])
         - store_url (Optional[bool])
+        - remove_fingerprint_on_success (Optional[bool])
         - url_storage (Optinal [<tusclient.storage.interface.Storage>])
         - fingerprinter (Optional [<tusclient.fingerprint.interface.Fingerprint>])
         - upload_checksum (Optional[bool])
@@ -121,6 +124,7 @@ class BaseUploader:
         retry_delay: int = 30,
         verify_tls_cert: bool = True,
         store_url=False,
+        remove_fingerprint_on_success=False,
         url_storage: Optional[Storage] = None,
         fingerprinter: Optional[interface.Fingerprint] = None,
         upload_checksum=False,
@@ -148,6 +152,7 @@ class BaseUploader:
         self.metadata = metadata or {}
         self.metadata_encoding = metadata_encoding
         self.store_url = store_url
+        self.remove_fingerprint_on_success = remove_fingerprint_on_success
         self.url_storage = url_storage
         self.fingerprinter = fingerprinter or fingerprint.Fingerprint()
         self.offset = 0
@@ -273,8 +278,12 @@ class BaseUploader:
                     raise error
 
     def _get_fingerprint(self):
-        with self.get_file_stream() as stream:
+        stream = self.get_file_stream()
+        try:
             return self.fingerprinter.get_fingerprint(stream)
+        finally:
+            if self.file_stream is None:
+                stream.close()
 
     def set_url(self, url: str):
         """Set the upload URL"""
@@ -298,6 +307,19 @@ class BaseUploader:
     def notify_chunk_complete(self, chunk_size: int, bytes_accepted: int):
         if self.on_chunk_complete:
             self.on_chunk_complete(chunk_size, bytes_accepted, self.file_size)
+
+    def remove_url_on_success(self):
+        if not (
+            self.store_url
+            and self.url_storage
+            and self.remove_fingerprint_on_success
+        ):
+            return
+
+        if self.file_size is None or self.offset < self.file_size:
+            return
+
+        self.url_storage.remove_item(self._get_fingerprint())
 
     def get_file_stream(self):
         """

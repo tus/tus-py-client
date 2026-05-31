@@ -8,6 +8,8 @@ import unittest
 import responses
 
 from tusclient.client import TusClient
+from tusclient.fingerprint.interface import Fingerprint
+from tusclient.storage.interface import Storage
 
 
 CASES = [
@@ -23,6 +25,7 @@ CASES = [
         'metadata': {
             'filename': 'hello.txt',
         },
+        'removeFingerprintOnSuccess': False,
         'requests': [
             {
                 'method': 'POST',
@@ -42,7 +45,48 @@ CASES = [
             },
         ],
         'scenarioId': 'singleUploadLifecycle',
+        'storedUpload': None,
+        'uploadLengthDeferred': False,
         'uploadUrl': 'https://tus.io/uploads/generated-contract',
+    },
+    {
+        'chunkSize': 6,
+        'content': 'hello world',
+        'endpointUrl': 'https://tus.io/uploads',
+        'eventKeys': [
+            'progress:5:11',
+            'progress:11:11',
+            'chunk-complete:6:11:11',
+        ],
+        'metadata': {},
+        'removeFingerprintOnSuccess': True,
+        'requests': [
+            {
+                'method': 'HEAD',
+                'responseHeaders': {
+                    'Upload-Length': '11',
+                    'Upload-Offset': '5',
+                },
+                'statusCode': 200,
+                'url': 'upload',
+            },
+            {
+                'method': 'PATCH',
+                'responseHeaders': {
+                    'Upload-Offset': '11',
+                },
+                'statusCode': 204,
+                'url': 'upload',
+            },
+        ],
+        'scenarioId': 'resumeFromPreviousUpload',
+        'storedUpload': {
+            'fingerprint': 'contract-resume-fingerprint',
+            'uploadUrl': 'https://tus.io/uploads/resume-contract',
+            'urlStorageKey': 'tus::contract-resume-fingerprint::1337',
+        },
+        'uploadLengthDeferred': False,
+        'uploadUrl': 'https://tus.io/uploads/resume-contract',
     },
     {
         'chunkSize': 11,
@@ -56,6 +100,7 @@ CASES = [
         'metadata': {
             'filename': 'hello.txt',
         },
+        'removeFingerprintOnSuccess': False,
         'requests': [
             {
                 'method': 'POST',
@@ -75,9 +120,33 @@ CASES = [
             },
         ],
         'scenarioId': 'relativeLocationResolution',
+        'storedUpload': None,
+        'uploadLengthDeferred': False,
         'uploadUrl': 'https://tus.io/files/relative-contract',
     },
 ]
+
+
+class GeneratedTusStorage(Storage):
+    def __init__(self, values):
+        self.values = dict(values)
+
+    def get_item(self, key):
+        return self.values.get(key)
+
+    def set_item(self, key, value):
+        self.values[key] = value
+
+    def remove_item(self, key):
+        self.values.pop(key, None)
+
+
+class GeneratedTusFingerprinter(Fingerprint):
+    def __init__(self, fingerprint):
+        self.fingerprint = fingerprint
+
+    def get_fingerprint(self, fs):
+        return self.fingerprint
 
 
 def format_event_value(value):
@@ -110,6 +179,7 @@ class GeneratedTusRuntimeEventsTest(unittest.TestCase):
         for case in CASES:
             events = []
             client = TusClient(case['endpointUrl'])
+            storage = storage_for(case)
 
             for request in case['requests']:
                 url = case['endpointUrl'] if request['url'] == 'endpoint' else case['uploadUrl']
@@ -124,9 +194,45 @@ class GeneratedTusRuntimeEventsTest(unittest.TestCase):
                 file_stream=io.BytesIO(case['content'].encode('utf-8')),
                 chunk_size=case['chunkSize'],
                 metadata=case['metadata'],
+                store_url=case['storedUpload'] is not None,
+                url_storage=storage,
+                fingerprinter=fingerprinter_for(case),
+                remove_fingerprint_on_success=case['removeFingerprintOnSuccess'],
                 on_progress=record_progress(events),
                 on_chunk_complete=record_chunk_complete(events),
             )
             uploader.upload()
 
             self.assertEqual(events, case['eventKeys'], case['scenarioId'])
+            assert_stored_upload_state(self, case, storage)
+
+
+def storage_for(case):
+    if case['storedUpload'] is None:
+        return None
+
+    return GeneratedTusStorage({
+        case['storedUpload']['fingerprint']: case['storedUpload']['uploadUrl'],
+    })
+
+
+def fingerprinter_for(case):
+    if case['storedUpload'] is None:
+        return None
+
+    return GeneratedTusFingerprinter(case['storedUpload']['fingerprint'])
+
+
+def assert_stored_upload_state(test, case, storage):
+    if case['storedUpload'] is None:
+        return
+
+    fingerprint = case['storedUpload']['fingerprint']
+    if case['removeFingerprintOnSuccess']:
+        test.assertIsNone(storage.get_item(fingerprint), case['scenarioId'])
+    else:
+        test.assertEqual(
+            storage.get_item(fingerprint),
+            case['storedUpload']['uploadUrl'],
+            case['scenarioId'],
+        )

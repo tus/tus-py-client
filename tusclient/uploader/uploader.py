@@ -66,6 +66,7 @@ class Uploader(BaseUploader):
             self.stop_at = self.offset
         self.notify_progress(self.offset)
         self.notify_chunk_complete(self.offset - previous_offset, self.offset)
+        self.remove_url_on_success()
 
     @catch_requests_error
     def create_url(self):
@@ -157,6 +158,7 @@ class AsyncUploader(BaseUploader):
             self.stop_at = self.offset
         self.notify_progress(self.offset)
         self.notify_chunk_complete(self.offset - previous_offset, self.offset)
+        self.remove_url_on_success()
 
     async def create_url(self):
         """
