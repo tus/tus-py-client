@@ -57,10 +57,15 @@ class Uploader(BaseUploader):
             self.set_url(self.create_url())
             self.offset = 0
 
+        previous_offset = self.offset
+        self.notify_progress(previous_offset)
         self._do_request()
         self.offset = int(self.request.response_headers.get("upload-offset"))
         if self.upload_length_deferred and self.request.stream_eof:
+            self.file_size = self.offset
             self.stop_at = self.offset
+        self.notify_progress(self.offset)
+        self.notify_chunk_complete(self.offset - previous_offset, self.offset)
 
     @catch_requests_error
     def create_url(self):
@@ -143,10 +148,15 @@ class AsyncUploader(BaseUploader):
             self.set_url(await self.create_url())
             self.offset = 0
 
+        previous_offset = self.offset
+        self.notify_progress(previous_offset)
         await self._do_request()
         self.offset = int(self.request.response_headers.get("upload-offset"))
         if self.upload_length_deferred and self.request.stream_eof:
+            self.file_size = self.offset
             self.stop_at = self.offset
+        self.notify_progress(self.offset)
+        self.notify_chunk_complete(self.offset - previous_offset, self.offset)
 
     async def create_url(self):
         """

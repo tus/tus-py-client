@@ -1,4 +1,4 @@
-from typing import Optional, IO, Dict, Tuple, TYPE_CHECKING, Union
+from typing import Callable, Optional, IO, Dict, Tuple, TYPE_CHECKING, Union
 import os
 import re
 from base64 import b64encode
@@ -78,6 +78,10 @@ class BaseUploader:
             Whether or not to declare the upload length when finished reading the file stream instead of when the upload is started. This is useful
             when uploading from a streaming resource, where the total file size isn't available when the upload is created
             but only becomes known when the stream finishes. The server must support the `creation-defer-length` extension.
+        - on_progress (Optional[Callable]):
+            Callback invoked with bytes sent and total bytes after upload progress changes.
+        - on_chunk_complete (Optional[Callable]):
+            Callback invoked with chunk size, accepted offset, and total bytes after a chunk is accepted.
 
     :Constructor Args:
         - file_path (str)
@@ -121,6 +125,8 @@ class BaseUploader:
         fingerprinter: Optional[interface.Fingerprint] = None,
         upload_checksum=False,
         upload_length_deferred=False,
+        on_progress: Optional[Callable[[int, Optional[int]], None]] = None,
+        on_chunk_complete: Optional[Callable[[int, int, Optional[int]], None]] = None,
     ):
         if file_path is None and file_stream is None:
             raise ValueError("Either 'file_path' or 'file_stream' cannot be None.")
@@ -154,6 +160,8 @@ class BaseUploader:
         self.retry_delay = retry_delay
         self.upload_checksum = upload_checksum
         self.upload_length_deferred = upload_length_deferred
+        self.on_progress = on_progress
+        self.on_chunk_complete = on_chunk_complete
         (
             self.__checksum_algorithm_name,
             self.__checksum_algorithm,
@@ -282,6 +290,14 @@ class BaseUploader:
         if self.stop_at is None:
             return self.chunk_size
         return min(self.chunk_size, self.stop_at - self.offset)
+
+    def notify_progress(self, bytes_sent: int):
+        if self.on_progress:
+            self.on_progress(bytes_sent, self.file_size)
+
+    def notify_chunk_complete(self, chunk_size: int, bytes_accepted: int):
+        if self.on_chunk_complete:
+            self.on_chunk_complete(chunk_size, bytes_accepted, self.file_size)
 
     def get_file_stream(self):
         """
