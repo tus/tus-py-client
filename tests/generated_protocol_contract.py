@@ -1976,6 +1976,15 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
+        'execution': {
+            'beforeStart': [
+                {
+                    'expectedPreviousUploadCount': 1,
+                    'kind': 'resume-from-previous-upload',
+                    'selectedPreviousUploadIndex': 0,
+                },
+            ],
+        },
         'featureId': 'resumeUpload',
         'input': {
             'content': 'hello world',
@@ -3274,6 +3283,14 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'completion': {
             'kind': 'terminated',
             'uploadUrl': 'https://tus.io/uploads/terminate-contract',
+        },
+        'execution': {
+            'onChunkComplete': [
+                {
+                    'kind': 'abort-upload',
+                    'terminateUpload': True,
+                },
+            ],
         },
         'featureId': 'terminateUpload',
         'input': {
