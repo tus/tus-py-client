@@ -1024,6 +1024,7 @@ TUS_MANAGED_UPLOAD = {
                 'absent-after-source-unavailable',
                 'remove-owned-source-after-success',
                 'remove-owned-source-after-cancel',
+                'retain-owned-source-while-deferred',
                 'retain-owned-source-after-permanent-failure',
                 'retain-source-after-retryable-failure',
                 'remove-managed-state-after-terminal-retention',
@@ -1091,7 +1092,7 @@ TUS_MANAGED_UPLOAD = {
             'managedUploadSourceUnavailable',
             'managedUploadNetworkConstraint',
         ],
-        'status': 'needs-generated-scenario',
+        'status': 'covered-by-generated-scenario',
     },
     'description': 'Submit upload work that can make sources durable, schedule/resume execution, retry, report state, and clean up while reusing the raw TUS protocol features underneath.',
     'featureId': 'managedUpload',
@@ -1319,6 +1320,15 @@ TUS_MANAGED_UPLOAD = {
                         },
                         'uploadPath': 'managed-durable-retry',
                     },
+                    'network': {
+                        'current': 'unmetered-network',
+                        'decision': 'start-upload-work',
+                        'required': 'any-network',
+                    },
+                    'outcome': {
+                        'kind': 'terminal',
+                        'state': 'succeeded',
+                    },
                     'retryDelays': [
                         0,
                     ],
@@ -1331,9 +1341,6 @@ TUS_MANAGED_UPLOAD = {
                         'running',
                         'succeeded',
                     ],
-                    'terminal': {
-                        'state': 'succeeded',
-                    },
                     'runtime': 'java',
                     'scheduler': 'process-lifetime-worker-pool',
                     'stateBackend': 'filesystem',
@@ -1425,6 +1432,15 @@ TUS_MANAGED_UPLOAD = {
                         },
                         'uploadPath': 'managed-durable-retry',
                     },
+                    'network': {
+                        'current': 'unmetered-network',
+                        'decision': 'start-upload-work',
+                        'required': 'any-network',
+                    },
+                    'outcome': {
+                        'kind': 'terminal',
+                        'state': 'succeeded',
+                    },
                     'retryDelays': [
                         0,
                     ],
@@ -1437,9 +1453,6 @@ TUS_MANAGED_UPLOAD = {
                         'running',
                         'succeeded',
                     ],
-                    'terminal': {
-                        'state': 'succeeded',
-                    },
                     'runtime': 'android',
                     'scheduler': 'durable-os-scheduler',
                     'stateBackend': 'platform-key-value-store',
@@ -1497,6 +1510,16 @@ TUS_MANAGED_UPLOAD = {
                         },
                         'uploadPath': 'managed-permanent-failure',
                     },
+                    'network': {
+                        'current': 'unmetered-network',
+                        'decision': 'start-upload-work',
+                        'required': 'any-network',
+                    },
+                    'outcome': {
+                        'failure': 'unretryable-protocol-error',
+                        'kind': 'terminal',
+                        'state': 'failed',
+                    },
                     'retryDelays': [],
                     'sourceAvailability': 'available',
                     'sourceDurability': 'copy-to-owned-storage',
@@ -1505,10 +1528,6 @@ TUS_MANAGED_UPLOAD = {
                         'running',
                         'failed',
                     ],
-                    'terminal': {
-                        'failure': 'unretryable-protocol-error',
-                        'state': 'failed',
-                    },
                     'runtime': 'java',
                     'scheduler': 'process-lifetime-worker-pool',
                     'stateBackend': 'filesystem',
@@ -1551,6 +1570,16 @@ TUS_MANAGED_UPLOAD = {
                         },
                         'uploadPath': 'managed-permanent-failure',
                     },
+                    'network': {
+                        'current': 'unmetered-network',
+                        'decision': 'start-upload-work',
+                        'required': 'any-network',
+                    },
+                    'outcome': {
+                        'failure': 'unretryable-protocol-error',
+                        'kind': 'terminal',
+                        'state': 'failed',
+                    },
                     'retryDelays': [],
                     'sourceAvailability': 'available',
                     'sourceDurability': 'copy-to-owned-storage',
@@ -1559,10 +1588,6 @@ TUS_MANAGED_UPLOAD = {
                         'running',
                         'failed',
                     ],
-                    'terminal': {
-                        'failure': 'unretryable-protocol-error',
-                        'state': 'failed',
-                    },
                     'runtime': 'android',
                     'scheduler': 'durable-os-scheduler',
                     'stateBackend': 'platform-key-value-store',
@@ -1664,6 +1689,16 @@ TUS_MANAGED_UPLOAD = {
                         },
                         'uploadPath': 'managed-retry-exhausted',
                     },
+                    'network': {
+                        'current': 'unmetered-network',
+                        'decision': 'start-upload-work',
+                        'required': 'any-network',
+                    },
+                    'outcome': {
+                        'failure': 'retry-policy-exhausted',
+                        'kind': 'terminal',
+                        'state': 'failed',
+                    },
                     'retryDelays': [
                         0,
                         0,
@@ -1679,10 +1714,6 @@ TUS_MANAGED_UPLOAD = {
                         'running',
                         'failed',
                     ],
-                    'terminal': {
-                        'failure': 'retry-policy-exhausted',
-                        'state': 'failed',
-                    },
                     'runtime': 'java',
                     'scheduler': 'process-lifetime-worker-pool',
                     'stateBackend': 'filesystem',
@@ -1769,6 +1800,16 @@ TUS_MANAGED_UPLOAD = {
                         },
                         'uploadPath': 'managed-retry-exhausted',
                     },
+                    'network': {
+                        'current': 'unmetered-network',
+                        'decision': 'start-upload-work',
+                        'required': 'any-network',
+                    },
+                    'outcome': {
+                        'failure': 'retry-policy-exhausted',
+                        'kind': 'terminal',
+                        'state': 'failed',
+                    },
                     'retryDelays': [
                         0,
                         0,
@@ -1784,10 +1825,6 @@ TUS_MANAGED_UPLOAD = {
                         'running',
                         'failed',
                     ],
-                    'terminal': {
-                        'failure': 'retry-policy-exhausted',
-                        'state': 'failed',
-                    },
                     'runtime': 'android',
                     'scheduler': 'durable-os-scheduler',
                     'stateBackend': 'platform-key-value-store',
@@ -1833,6 +1870,16 @@ TUS_MANAGED_UPLOAD = {
                         },
                         'uploadPath': 'managed-source-unavailable',
                     },
+                    'network': {
+                        'current': 'unmetered-network',
+                        'decision': 'start-upload-work',
+                        'required': 'any-network',
+                    },
+                    'outcome': {
+                        'failure': 'source-unavailable',
+                        'kind': 'terminal',
+                        'state': 'failed',
+                    },
                     'retryDelays': [],
                     'sourceAvailability': 'missing-before-durable-copy',
                     'sourceDurability': 'copy-to-owned-storage',
@@ -1841,10 +1888,6 @@ TUS_MANAGED_UPLOAD = {
                         'running',
                         'failed',
                     ],
-                    'terminal': {
-                        'failure': 'source-unavailable',
-                        'state': 'failed',
-                    },
                     'runtime': 'java',
                     'scheduler': 'process-lifetime-worker-pool',
                     'stateBackend': 'filesystem',
@@ -1874,6 +1917,16 @@ TUS_MANAGED_UPLOAD = {
                         },
                         'uploadPath': 'managed-source-unavailable',
                     },
+                    'network': {
+                        'current': 'unmetered-network',
+                        'decision': 'start-upload-work',
+                        'required': 'any-network',
+                    },
+                    'outcome': {
+                        'failure': 'source-unavailable',
+                        'kind': 'terminal',
+                        'state': 'failed',
+                    },
                     'retryDelays': [],
                     'sourceAvailability': 'missing-before-durable-copy',
                     'sourceDurability': 'copy-to-owned-storage',
@@ -1882,10 +1935,6 @@ TUS_MANAGED_UPLOAD = {
                         'running',
                         'failed',
                     ],
-                    'terminal': {
-                        'failure': 'source-unavailable',
-                        'state': 'failed',
-                    },
                     'runtime': 'android',
                     'scheduler': 'durable-os-scheduler',
                     'stateBackend': 'platform-key-value-store',
@@ -1903,8 +1952,46 @@ TUS_MANAGED_UPLOAD = {
             'summary': 'Classify source disappearance before protocol requests as terminal without issuing a TUS request.',
         },
         {
+            'proofs': [
+                {
+                    'attempts': [],
+                    'cleanup': {
+                        'ownedSource': 'retain-owned-source-while-deferred',
+                        'resumeUrl': 'absent-while-deferred',
+                    },
+                    'input': {
+                        'chunkSize': 7,
+                        'content': 'hello later!',
+                        'fingerprint': 'managed-network-constraint-fingerprint',
+                        'metadata': {
+                            'filename': 'managed-network-constraint.txt',
+                        },
+                        'uploadPath': 'managed-network-constraint',
+                    },
+                    'network': {
+                        'current': 'metered-network',
+                        'decision': 'defer-until-network-constraint-satisfied',
+                        'required': 'unmetered-network',
+                    },
+                    'outcome': {
+                        'kind': 'deferred',
+                        'reason': 'network-constraint-unsatisfied',
+                        'state': 'pending',
+                    },
+                    'retryDelays': [],
+                    'sourceAvailability': 'available',
+                    'sourceDurability': 'copy-to-owned-storage',
+                    'states': [
+                        'pending',
+                    ],
+                    'runtime': 'android',
+                    'scheduler': 'durable-os-scheduler',
+                    'stateBackend': 'platform-key-value-store',
+                },
+            ],
             'requiredPrimitives': [
                 'accept-upload-submission',
+                'make-source-durable',
                 'schedule-upload-work',
                 'publish-upload-state',
             ],
@@ -2038,13 +2125,16 @@ TUS_MANAGED_UPLOAD_PROOF_CASES = [
     {
         'featureId': 'managedUpload',
         'layer': 'feature-over-protocol',
-        'proofRuntimes': [],
+        'proofRuntimes': [
+            'android',
+        ],
         'protocolFeatureIds': [
             'singleUploadLifecycle',
             'retryOffsetRecovery',
         ],
         'requiredPrimitives': [
             'accept-upload-submission',
+            'make-source-durable',
             'schedule-upload-work',
             'publish-upload-state',
         ],
