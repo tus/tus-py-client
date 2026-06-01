@@ -7,6 +7,8 @@ import unittest
 from tests.generated_protocol_contract import (
     TUS_CLIENT_CONFORMANCE_SCENARIOS,
     TUS_CLIENT_FEATURES,
+    TUS_MANAGED_UPLOAD,
+    TUS_MANAGED_UPLOAD_PROOF_CASES,
 )
 
 
@@ -396,6 +398,13 @@ def client_scenario(scenario_id):
     raise AssertionError("Missing generated TUS client scenario: {}".format(scenario_id))
 
 
+def managed_upload_scenario(scenario_id):
+    for scenario in TUS_MANAGED_UPLOAD["scenarios"]:
+        if scenario["scenarioId"] == scenario_id:
+            return scenario
+    raise AssertionError("Missing generated TUS managed-upload scenario: {}".format(scenario_id))
+
+
 class GeneratedTusConformanceEventsTest(unittest.TestCase):
     def test_generated_scenario_event_keys(self):
         for case in CASES:
@@ -424,3 +433,19 @@ class GeneratedTusConformanceEventsTest(unittest.TestCase):
             self.assertIn(scenario["scenarioId"], feature["conformance"]["scenarioIds"])
             self.assertEqual(scenario["operationIds"], case["operationIds"])
             self.assertEqual(scenario["primitives"], case["primitives"])
+
+    def test_generated_managed_upload_proof_scenarios(self):
+        for case in TUS_MANAGED_UPLOAD_PROOF_CASES:
+            scenario = managed_upload_scenario(case["scenarioId"])
+
+            self.assertEqual(TUS_MANAGED_UPLOAD["featureId"], case["featureId"])
+            self.assertEqual(TUS_MANAGED_UPLOAD["layer"], case["layer"])
+            self.assertEqual(scenario["requiredPrimitives"], case["requiredPrimitives"])
+            for primitive in case["requiredPrimitives"]:
+                self.assertIn(primitive, TUS_MANAGED_UPLOAD["primitives"])
+            for feature_id in case["protocolFeatureIds"]:
+                client_feature(feature_id)
+            self.assertEqual(
+                [profile["runtime"] for profile in TUS_MANAGED_UPLOAD["runtimeProfiles"]],
+                case["runtimeProfiles"],
+            )

@@ -1263,6 +1263,81 @@ TUS_MANAGED_UPLOAD = {
     ],
 }
 
+TUS_MANAGED_UPLOAD_PROOF_CASES = [
+    {
+        'featureId': 'managedUpload',
+        'layer': 'feature-over-protocol',
+        'protocolFeatureIds': [
+            'singleUploadLifecycle',
+            'retryOffsetRecovery',
+        ],
+        'requiredPrimitives': [
+            'accept-upload-submission',
+            'make-source-durable',
+            'schedule-upload-work',
+            'run-protocol-upload',
+            'apply-managed-retry-policy',
+            'publish-upload-state',
+            'cleanup-managed-upload',
+        ],
+        'runtimeProfiles': [
+            'android',
+            'ios',
+            'browser',
+            'java',
+            'node',
+            'react-native',
+        ],
+        'scenarioId': 'managedUploadDurableRetry',
+    },
+    {
+        'featureId': 'managedUpload',
+        'layer': 'feature-over-protocol',
+        'protocolFeatureIds': [
+            'singleUploadLifecycle',
+            'retryOffsetRecovery',
+        ],
+        'requiredPrimitives': [
+            'accept-upload-submission',
+            'make-source-durable',
+            'schedule-upload-work',
+            'classify-failure',
+            'publish-upload-state',
+        ],
+        'runtimeProfiles': [
+            'android',
+            'ios',
+            'browser',
+            'java',
+            'node',
+            'react-native',
+        ],
+        'scenarioId': 'managedUploadPermanentFailure',
+    },
+    {
+        'featureId': 'managedUpload',
+        'layer': 'feature-over-protocol',
+        'protocolFeatureIds': [
+            'singleUploadLifecycle',
+            'retryOffsetRecovery',
+        ],
+        'requiredPrimitives': [
+            'accept-upload-submission',
+            'schedule-upload-work',
+            'publish-upload-state',
+        ],
+        'runtimeProfiles': [
+            'android',
+            'ios',
+            'browser',
+            'java',
+            'node',
+            'react-native',
+        ],
+        'scenarioId': 'managedUploadNetworkConstraint',
+    },
+]
+
 TUS_CLIENT_CONFORMANCE_SCENARIOS = [
     {
         'behavior': 'single-upload-lifecycle',
