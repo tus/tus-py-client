@@ -1086,6 +1086,7 @@ TUS_MANAGED_UPLOAD = {
         'scenarioIds': [
             'managedUploadDurableRetry',
             'managedUploadPermanentFailure',
+            'managedUploadRetryPolicyExhausted',
             'managedUploadNetworkConstraint',
         ],
         'status': 'needs-generated-scenario',
@@ -1574,6 +1575,230 @@ TUS_MANAGED_UPLOAD = {
             'summary': 'Classify missing sources and unretryable protocol failures as terminal without further retry.',
         },
         {
+            'proofs': [
+                {
+                    'attempts': [
+                        {
+                            'attemptIndex': 0,
+                            'failure': {
+                                'kind': 'retryable-protocol-error',
+                                'phase': 'during-protocol-request',
+                            },
+                            'requests': [
+                                {
+                                    'bodySize': 0,
+                                    'headers': {
+                                        'Upload-Length': '14',
+                                    },
+                                    'operationId': 'createTusUpload',
+                                    'response': {
+                                        'headers': {},
+                                        'statusCode': 500,
+                                    },
+                                    'url': 'endpoint',
+                                },
+                            ],
+                            'stateAfterAttempt': 'failed',
+                        },
+                        {
+                            'attemptIndex': 1,
+                            'failure': {
+                                'kind': 'retryable-protocol-error',
+                                'phase': 'during-protocol-request',
+                            },
+                            'requests': [
+                                {
+                                    'bodySize': 0,
+                                    'headers': {
+                                        'Upload-Length': '14',
+                                    },
+                                    'operationId': 'createTusUpload',
+                                    'response': {
+                                        'headers': {},
+                                        'statusCode': 500,
+                                    },
+                                    'url': 'endpoint',
+                                },
+                            ],
+                            'stateAfterAttempt': 'failed',
+                        },
+                        {
+                            'attemptIndex': 2,
+                            'failure': {
+                                'kind': 'retryable-protocol-error',
+                                'phase': 'during-protocol-request',
+                            },
+                            'requests': [
+                                {
+                                    'bodySize': 0,
+                                    'headers': {
+                                        'Upload-Length': '14',
+                                    },
+                                    'operationId': 'createTusUpload',
+                                    'response': {
+                                        'headers': {},
+                                        'statusCode': 500,
+                                    },
+                                    'url': 'endpoint',
+                                },
+                            ],
+                            'stateAfterAttempt': 'failed',
+                        },
+                    ],
+                    'cleanup': {
+                        'ownedSource': 'retain-owned-source-after-permanent-failure',
+                        'resumeUrl': 'absent-after-permanent-failure',
+                    },
+                    'input': {
+                        'chunkSize': 7,
+                        'content': 'hello retries!',
+                        'fingerprint': 'managed-retry-exhausted-fingerprint',
+                        'metadata': {
+                            'filename': 'managed-retry-exhausted.txt',
+                        },
+                        'uploadPath': 'managed-retry-exhausted',
+                    },
+                    'retryDelays': [
+                        0,
+                        0,
+                    ],
+                    'sourceDurability': 'copy-to-owned-storage',
+                    'states': [
+                        'pending',
+                        'running',
+                        'failed',
+                        'running',
+                        'failed',
+                        'running',
+                        'failed',
+                    ],
+                    'terminal': {
+                        'failure': 'retry-policy-exhausted',
+                        'state': 'failed',
+                    },
+                    'runtime': 'java',
+                    'scheduler': 'process-lifetime-worker-pool',
+                    'stateBackend': 'filesystem',
+                },
+                {
+                    'attempts': [
+                        {
+                            'attemptIndex': 0,
+                            'failure': {
+                                'kind': 'retryable-protocol-error',
+                                'phase': 'during-protocol-request',
+                            },
+                            'requests': [
+                                {
+                                    'bodySize': 0,
+                                    'headers': {
+                                        'Upload-Length': '14',
+                                    },
+                                    'operationId': 'createTusUpload',
+                                    'response': {
+                                        'headers': {},
+                                        'statusCode': 500,
+                                    },
+                                    'url': 'endpoint',
+                                },
+                            ],
+                            'stateAfterAttempt': 'failed',
+                        },
+                        {
+                            'attemptIndex': 1,
+                            'failure': {
+                                'kind': 'retryable-protocol-error',
+                                'phase': 'during-protocol-request',
+                            },
+                            'requests': [
+                                {
+                                    'bodySize': 0,
+                                    'headers': {
+                                        'Upload-Length': '14',
+                                    },
+                                    'operationId': 'createTusUpload',
+                                    'response': {
+                                        'headers': {},
+                                        'statusCode': 500,
+                                    },
+                                    'url': 'endpoint',
+                                },
+                            ],
+                            'stateAfterAttempt': 'failed',
+                        },
+                        {
+                            'attemptIndex': 2,
+                            'failure': {
+                                'kind': 'retryable-protocol-error',
+                                'phase': 'during-protocol-request',
+                            },
+                            'requests': [
+                                {
+                                    'bodySize': 0,
+                                    'headers': {
+                                        'Upload-Length': '14',
+                                    },
+                                    'operationId': 'createTusUpload',
+                                    'response': {
+                                        'headers': {},
+                                        'statusCode': 500,
+                                    },
+                                    'url': 'endpoint',
+                                },
+                            ],
+                            'stateAfterAttempt': 'failed',
+                        },
+                    ],
+                    'cleanup': {
+                        'ownedSource': 'retain-owned-source-after-permanent-failure',
+                        'resumeUrl': 'absent-after-permanent-failure',
+                    },
+                    'input': {
+                        'chunkSize': 7,
+                        'content': 'hello retries!',
+                        'fingerprint': 'managed-retry-exhausted-fingerprint',
+                        'metadata': {
+                            'filename': 'managed-retry-exhausted.txt',
+                        },
+                        'uploadPath': 'managed-retry-exhausted',
+                    },
+                    'retryDelays': [
+                        0,
+                        0,
+                    ],
+                    'sourceDurability': 'copy-to-owned-storage',
+                    'states': [
+                        'pending',
+                        'running',
+                        'failed',
+                        'running',
+                        'failed',
+                        'running',
+                        'failed',
+                    ],
+                    'terminal': {
+                        'failure': 'retry-policy-exhausted',
+                        'state': 'failed',
+                    },
+                    'runtime': 'android',
+                    'scheduler': 'durable-os-scheduler',
+                    'stateBackend': 'platform-key-value-store',
+                },
+            ],
+            'requiredPrimitives': [
+                'accept-upload-submission',
+                'make-source-durable',
+                'schedule-upload-work',
+                'run-protocol-upload',
+                'apply-managed-retry-policy',
+                'classify-failure',
+                'publish-upload-state',
+                'cleanup-managed-upload',
+            ],
+            'scenarioId': 'managedUploadRetryPolicyExhausted',
+            'summary': 'Retry transient protocol failures up to the managed retry budget and then classify the upload as terminally failed.',
+        },
+        {
             'requiredPrimitives': [
                 'accept-upload-submission',
                 'schedule-upload-work',
@@ -1645,6 +1870,37 @@ TUS_MANAGED_UPLOAD_PROOF_CASES = [
             'react-native',
         ],
         'scenarioId': 'managedUploadPermanentFailure',
+    },
+    {
+        'featureId': 'managedUpload',
+        'layer': 'feature-over-protocol',
+        'proofRuntimes': [
+            'java',
+            'android',
+        ],
+        'protocolFeatureIds': [
+            'singleUploadLifecycle',
+            'retryOffsetRecovery',
+        ],
+        'requiredPrimitives': [
+            'accept-upload-submission',
+            'make-source-durable',
+            'schedule-upload-work',
+            'run-protocol-upload',
+            'apply-managed-retry-policy',
+            'classify-failure',
+            'publish-upload-state',
+            'cleanup-managed-upload',
+        ],
+        'runtimeProfiles': [
+            'android',
+            'ios',
+            'browser',
+            'java',
+            'node',
+            'react-native',
+        ],
+        'scenarioId': 'managedUploadRetryPolicyExhausted',
     },
     {
         'featureId': 'managedUpload',
