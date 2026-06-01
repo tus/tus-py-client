@@ -1021,6 +1021,7 @@ TUS_MANAGED_UPLOAD = {
     'capabilities': {
         'cleanup': {
             'policies': [
+                'absent-after-source-unavailable',
                 'remove-owned-source-after-success',
                 'remove-owned-source-after-cancel',
                 'retain-owned-source-after-permanent-failure',
@@ -1087,6 +1088,7 @@ TUS_MANAGED_UPLOAD = {
             'managedUploadDurableRetry',
             'managedUploadPermanentFailure',
             'managedUploadRetryPolicyExhausted',
+            'managedUploadSourceUnavailable',
             'managedUploadNetworkConstraint',
         ],
         'status': 'needs-generated-scenario',
@@ -1320,6 +1322,7 @@ TUS_MANAGED_UPLOAD = {
                     'retryDelays': [
                         0,
                     ],
+                    'sourceAvailability': 'available',
                     'sourceDurability': 'copy-to-owned-storage',
                     'states': [
                         'pending',
@@ -1425,6 +1428,7 @@ TUS_MANAGED_UPLOAD = {
                     'retryDelays': [
                         0,
                     ],
+                    'sourceAvailability': 'available',
                     'sourceDurability': 'copy-to-owned-storage',
                     'states': [
                         'pending',
@@ -1494,6 +1498,7 @@ TUS_MANAGED_UPLOAD = {
                         'uploadPath': 'managed-permanent-failure',
                     },
                     'retryDelays': [],
+                    'sourceAvailability': 'available',
                     'sourceDurability': 'copy-to-owned-storage',
                     'states': [
                         'pending',
@@ -1547,6 +1552,7 @@ TUS_MANAGED_UPLOAD = {
                         'uploadPath': 'managed-permanent-failure',
                     },
                     'retryDelays': [],
+                    'sourceAvailability': 'available',
                     'sourceDurability': 'copy-to-owned-storage',
                     'states': [
                         'pending',
@@ -1572,7 +1578,7 @@ TUS_MANAGED_UPLOAD = {
                 'cleanup-managed-upload',
             ],
             'scenarioId': 'managedUploadPermanentFailure',
-            'summary': 'Classify missing sources and unretryable protocol failures as terminal without further retry.',
+            'summary': 'Classify unretryable protocol failures as terminal without further retry.',
         },
         {
             'proofs': [
@@ -1662,6 +1668,7 @@ TUS_MANAGED_UPLOAD = {
                         0,
                         0,
                     ],
+                    'sourceAvailability': 'available',
                     'sourceDurability': 'copy-to-owned-storage',
                     'states': [
                         'pending',
@@ -1766,6 +1773,7 @@ TUS_MANAGED_UPLOAD = {
                         0,
                         0,
                     ],
+                    'sourceAvailability': 'available',
                     'sourceDurability': 'copy-to-owned-storage',
                     'states': [
                         'pending',
@@ -1797,6 +1805,102 @@ TUS_MANAGED_UPLOAD = {
             ],
             'scenarioId': 'managedUploadRetryPolicyExhausted',
             'summary': 'Retry transient protocol failures up to the managed retry budget and then classify the upload as terminally failed.',
+        },
+        {
+            'proofs': [
+                {
+                    'attempts': [
+                        {
+                            'attemptIndex': 0,
+                            'failure': {
+                                'kind': 'source-unavailable',
+                                'phase': 'before-protocol-request',
+                            },
+                            'requests': [],
+                            'stateAfterAttempt': 'failed',
+                        },
+                    ],
+                    'cleanup': {
+                        'ownedSource': 'absent-after-source-unavailable',
+                        'resumeUrl': 'absent-after-permanent-failure',
+                    },
+                    'input': {
+                        'chunkSize': 7,
+                        'content': 'hello missing!',
+                        'fingerprint': 'managed-source-unavailable-fingerprint',
+                        'metadata': {
+                            'filename': 'managed-source-unavailable.txt',
+                        },
+                        'uploadPath': 'managed-source-unavailable',
+                    },
+                    'retryDelays': [],
+                    'sourceAvailability': 'missing-before-durable-copy',
+                    'sourceDurability': 'copy-to-owned-storage',
+                    'states': [
+                        'pending',
+                        'running',
+                        'failed',
+                    ],
+                    'terminal': {
+                        'failure': 'source-unavailable',
+                        'state': 'failed',
+                    },
+                    'runtime': 'java',
+                    'scheduler': 'process-lifetime-worker-pool',
+                    'stateBackend': 'filesystem',
+                },
+                {
+                    'attempts': [
+                        {
+                            'attemptIndex': 0,
+                            'failure': {
+                                'kind': 'source-unavailable',
+                                'phase': 'before-protocol-request',
+                            },
+                            'requests': [],
+                            'stateAfterAttempt': 'failed',
+                        },
+                    ],
+                    'cleanup': {
+                        'ownedSource': 'absent-after-source-unavailable',
+                        'resumeUrl': 'absent-after-permanent-failure',
+                    },
+                    'input': {
+                        'chunkSize': 7,
+                        'content': 'hello missing!',
+                        'fingerprint': 'managed-source-unavailable-fingerprint',
+                        'metadata': {
+                            'filename': 'managed-source-unavailable.txt',
+                        },
+                        'uploadPath': 'managed-source-unavailable',
+                    },
+                    'retryDelays': [],
+                    'sourceAvailability': 'missing-before-durable-copy',
+                    'sourceDurability': 'copy-to-owned-storage',
+                    'states': [
+                        'pending',
+                        'running',
+                        'failed',
+                    ],
+                    'terminal': {
+                        'failure': 'source-unavailable',
+                        'state': 'failed',
+                    },
+                    'runtime': 'android',
+                    'scheduler': 'durable-os-scheduler',
+                    'stateBackend': 'platform-key-value-store',
+                },
+            ],
+            'requiredPrimitives': [
+                'accept-upload-submission',
+                'make-source-durable',
+                'schedule-upload-work',
+                'classify-failure',
+                'publish-upload-state',
+                'cleanup-managed-upload',
+            ],
+            'scenarioId': 'managedUploadSourceUnavailable',
+            'summary': 'Classify source disappearance before protocol requests as terminal without issuing a TUS request.',
         },
         {
             'requiredPrimitives': [
@@ -1901,6 +2005,35 @@ TUS_MANAGED_UPLOAD_PROOF_CASES = [
             'react-native',
         ],
         'scenarioId': 'managedUploadRetryPolicyExhausted',
+    },
+    {
+        'featureId': 'managedUpload',
+        'layer': 'feature-over-protocol',
+        'proofRuntimes': [
+            'java',
+            'android',
+        ],
+        'protocolFeatureIds': [
+            'singleUploadLifecycle',
+            'retryOffsetRecovery',
+        ],
+        'requiredPrimitives': [
+            'accept-upload-submission',
+            'make-source-durable',
+            'schedule-upload-work',
+            'classify-failure',
+            'publish-upload-state',
+            'cleanup-managed-upload',
+        ],
+        'runtimeProfiles': [
+            'android',
+            'ios',
+            'browser',
+            'java',
+            'node',
+            'react-native',
+        ],
+        'scenarioId': 'managedUploadSourceUnavailable',
     },
     {
         'featureId': 'managedUpload',
