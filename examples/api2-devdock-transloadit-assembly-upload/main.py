@@ -116,10 +116,21 @@ def upload_with_tus(scenario, create_response):
     return uploader.url
 
 
+def write_result(upload_url):
+    result_path = os.environ.get("API2_SDK_EXAMPLE_RESULT")
+    if not result_path:
+        return
+
+    with Path(result_path).open("w", encoding="utf-8") as result_file:
+        json.dump({"uploadUrl": upload_url}, result_file, indent=2)
+        result_file.write("\n")
+
+
 def main():
     scenario = load_scenario()
     create_response = scenario["prepared"]["createResponse"]
     upload_url = upload_with_tus(scenario, create_response)
+    write_result(upload_url)
     print(
         "Python TUS SDK devdock scenario {} uploaded to {}".format(
             scenario["scenarioId"], upload_url
