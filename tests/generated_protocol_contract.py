@@ -1025,7 +1025,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'uploadUrl': 'https://tus.io/uploads/generated-contract',
         },
         'eventPolicy': {
-            'matching': 'ordered-subsequence',
+            'matching': 'exact-except-extra-progress',
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
@@ -1133,7 +1133,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'uploadUrl': 'https://tus.io/uploads/creation-with-upload-contract',
         },
         'eventPolicy': {
-            'matching': 'ordered-subsequence',
+            'matching': 'exact-except-extra-progress',
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
@@ -1207,7 +1207,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'uploadUrl': 'https://tus.io/uploads/creation-with-upload-partial-contract',
         },
         'eventPolicy': {
-            'matching': 'ordered-subsequence',
+            'matching': 'exact-except-extra-progress',
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
@@ -1299,6 +1299,13 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'key': 'upload-url-available',
             },
             {
+                'bytesAccepted': 5,
+                'bytesTotal': 11,
+                'chunkSize': 5,
+                'kind': 'chunk-complete',
+                'key': 'chunk-complete:5:5:11',
+            },
+            {
                 'bytesSent': 5,
                 'bytesTotal': 11,
                 'kind': 'progress',
@@ -1353,7 +1360,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'uploadUrl': 'https://tus.io/uploads/ietf-draft-05-contract',
         },
         'eventPolicy': {
-            'matching': 'ordered-subsequence',
+            'matching': 'exact-except-extra-progress',
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
@@ -1434,7 +1441,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'uploadUrl': 'https://tus.io/uploads/ietf-draft-03-resume-contract',
         },
         'eventPolicy': {
-            'matching': 'ordered-subsequence',
+            'matching': 'exact-except-extra-progress',
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
@@ -1965,7 +1972,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'uploadUrl': 'https://tus.io/uploads/resume-contract',
         },
         'eventPolicy': {
-            'matching': 'ordered-subsequence',
+            'matching': 'exact-except-extra-progress',
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
@@ -2080,7 +2087,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'uploadUrl': 'https://tus.io/files/relative-contract',
         },
         'eventPolicy': {
-            'matching': 'ordered-subsequence',
+            'matching': 'exact-except-extra-progress',
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
@@ -2534,7 +2541,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'uploadUrl': 'https://tus.io/uploads/deferred-contract',
         },
         'eventPolicy': {
-            'matching': 'ordered-subsequence',
+            'matching': 'exact-except-extra-progress',
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
@@ -2687,7 +2694,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'uploadUrl': 'https://tus.io/uploads/parallel-final',
         },
         'eventPolicy': {
-            'matching': 'ordered-subsequence',
+            'matching': 'exact-except-extra-progress',
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
