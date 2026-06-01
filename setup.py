@@ -11,7 +11,7 @@ setup(
     install_requires=[
         'requests>=2.18.4',
         'tinydb>=3.5.0',
-        'aiohttp>=3.6.2'
+        'aiohttp>=3.6.2,<3.14'
     ],
     extras_require={
         'test': [
