@@ -288,6 +288,17 @@ CASES = [
         'featureId': 'abortUpload',
         'scenarioId': 'abortUploadAfterStoredUrl',
     },
+    {
+        'eventKeys': [
+            'should-retry:0:true',
+            'retry-schedule:0',
+        ],
+        'eventPolicy': {
+            'matching': 'exact',
+        },
+        'featureId': 'terminateUpload',
+        'scenarioId': 'terminateWithRetry',
+    },
 ]
 
 

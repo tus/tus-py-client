@@ -3343,5 +3343,18 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
         ],
         'scenarioId': 'terminateWithRetry',
+        'events': [
+            {
+                'decision': True,
+                'kind': 'should-retry',
+                'retryAttempt': 0,
+                'key': 'should-retry:0:true',
+            },
+            {
+                'delay': 0,
+                'kind': 'retry-schedule',
+                'key': 'retry-schedule:0',
+            },
+        ],
     },
 ]
