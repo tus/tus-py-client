@@ -22,6 +22,11 @@ CASES = [
             'progress:11:11',
             'chunk-complete:11:11:11',
         ],
+        'eventPolicy': {
+            'matching': 'exact-except-extra-progress',
+            'progress': 'milestone',
+            'transportProgress': 'may-emit-extra-samples',
+        },
         'metadata': {
             'filename': 'hello.txt',
         },
@@ -64,6 +69,11 @@ CASES = [
             'progress:11:11',
             'chunk-complete:6:11:11',
         ],
+        'eventPolicy': {
+            'matching': 'exact-except-extra-progress',
+            'progress': 'milestone',
+            'transportProgress': 'may-emit-extra-samples',
+        },
         'metadata': {},
         'removeFingerprintOnSuccess': True,
         'requests': [
@@ -107,6 +117,11 @@ CASES = [
             'progress:11:11',
             'chunk-complete:11:11:11',
         ],
+        'eventPolicy': {
+            'matching': 'exact-except-extra-progress',
+            'progress': 'milestone',
+            'transportProgress': 'may-emit-extra-samples',
+        },
         'metadata': {
             'filename': 'hello.txt',
         },
@@ -149,6 +164,11 @@ CASES = [
             'progress:11:11',
             'chunk-complete:11:11:11',
         ],
+        'eventPolicy': {
+            'matching': 'exact-except-extra-progress',
+            'progress': 'milestone',
+            'transportProgress': 'may-emit-extra-samples',
+        },
         'metadata': {
             'filename': 'hello.txt',
         },
@@ -232,6 +252,52 @@ def record_chunk_complete(events):
     return on_chunk_complete
 
 
+def is_progress_event_key(event_key):
+    return event_key.startswith('progress:')
+
+
+def assert_events(test, case, events):
+    expected_events = case['eventKeys']
+    event_policy = case.get('eventPolicy', {'matching': 'exact'})
+    matching = event_policy['matching']
+
+    if matching == 'exact':
+        test.assertEqual(events, expected_events, case['scenarioId'])
+        return
+
+    if matching == 'exact-except-extra-progress':
+        expected_index = 0
+        for event in events:
+            if (
+                expected_index < len(expected_events)
+                and event == expected_events[expected_index]
+            ):
+                expected_index += 1
+                continue
+
+            test.assertTrue(
+                is_progress_event_key(event),
+                '{} emitted an unexpected non-progress event {}; expected {}'.format(
+                    case['scenarioId'], event, expected_events
+                ),
+            )
+
+        test.assertEqual(
+            expected_index,
+            len(expected_events),
+            '{} did not emit every expected non-extra event; observed {}; expected {}'.format(
+                case['scenarioId'], events, expected_events
+            ),
+        )
+        return
+
+    raise AssertionError(
+        '{} uses unsupported generated event policy {}'.format(
+            case['scenarioId'], event_policy
+        )
+    )
+
+
 class GeneratedTusRuntimeEventsTest(unittest.TestCase):
     @responses.activate
     def test_sync_uploader_emits_generated_progress_and_chunk_events(self):
@@ -264,7 +330,7 @@ class GeneratedTusRuntimeEventsTest(unittest.TestCase):
             )
             uploader.upload()
 
-            self.assertEqual(events, case['eventKeys'], case['scenarioId'])
+            assert_events(self, case, events)
             assert_request_sequence(self, case, responses.calls[first_call_index:])
             assert_stored_upload_state(self, case, storage)
 

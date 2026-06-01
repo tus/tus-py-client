@@ -22,6 +22,11 @@ CASES = [
             'success',
             'source-close',
         ],
+        'eventPolicy': {
+            'matching': 'exact-except-extra-progress',
+            'progress': 'milestone',
+            'transportProgress': 'may-emit-extra-samples',
+        },
         'featureId': 'singleUploadLifecycle',
         'scenarioId': 'singleUploadLifecycle',
     },
@@ -33,6 +38,11 @@ CASES = [
             'success',
             'source-close',
         ],
+        'eventPolicy': {
+            'matching': 'exact-except-extra-progress',
+            'progress': 'milestone',
+            'transportProgress': 'may-emit-extra-samples',
+        },
         'featureId': 'creationWithUpload',
         'scenarioId': 'creationWithUpload',
     },
@@ -51,6 +61,11 @@ CASES = [
             'success',
             'source-close',
         ],
+        'eventPolicy': {
+            'matching': 'exact-except-extra-progress',
+            'progress': 'milestone',
+            'transportProgress': 'may-emit-extra-samples',
+        },
         'featureId': 'creationWithUpload',
         'scenarioId': 'creationWithUploadPartialChunk',
     },
@@ -62,6 +77,11 @@ CASES = [
             'success',
             'source-close',
         ],
+        'eventPolicy': {
+            'matching': 'exact-except-extra-progress',
+            'progress': 'milestone',
+            'transportProgress': 'may-emit-extra-samples',
+        },
         'featureId': 'protocolVersionSelection',
         'scenarioId': 'ietfDraft05CreationWithUpload',
     },
@@ -74,6 +94,11 @@ CASES = [
             'success',
             'source-close',
         ],
+        'eventPolicy': {
+            'matching': 'exact-except-extra-progress',
+            'progress': 'milestone',
+            'transportProgress': 'may-emit-extra-samples',
+        },
         'featureId': 'protocolVersionSelection',
         'scenarioId': 'ietfDraft03ResumeWithoutKnownLength',
     },
@@ -90,6 +115,11 @@ CASES = [
             'success',
             'source-close',
         ],
+        'eventPolicy': {
+            'matching': 'exact-except-extra-progress',
+            'progress': 'milestone',
+            'transportProgress': 'may-emit-extra-samples',
+        },
         'featureId': 'resumeUpload',
         'scenarioId': 'resumeFromPreviousUpload',
     },
@@ -102,6 +132,11 @@ CASES = [
             'success',
             'source-close',
         ],
+        'eventPolicy': {
+            'matching': 'exact-except-extra-progress',
+            'progress': 'milestone',
+            'transportProgress': 'may-emit-extra-samples',
+        },
         'featureId': 'relativeLocationResolution',
         'scenarioId': 'relativeLocationResolution',
     },
@@ -111,6 +146,9 @@ CASES = [
             'success',
             'source-close',
         ],
+        'eventPolicy': {
+            'matching': 'exact',
+        },
         'featureId': 'inputSources',
         'scenarioId': 'arrayBufferInput',
     },
@@ -120,6 +158,9 @@ CASES = [
             'success',
             'source-close',
         ],
+        'eventPolicy': {
+            'matching': 'exact',
+        },
         'featureId': 'inputSources',
         'scenarioId': 'arrayBufferViewInput',
     },
@@ -129,6 +170,9 @@ CASES = [
             'success',
             'source-close',
         ],
+        'eventPolicy': {
+            'matching': 'exact',
+        },
         'featureId': 'inputSources',
         'scenarioId': 'webReadableStreamInput',
     },
@@ -138,6 +182,9 @@ CASES = [
             'success',
             'source-close',
         ],
+        'eventPolicy': {
+            'matching': 'exact',
+        },
         'featureId': 'inputSources',
         'scenarioId': 'nodeReadableStreamInput',
     },
@@ -147,6 +194,9 @@ CASES = [
             'success',
             'source-close',
         ],
+        'eventPolicy': {
+            'matching': 'exact',
+        },
         'featureId': 'inputSources',
         'scenarioId': 'nodePathInput',
     },
@@ -159,6 +209,11 @@ CASES = [
             'success',
             'source-close',
         ],
+        'eventPolicy': {
+            'matching': 'exact-except-extra-progress',
+            'progress': 'milestone',
+            'transportProgress': 'may-emit-extra-samples',
+        },
         'featureId': 'deferredLengthUpload',
         'scenarioId': 'deferredLengthUpload',
     },
@@ -169,6 +224,11 @@ CASES = [
             'progress:11:11',
             'chunk-complete:6:11:11',
         ],
+        'eventPolicy': {
+            'matching': 'exact-except-extra-progress',
+            'progress': 'milestone',
+            'transportProgress': 'may-emit-extra-samples',
+        },
         'featureId': 'parallelUploadConcat',
         'scenarioId': 'parallelUploadConcat',
     },
@@ -176,6 +236,9 @@ CASES = [
         'eventKeys': [
             'request-abort:3',
         ],
+        'eventPolicy': {
+            'matching': 'exact',
+        },
         'featureId': 'parallelUploadConcat',
         'scenarioId': 'parallelUploadAbortCleanup',
     },
@@ -186,6 +249,9 @@ CASES = [
             'should-retry:0:true',
             'retry-schedule:0',
         ],
+        'eventPolicy': {
+            'matching': 'exact',
+        },
         'featureId': 'retryOffsetRecovery',
         'scenarioId': 'retryPatchAfterOffsetRecovery',
     },
@@ -196,6 +262,9 @@ CASES = [
             'success',
             'source-close',
         ],
+        'eventPolicy': {
+            'matching': 'exact',
+        },
         'featureId': 'requestLifecycleHooks',
         'scenarioId': 'requestLifecycleHooks',
     },
@@ -203,6 +272,9 @@ CASES = [
         'eventKeys': [
             'request-abort:0',
         ],
+        'eventPolicy': {
+            'matching': 'exact',
+        },
         'featureId': 'abortUpload',
         'scenarioId': 'abortUpload',
     },
@@ -210,6 +282,9 @@ CASES = [
         'eventKeys': [
             'request-abort:1',
         ],
+        'eventPolicy': {
+            'matching': 'exact',
+        },
         'featureId': 'abortUpload',
         'scenarioId': 'abortUploadAfterStoredUrl',
     },
@@ -241,4 +316,8 @@ class GeneratedTusConformanceEventsTest(unittest.TestCase):
             self.assertEqual(
                 [event["key"] for event in scenario["events"]],
                 case["eventKeys"],
+            )
+            self.assertEqual(
+                scenario.get("eventPolicy", {"matching": "exact"}),
+                case["eventPolicy"],
             )
