@@ -2707,6 +2707,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
+        'execution': {
+            'serverRequestGates': [
+                {
+                    'gateId': 'parallel-patches',
+                    'heldRequestIndexes': [
+                        2,
+                        3,
+                    ],
+                    'kind': 'release-after-all-started',
+                    'releaseAfterRequestIndexes': [
+                        2,
+                        3,
+                    ],
+                    'timeoutMs': 2000,
+                },
+            ],
+        },
         'featureId': 'parallelUploadConcat',
         'input': {
             'content': 'hello world',
@@ -2844,6 +2861,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'behavior': 'parallel-upload-abort-cleanup',
         'completion': {
             'kind': 'aborted',
+        },
+        'execution': {
+            'serverRequestGates': [
+                {
+                    'gateId': 'parallel-cleanup-patches',
+                    'heldRequestIndexes': [
+                        2,
+                        3,
+                    ],
+                    'kind': 'release-after-all-started',
+                    'releaseAfterRequestIndexes': [
+                        2,
+                        3,
+                    ],
+                    'timeoutMs': 2000,
+                },
+            ],
         },
         'featureId': 'parallelUploadConcat',
         'input': {
