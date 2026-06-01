@@ -1236,6 +1236,7 @@ TUS_MANAGED_UPLOAD = {
                             'failure': {
                                 'afterAcceptedOffset': 7,
                                 'kind': 'io-error',
+                                'phase': 'after-accepted-offset',
                             },
                             'requests': [
                                 {
@@ -1326,6 +1327,9 @@ TUS_MANAGED_UPLOAD = {
                         'running',
                         'succeeded',
                     ],
+                    'terminal': {
+                        'state': 'succeeded',
+                    },
                     'runtime': 'java',
                     'scheduler': 'process-lifetime-worker-pool',
                     'stateBackend': 'filesystem',
@@ -1337,6 +1341,7 @@ TUS_MANAGED_UPLOAD = {
                             'failure': {
                                 'afterAcceptedOffset': 7,
                                 'kind': 'io-error',
+                                'phase': 'after-accepted-offset',
                             },
                             'requests': [
                                 {
@@ -1427,6 +1432,9 @@ TUS_MANAGED_UPLOAD = {
                         'running',
                         'succeeded',
                     ],
+                    'terminal': {
+                        'state': 'succeeded',
+                    },
                     'runtime': 'android',
                     'scheduler': 'durable-os-scheduler',
                     'stateBackend': 'platform-key-value-store',
@@ -1445,12 +1453,122 @@ TUS_MANAGED_UPLOAD = {
             'summary': 'Submit a durable source, survive scheduler/process interruption, resume by stored upload URL, and finish with cleanup.',
         },
         {
+            'proofs': [
+                {
+                    'attempts': [
+                        {
+                            'attemptIndex': 0,
+                            'failure': {
+                                'kind': 'unretryable-protocol-error',
+                                'phase': 'during-protocol-request',
+                            },
+                            'requests': [
+                                {
+                                    'bodySize': 0,
+                                    'headers': {
+                                        'Upload-Length': '14',
+                                    },
+                                    'operationId': 'createTusUpload',
+                                    'response': {
+                                        'headers': {},
+                                        'statusCode': 400,
+                                    },
+                                    'url': 'endpoint',
+                                },
+                            ],
+                            'stateAfterAttempt': 'failed',
+                        },
+                    ],
+                    'cleanup': {
+                        'ownedSource': 'retain-owned-source-after-permanent-failure',
+                        'resumeUrl': 'absent-after-permanent-failure',
+                    },
+                    'input': {
+                        'chunkSize': 7,
+                        'content': 'hello failure!',
+                        'fingerprint': 'managed-permanent-failure-fingerprint',
+                        'metadata': {
+                            'filename': 'managed-permanent-failure.txt',
+                        },
+                        'uploadPath': 'managed-permanent-failure',
+                    },
+                    'retryDelays': [],
+                    'sourceDurability': 'copy-to-owned-storage',
+                    'states': [
+                        'pending',
+                        'running',
+                        'failed',
+                    ],
+                    'terminal': {
+                        'failure': 'unretryable-protocol-error',
+                        'state': 'failed',
+                    },
+                    'runtime': 'java',
+                    'scheduler': 'process-lifetime-worker-pool',
+                    'stateBackend': 'filesystem',
+                },
+                {
+                    'attempts': [
+                        {
+                            'attemptIndex': 0,
+                            'failure': {
+                                'kind': 'unretryable-protocol-error',
+                                'phase': 'during-protocol-request',
+                            },
+                            'requests': [
+                                {
+                                    'bodySize': 0,
+                                    'headers': {
+                                        'Upload-Length': '14',
+                                    },
+                                    'operationId': 'createTusUpload',
+                                    'response': {
+                                        'headers': {},
+                                        'statusCode': 400,
+                                    },
+                                    'url': 'endpoint',
+                                },
+                            ],
+                            'stateAfterAttempt': 'failed',
+                        },
+                    ],
+                    'cleanup': {
+                        'ownedSource': 'retain-owned-source-after-permanent-failure',
+                        'resumeUrl': 'absent-after-permanent-failure',
+                    },
+                    'input': {
+                        'chunkSize': 7,
+                        'content': 'hello failure!',
+                        'fingerprint': 'managed-permanent-failure-fingerprint',
+                        'metadata': {
+                            'filename': 'managed-permanent-failure.txt',
+                        },
+                        'uploadPath': 'managed-permanent-failure',
+                    },
+                    'retryDelays': [],
+                    'sourceDurability': 'copy-to-owned-storage',
+                    'states': [
+                        'pending',
+                        'running',
+                        'failed',
+                    ],
+                    'terminal': {
+                        'failure': 'unretryable-protocol-error',
+                        'state': 'failed',
+                    },
+                    'runtime': 'android',
+                    'scheduler': 'durable-os-scheduler',
+                    'stateBackend': 'platform-key-value-store',
+                },
+            ],
             'requiredPrimitives': [
                 'accept-upload-submission',
                 'make-source-durable',
                 'schedule-upload-work',
+                'run-protocol-upload',
                 'classify-failure',
                 'publish-upload-state',
+                'cleanup-managed-upload',
             ],
             'scenarioId': 'managedUploadPermanentFailure',
             'summary': 'Classify missing sources and unretryable protocol failures as terminal without further retry.',
@@ -1501,7 +1619,10 @@ TUS_MANAGED_UPLOAD_PROOF_CASES = [
     {
         'featureId': 'managedUpload',
         'layer': 'feature-over-protocol',
-        'proofRuntimes': [],
+        'proofRuntimes': [
+            'java',
+            'android',
+        ],
         'protocolFeatureIds': [
             'singleUploadLifecycle',
             'retryOffsetRecovery',
@@ -1510,8 +1631,10 @@ TUS_MANAGED_UPLOAD_PROOF_CASES = [
             'accept-upload-submission',
             'make-source-durable',
             'schedule-upload-work',
+            'run-protocol-upload',
             'classify-failure',
             'publish-upload-state',
+            'cleanup-managed-upload',
         ],
         'runtimeProfiles': [
             'android',
