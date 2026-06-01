@@ -3164,6 +3164,14 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'completion': {
             'kind': 'aborted',
         },
+        'execution': {
+            'onRequestStart': [
+                {
+                    'kind': 'cancel-upload',
+                    'requestIndex': 0,
+                },
+            ],
+        },
         'featureId': 'abortUpload',
         'input': {
             'content': 'hello world',
@@ -3203,6 +3211,14 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'completion': {
             'kind': 'aborted',
             'uploadUrl': 'https://tus.io/uploads/abort-terminate-contract',
+        },
+        'execution': {
+            'onRequestStart': [
+                {
+                    'kind': 'cancel-upload',
+                    'requestIndex': 1,
+                },
+            ],
         },
         'featureId': 'abortUpload',
         'input': {
