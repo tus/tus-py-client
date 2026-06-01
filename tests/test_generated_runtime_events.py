@@ -27,6 +27,7 @@ CASES = [
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
+        'execution': None,
         'metadata': {
             'filename': 'hello.txt',
         },
@@ -73,6 +74,15 @@ CASES = [
             'matching': 'exact-except-extra-progress',
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
+        },
+        'execution': {
+            'beforeStart': [
+                {
+                    'expectedPreviousUploadCount': 1,
+                    'kind': 'resume-from-previous-upload',
+                    'selectedPreviousUploadIndex': 0,
+                },
+            ],
         },
         'metadata': {},
         'removeFingerprintOnSuccess': True,
@@ -122,6 +132,7 @@ CASES = [
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
+        'execution': None,
         'metadata': {
             'filename': 'hello.txt',
         },
@@ -169,6 +180,7 @@ CASES = [
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
+        'execution': None,
         'metadata': {
             'filename': 'hello.txt',
         },
@@ -256,6 +268,50 @@ def is_progress_event_key(event_key):
     return event_key.startswith('progress:')
 
 
+def execution_actions(case, phase):
+    execution = case.get('execution') or {}
+    return execution.get(phase, [])
+
+
+def resume_before_start_action(case):
+    action = None
+    for candidate in execution_actions(case, 'beforeStart'):
+        if candidate['kind'] != 'resume-from-previous-upload':
+            raise AssertionError(
+                '{} uses unsupported generated beforeStart action {}'.format(
+                    case['scenarioId'], candidate['kind']
+                )
+            )
+
+        if action is not None:
+            raise AssertionError(
+                '{} defines more than one resume beforeStart action'.format(
+                    case['scenarioId']
+                )
+            )
+
+        action = candidate
+
+    return action
+
+
+def assert_before_start_actions(test, case, storage):
+    action = resume_before_start_action(case)
+    if action is None:
+        return
+
+    test.assertIsNotNone(storage, case['scenarioId'])
+    test.assertIsNotNone(case['storedUpload'], case['scenarioId'])
+    test.assertEqual(action['selectedPreviousUploadIndex'], 0, case['scenarioId'])
+    fingerprint = case['storedUpload']['fingerprint']
+    stored_upload_count = 1 if storage.get_item(fingerprint) is not None else 0
+    test.assertEqual(
+        stored_upload_count,
+        action['expectedPreviousUploadCount'],
+        case['scenarioId'],
+    )
+
+
 def assert_events(test, case, events):
     expected_events = case['eventKeys']
     event_policy = case.get('eventPolicy', {'matching': 'exact'})
@@ -305,6 +361,7 @@ class GeneratedTusRuntimeEventsTest(unittest.TestCase):
             events = []
             client = TusClient(case['endpointUrl'])
             storage = storage_for(case)
+            resume_action = resume_before_start_action(case)
             first_call_index = len(responses.calls)
 
             for request in case['requests']:
@@ -316,13 +373,14 @@ class GeneratedTusRuntimeEventsTest(unittest.TestCase):
                     status=request['statusCode'],
                 )
 
+            assert_before_start_actions(self, case, storage)
             uploader = client.uploader(
                 file_stream=io.BytesIO(case['content'].encode('utf-8')),
                 chunk_size=case['chunkSize'],
                 metadata=case['metadata'],
-                store_url=case['storedUpload'] is not None,
+                store_url=resume_action is not None,
                 url_storage=storage,
-                fingerprinter=fingerprinter_for(case),
+                fingerprinter=fingerprinter_for(case, resume_action),
                 remove_fingerprint_on_success=case['removeFingerprintOnSuccess'],
                 upload_length_deferred=case['uploadLengthDeferred'],
                 on_progress=record_progress(events),
@@ -344,9 +402,16 @@ def storage_for(case):
     })
 
 
-def fingerprinter_for(case):
-    if case['storedUpload'] is None:
+def fingerprinter_for(case, resume_action):
+    if resume_action is None:
         return None
+
+    if case['storedUpload'] is None:
+        raise AssertionError(
+            '{} cannot resume without a generated stored upload'.format(
+                case['scenarioId']
+            )
+        )
 
     return GeneratedTusFingerprinter(case['storedUpload']['fingerprint'])
 
