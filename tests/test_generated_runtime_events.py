@@ -16,6 +16,7 @@ CASES = [
     {
         'chunkSize': 11,
         'content': 'hello world',
+        'endpointHasTrailingSlash': False,
         'endpointUrl': 'https://tus.io/uploads',
         'eventKeys': [
             'progress:0:11',
@@ -28,6 +29,7 @@ CASES = [
             'transportProgress': 'may-emit-extra-samples',
         },
         'execution': None,
+        'locationHeaderKind': 'absolute',
         'metadata': {
             'filename': 'hello.txt',
         },
@@ -36,10 +38,13 @@ CASES = [
             {
                 'headers': {
                     'Upload-Length': '11',
+                    'Tus-Resumable': '1.0.0',
+                    'Upload-Metadata': 'filename aGVsbG8udHh0',
                 },
                 'method': 'POST',
                 'responseHeaders': {
                     'Location': 'https://tus.io/uploads/generated-contract',
+                    'Tus-Resumable': '1.0.0',
                 },
                 'statusCode': 201,
                 'url': 'endpoint',
@@ -47,10 +52,13 @@ CASES = [
             {
                 'headers': {
                     'Upload-Offset': '0',
+                    'Content-Type': 'application/offset+octet-stream',
+                    'Tus-Resumable': '1.0.0',
                 },
                 'method': 'PATCH',
                 'responseHeaders': {
                     'Upload-Offset': '11',
+                    'Tus-Resumable': '1.0.0',
                 },
                 'statusCode': 204,
                 'url': 'upload',
@@ -59,11 +67,13 @@ CASES = [
         'scenarioId': 'singleUploadLifecycle',
         'storedUpload': None,
         'uploadLengthDeferred': False,
+        'uploadPath': 'generated-contract',
         'uploadUrl': 'https://tus.io/uploads/generated-contract',
     },
     {
         'chunkSize': 6,
         'content': 'hello world',
+        'endpointHasTrailingSlash': False,
         'endpointUrl': 'https://tus.io/uploads',
         'eventKeys': [
             'progress:5:11',
@@ -84,15 +94,19 @@ CASES = [
                 },
             ],
         },
+        'locationHeaderKind': 'stored',
         'metadata': {},
         'removeFingerprintOnSuccess': True,
         'requests': [
             {
-                'headers': {},
+                'headers': {
+                    'Tus-Resumable': '1.0.0',
+                },
                 'method': 'HEAD',
                 'responseHeaders': {
                     'Upload-Length': '11',
                     'Upload-Offset': '5',
+                    'Tus-Resumable': '1.0.0',
                 },
                 'statusCode': 200,
                 'url': 'upload',
@@ -100,10 +114,13 @@ CASES = [
             {
                 'headers': {
                     'Upload-Offset': '5',
+                    'Content-Type': 'application/offset+octet-stream',
+                    'Tus-Resumable': '1.0.0',
                 },
                 'method': 'PATCH',
                 'responseHeaders': {
                     'Upload-Offset': '11',
+                    'Tus-Resumable': '1.0.0',
                 },
                 'statusCode': 204,
                 'url': 'upload',
@@ -116,11 +133,13 @@ CASES = [
             'urlStorageKey': 'tus::contract-resume-fingerprint::1337',
         },
         'uploadLengthDeferred': False,
+        'uploadPath': 'resume-contract',
         'uploadUrl': 'https://tus.io/uploads/resume-contract',
     },
     {
         'chunkSize': 11,
         'content': 'hello world',
+        'endpointHasTrailingSlash': True,
         'endpointUrl': 'https://tus.io/files/',
         'eventKeys': [
             'progress:0:11',
@@ -133,6 +152,7 @@ CASES = [
             'transportProgress': 'may-emit-extra-samples',
         },
         'execution': None,
+        'locationHeaderKind': 'relative',
         'metadata': {
             'filename': 'hello.txt',
         },
@@ -141,10 +161,13 @@ CASES = [
             {
                 'headers': {
                     'Upload-Length': '11',
+                    'Tus-Resumable': '1.0.0',
+                    'Upload-Metadata': 'filename aGVsbG8udHh0',
                 },
                 'method': 'POST',
                 'responseHeaders': {
                     'Location': 'relative-contract',
+                    'Tus-Resumable': '1.0.0',
                 },
                 'statusCode': 201,
                 'url': 'endpoint',
@@ -152,10 +175,13 @@ CASES = [
             {
                 'headers': {
                     'Upload-Offset': '0',
+                    'Content-Type': 'application/offset+octet-stream',
+                    'Tus-Resumable': '1.0.0',
                 },
                 'method': 'PATCH',
                 'responseHeaders': {
                     'Upload-Offset': '11',
+                    'Tus-Resumable': '1.0.0',
                 },
                 'statusCode': 204,
                 'url': 'upload',
@@ -164,11 +190,13 @@ CASES = [
         'scenarioId': 'relativeLocationResolution',
         'storedUpload': None,
         'uploadLengthDeferred': False,
+        'uploadPath': 'relative-contract',
         'uploadUrl': 'https://tus.io/files/relative-contract',
     },
     {
         'chunkSize': 100,
         'content': 'hello world',
+        'endpointHasTrailingSlash': False,
         'endpointUrl': 'https://tus.io/uploads',
         'eventKeys': [
             'progress:0:11',
@@ -181,6 +209,7 @@ CASES = [
             'transportProgress': 'may-emit-extra-samples',
         },
         'execution': None,
+        'locationHeaderKind': 'absolute',
         'metadata': {
             'filename': 'hello.txt',
         },
@@ -189,10 +218,13 @@ CASES = [
             {
                 'headers': {
                     'Upload-Defer-Length': '1',
+                    'Tus-Resumable': '1.0.0',
+                    'Upload-Metadata': 'filename aGVsbG8udHh0',
                 },
                 'method': 'POST',
                 'responseHeaders': {
                     'Location': 'https://tus.io/uploads/deferred-contract',
+                    'Tus-Resumable': '1.0.0',
                 },
                 'statusCode': 201,
                 'url': 'endpoint',
@@ -201,10 +233,13 @@ CASES = [
                 'headers': {
                     'Upload-Length': '11',
                     'Upload-Offset': '0',
+                    'Content-Type': 'application/offset+octet-stream',
+                    'Tus-Resumable': '1.0.0',
                 },
                 'method': 'PATCH',
                 'responseHeaders': {
                     'Upload-Offset': '11',
+                    'Tus-Resumable': '1.0.0',
                 },
                 'statusCode': 204,
                 'url': 'upload',
@@ -213,6 +248,7 @@ CASES = [
         'scenarioId': 'deferredLengthUpload',
         'storedUpload': None,
         'uploadLengthDeferred': True,
+        'uploadPath': 'deferred-contract',
         'uploadUrl': 'https://tus.io/uploads/deferred-contract',
     },
 ]
