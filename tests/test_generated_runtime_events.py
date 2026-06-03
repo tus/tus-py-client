@@ -9,6 +9,7 @@ import responses
 
 from tusclient.client import TusClient
 from tusclient.fingerprint.interface import Fingerprint
+from tusclient.protocol_generated import DEFAULT_REQUEST_HEADERS, DEFAULT_RESPONSE_HEADERS
 from tusclient.storage.interface import Storage
 
 
@@ -38,30 +39,30 @@ CASES = [
             {
                 'headers': {
                     'Upload-Length': '11',
-                    'Tus-Resumable': '1.0.0',
                     'Upload-Metadata': 'filename aGVsbG8udHh0',
                 },
                 'method': 'POST',
                 'responseHeaders': {
                     'Location': 'https://tus.io/uploads/generated-contract',
-                    'Tus-Resumable': '1.0.0',
                 },
                 'statusCode': 201,
                 'url': 'endpoint',
+                'includesDefaultProtocolRequestHeaders': True,
+                'includesDefaultProtocolResponseHeaders': True,
             },
             {
                 'headers': {
                     'Upload-Offset': '0',
                     'Content-Type': 'application/offset+octet-stream',
-                    'Tus-Resumable': '1.0.0',
                 },
                 'method': 'PATCH',
                 'responseHeaders': {
                     'Upload-Offset': '11',
-                    'Tus-Resumable': '1.0.0',
                 },
                 'statusCode': 204,
                 'url': 'upload',
+                'includesDefaultProtocolRequestHeaders': True,
+                'includesDefaultProtocolResponseHeaders': True,
             },
         ],
         'scenarioId': 'singleUploadLifecycle',
@@ -99,31 +100,30 @@ CASES = [
         'removeFingerprintOnSuccess': True,
         'requests': [
             {
-                'headers': {
-                    'Tus-Resumable': '1.0.0',
-                },
+                'headers': {},
                 'method': 'HEAD',
                 'responseHeaders': {
                     'Upload-Length': '11',
                     'Upload-Offset': '5',
-                    'Tus-Resumable': '1.0.0',
                 },
                 'statusCode': 200,
                 'url': 'upload',
+                'includesDefaultProtocolRequestHeaders': True,
+                'includesDefaultProtocolResponseHeaders': True,
             },
             {
                 'headers': {
                     'Upload-Offset': '5',
                     'Content-Type': 'application/offset+octet-stream',
-                    'Tus-Resumable': '1.0.0',
                 },
                 'method': 'PATCH',
                 'responseHeaders': {
                     'Upload-Offset': '11',
-                    'Tus-Resumable': '1.0.0',
                 },
                 'statusCode': 204,
                 'url': 'upload',
+                'includesDefaultProtocolRequestHeaders': True,
+                'includesDefaultProtocolResponseHeaders': True,
             },
         ],
         'scenarioId': 'resumeFromPreviousUpload',
@@ -161,30 +161,30 @@ CASES = [
             {
                 'headers': {
                     'Upload-Length': '11',
-                    'Tus-Resumable': '1.0.0',
                     'Upload-Metadata': 'filename aGVsbG8udHh0',
                 },
                 'method': 'POST',
                 'responseHeaders': {
                     'Location': 'relative-contract',
-                    'Tus-Resumable': '1.0.0',
                 },
                 'statusCode': 201,
                 'url': 'endpoint',
+                'includesDefaultProtocolRequestHeaders': True,
+                'includesDefaultProtocolResponseHeaders': True,
             },
             {
                 'headers': {
                     'Upload-Offset': '0',
                     'Content-Type': 'application/offset+octet-stream',
-                    'Tus-Resumable': '1.0.0',
                 },
                 'method': 'PATCH',
                 'responseHeaders': {
                     'Upload-Offset': '11',
-                    'Tus-Resumable': '1.0.0',
                 },
                 'statusCode': 204,
                 'url': 'upload',
+                'includesDefaultProtocolRequestHeaders': True,
+                'includesDefaultProtocolResponseHeaders': True,
             },
         ],
         'scenarioId': 'relativeLocationResolution',
@@ -218,31 +218,31 @@ CASES = [
             {
                 'headers': {
                     'Upload-Defer-Length': '1',
-                    'Tus-Resumable': '1.0.0',
                     'Upload-Metadata': 'filename aGVsbG8udHh0',
                 },
                 'method': 'POST',
                 'responseHeaders': {
                     'Location': 'https://tus.io/uploads/deferred-contract',
-                    'Tus-Resumable': '1.0.0',
                 },
                 'statusCode': 201,
                 'url': 'endpoint',
+                'includesDefaultProtocolRequestHeaders': True,
+                'includesDefaultProtocolResponseHeaders': True,
             },
             {
                 'headers': {
                     'Upload-Length': '11',
                     'Upload-Offset': '0',
                     'Content-Type': 'application/offset+octet-stream',
-                    'Tus-Resumable': '1.0.0',
                 },
                 'method': 'PATCH',
                 'responseHeaders': {
                     'Upload-Offset': '11',
-                    'Tus-Resumable': '1.0.0',
                 },
                 'statusCode': 204,
                 'url': 'upload',
+                'includesDefaultProtocolRequestHeaders': True,
+                'includesDefaultProtocolResponseHeaders': True,
             },
         ],
         'scenarioId': 'deferredLengthUpload',
@@ -405,7 +405,7 @@ class GeneratedTusRuntimeEventsTest(unittest.TestCase):
                 responses.add(
                     request['method'],
                     url,
-                    adding_headers=request['responseHeaders'],
+                    adding_headers=response_headers_for(request),
                     status=request['statusCode'],
                 )
 
@@ -456,6 +456,14 @@ def request_header(request, name):
     return request.headers.get(name) or request.headers.get(name.lower())
 
 
+def response_headers_for(request):
+    headers = {}
+    if request['includesDefaultProtocolResponseHeaders']:
+        headers.update(DEFAULT_RESPONSE_HEADERS)
+    headers.update(request['responseHeaders'])
+    return headers
+
+
 def assert_request_sequence(test, case, calls):
     test.assertEqual(len(calls), len(case['requests']), case['scenarioId'])
 
@@ -469,6 +477,9 @@ def assert_request_sequence(test, case, calls):
 
         test.assertEqual(actual_request.method, expected_request['method'], case['scenarioId'])
         test.assertEqual(actual_request.url, expected_url, case['scenarioId'])
+        if expected_request['includesDefaultProtocolRequestHeaders']:
+            for name, value in DEFAULT_REQUEST_HEADERS.items():
+                test.assertEqual(request_header(actual_request, name), value, case['scenarioId'])
         for name, value in expected_request['headers'].items():
             test.assertEqual(request_header(actual_request, name), value, case['scenarioId'])
 
