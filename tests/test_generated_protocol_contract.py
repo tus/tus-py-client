@@ -10,7 +10,12 @@ from tests.generated_protocol_contract import (
     TUS_WIRE_VERSIONS,
 )
 from tusclient.client import TusClient
-from tusclient.protocol_generated import DEFAULT_PROTOCOL_VERSION
+from tusclient.protocol_generated import (
+    DEFAULT_PROTOCOL_VERSION,
+    DEFAULT_REQUEST_HEADERS,
+    DEFAULT_RESPONSE_HEADERS,
+)
+from tusclient.uploader.baseuploader import BaseUploader
 
 
 def default_wire_version():
@@ -52,10 +57,10 @@ def response_headers_for(response, overrides):
     for field in variant["fields"]:
         if not field["required"]:
             continue
-        headers[field["displayName"]] = overrides.get(
-            field["displayName"],
-            default_wire_version(),
-        )
+        if field["displayName"] in overrides:
+            headers[field["displayName"]] = overrides[field["displayName"]]
+            continue
+        headers[field["displayName"]] = DEFAULT_RESPONSE_HEADERS[field["displayName"]]
     return headers
 
 
@@ -64,6 +69,9 @@ def request_header(request, field):
 
 
 class GeneratedProtocolContractTest(unittest.TestCase):
+    def test_runtime_default_headers_are_generated_contract_headers(self):
+        self.assertEqual(BaseUploader.DEFAULT_HEADERS, DEFAULT_REQUEST_HEADERS)
+
     @responses.activate
     def test_drives_create_and_patch_lifecycle_assertions_from_generated_contract(self):
         self.assertEqual(DEFAULT_PROTOCOL_VERSION, default_wire_version())

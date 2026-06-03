@@ -11,6 +11,7 @@ import pytest
 
 from tusclient import exceptions
 from tusclient.fingerprint import fingerprint
+from tusclient.protocol_generated import DEFAULT_REQUEST_HEADERS
 from tusclient.storage import filestorage
 from tests import mixin
 
@@ -35,10 +36,10 @@ class UploaderTest(mixin.Mixin):
         self.assertEqual(self.uploader.offset, 0)
 
     def test_headers(self):
-        self.assertEqual(self.uploader.get_headers(), {"Tus-Resumable": "1.0.0"})
+        self.assertEqual(self.uploader.get_headers(), DEFAULT_REQUEST_HEADERS)
 
         self.client.set_headers({'foo': 'bar'})
-        self.assertEqual(self.uploader.get_headers(), {"Tus-Resumable": "1.0.0", 'foo': 'bar'})
+        self.assertEqual(self.uploader.get_headers(), dict(DEFAULT_REQUEST_HEADERS, foo='bar'))
 
     @responses.activate
     def test_get_offset(self):

@@ -10,7 +10,7 @@ import requests
 from tusclient.exceptions import TusCommunicationError
 from tusclient.request import TusRequest, catch_requests_error
 from tusclient.fingerprint import fingerprint, interface
-from tusclient.protocol_generated import DEFAULT_PROTOCOL_VERSION
+from tusclient.protocol_generated import DEFAULT_REQUEST_HEADERS
 from tusclient.storage.interface import Storage
 
 if TYPE_CHECKING:
@@ -104,7 +104,7 @@ class BaseUploader:
         - upload_length_deferred (Optional[bool])
     """
 
-    DEFAULT_HEADERS = {"Tus-Resumable": DEFAULT_PROTOCOL_VERSION}
+    DEFAULT_HEADERS = dict(DEFAULT_REQUEST_HEADERS)
     DEFAULT_CHUNK_SIZE = MAXSIZE
     CHECKSUM_ALGORITHM_PAIR = (
         "sha1",

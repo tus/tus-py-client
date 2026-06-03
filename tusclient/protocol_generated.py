@@ -3,3 +3,9 @@
 # the source fix belongs in the protocol contract generator so all TUS clients stay in sync.
 
 DEFAULT_PROTOCOL_VERSION = '1.0.0'
+DEFAULT_REQUEST_HEADERS = {
+    'Tus-Resumable': '1.0.0',
+}
+DEFAULT_RESPONSE_HEADERS = {
+    'Tus-Resumable': '1.0.0',
+}
