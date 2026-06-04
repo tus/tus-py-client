@@ -2243,6 +2243,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'filename': 'hello.txt',
             },
         },
+        'inputSource': {
+            'content': 'hello world',
+            'kind': 'blob',
+        },
         'operationIds': [
             'createTusUpload',
             'patchTusUpload',
@@ -2281,6 +2285,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'endpoint',
                 'requestIndex': 0,
+                'expectedUrl': 'https://tus.io/uploads',
             },
             {
                 'absentHeaders': [],
@@ -2308,6 +2313,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'upload',
                 'requestIndex': 1,
+                'expectedUrl': 'https://tus.io/uploads/generated-contract',
             },
         ],
         'retryDecisions': [],
@@ -2358,6 +2364,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
             'uploadDataDuringCreation': True,
         },
+        'inputSource': {
+            'content': 'hello world',
+            'kind': 'blob',
+        },
         'operationIds': [
             'createTusUpload',
         ],
@@ -2393,6 +2403,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'endpoint',
                 'requestIndex': 0,
+                'expectedUrl': 'https://tus.io/uploads',
             },
         ],
         'retryDecisions': [],
@@ -2459,6 +2470,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
             'uploadDataDuringCreation': True,
         },
+        'inputSource': {
+            'content': 'hello world',
+            'kind': 'blob',
+        },
         'operationIds': [
             'createTusUpload',
             'patchTusUpload',
@@ -2495,6 +2510,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'endpoint',
                 'requestIndex': 0,
+                'expectedUrl': 'https://tus.io/uploads',
             },
             {
                 'absentHeaders': [],
@@ -2522,6 +2538,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': 'https://tus.io/uploads/creation-with-upload-partial-contract',
                 'url': 'upload',
                 'requestIndex': 1,
+                'expectedUrl': 'https://tus.io/uploads/creation-with-upload-partial-contract',
             },
             {
                 'absentHeaders': [],
@@ -2549,6 +2566,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': 'https://tus.io/uploads/creation-with-upload-partial-contract',
                 'url': 'upload',
                 'requestIndex': 2,
+                'expectedUrl': 'https://tus.io/uploads/creation-with-upload-partial-contract',
             },
         ],
         'retryDecisions': [],
@@ -2600,6 +2618,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'protocol': 'ietf-draft-05',
             'uploadDataDuringCreation': True,
         },
+        'inputSource': {
+            'content': 'hello world',
+            'kind': 'blob',
+        },
         'operationIds': [
             'createTusUpload',
         ],
@@ -2637,6 +2659,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'endpoint',
                 'requestIndex': 0,
+                'expectedUrl': 'https://tus.io/uploads',
             },
         ],
         'retryDecisions': [],
@@ -2701,6 +2724,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'protocol': 'ietf-draft-05',
             'uploadUrl': 'https://tus.io/uploads/ietf-draft-05-chunked-contract',
         },
+        'inputSource': {
+            'content': 'hello world',
+            'kind': 'blob',
+        },
         'operationIds': [
             'getTusUploadOffset',
             'patchTusUpload',
@@ -2735,6 +2762,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'upload',
                 'requestIndex': 0,
+                'expectedUrl': 'https://tus.io/uploads/ietf-draft-05-chunked-contract',
             },
             {
                 'absentHeaders': [
@@ -2765,6 +2793,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'upload',
                 'requestIndex': 1,
+                'expectedUrl': 'https://tus.io/uploads/ietf-draft-05-chunked-contract',
             },
             {
                 'absentHeaders': [
@@ -2795,6 +2824,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'upload',
                 'requestIndex': 2,
+                'expectedUrl': 'https://tus.io/uploads/ietf-draft-05-chunked-contract',
             },
             {
                 'absentHeaders': [
@@ -2825,6 +2855,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'upload',
                 'requestIndex': 3,
+                'expectedUrl': 'https://tus.io/uploads/ietf-draft-05-chunked-contract',
             },
         ],
         'retryDecisions': [],
@@ -2877,6 +2908,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'protocol': 'ietf-draft-03',
             'uploadUrl': 'https://tus.io/uploads/ietf-draft-03-resume-contract',
         },
+        'inputSource': {
+            'content': 'hello world',
+            'kind': 'blob',
+        },
         'operationIds': [
             'getTusUploadOffset',
             'patchTusUpload',
@@ -2910,6 +2945,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'upload',
                 'requestIndex': 0,
+                'expectedUrl': 'https://tus.io/uploads/ietf-draft-03-resume-contract',
             },
             {
                 'absentHeaders': [
@@ -2940,6 +2976,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'upload',
                 'requestIndex': 1,
+                'expectedUrl': 'https://tus.io/uploads/ietf-draft-03-resume-contract',
             },
         ],
         'retryDecisions': [],
@@ -2963,6 +3000,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'input': {
             'content': '',
             'endpointUrl': 'https://tus.io/uploads',
+            'kind': 'none',
+        },
+        'inputSource': {
+            'content': '',
             'kind': 'none',
         },
         'operationIds': [],
@@ -2989,6 +3030,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'executionActionPhases': [],
         'featureId': 'startOptionValidation',
         'input': {
+            'content': 'hello world',
+            'kind': 'blob',
+        },
+        'inputSource': {
             'content': 'hello world',
             'kind': 'blob',
         },
@@ -3021,6 +3066,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'kind': 'blob',
             'protocol': 'tus-v9',
         },
+        'inputSource': {
+            'content': 'hello world',
+            'kind': 'blob',
+        },
         'operationIds': [],
         'primitives': [
             'validate-start-options',
@@ -3052,6 +3101,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'retryDelays': 44,
             },
         },
+        'inputSource': {
+            'content': 'hello world',
+            'kind': 'blob',
+        },
         'operationIds': [],
         'primitives': [
             'validate-start-options',
@@ -3081,6 +3134,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'kind': 'blob',
             'parallelUploads': 2,
             'uploadUrl': 'https://tus.io/uploads/start-validation-upload-url',
+        },
+        'inputSource': {
+            'content': 'hello world',
+            'kind': 'blob',
         },
         'operationIds': [],
         'primitives': [
@@ -3112,6 +3169,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'parallelUploads': 2,
             'uploadSize': 11,
         },
+        'inputSource': {
+            'content': 'hello world',
+            'kind': 'blob',
+        },
         'operationIds': [],
         'primitives': [
             'validate-start-options',
@@ -3142,6 +3203,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'parallelUploads': 2,
             'uploadLengthDeferred': True,
         },
+        'inputSource': {
+            'content': 'hello world',
+            'kind': 'blob',
+        },
         'operationIds': [],
         'primitives': [
             'validate-start-options',
@@ -3171,6 +3236,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'kind': 'blob',
             'parallelUploads': 2,
             'uploadDataDuringCreation': True,
+        },
+        'inputSource': {
+            'content': 'hello world',
+            'kind': 'blob',
         },
         'operationIds': [],
         'primitives': [
@@ -3206,6 +3275,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 },
             ],
         },
+        'inputSource': {
+            'content': 'hello world',
+            'kind': 'blob',
+        },
         'operationIds': [],
         'primitives': [
             'validate-start-options',
@@ -3240,6 +3313,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 },
             ],
             'parallelUploads': 2,
+        },
+        'inputSource': {
+            'content': 'hello world',
+            'kind': 'blob',
         },
         'operationIds': [],
         'primitives': [
@@ -3278,6 +3355,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'retryDelays': None,
             },
         },
+        'inputSource': {
+            'content': 'hello world',
+            'kind': 'blob',
+        },
         'operationIds': [
             'createTusUpload',
         ],
@@ -3309,6 +3390,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'endpoint',
                 'requestIndex': 0,
+                'expectedUrl': 'https://tus.io/uploads',
             },
         ],
         'retryDecisions': [],
@@ -3343,6 +3425,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'retryDelays': None,
             },
         },
+        'inputSource': {
+            'content': 'hello world',
+            'kind': 'blob',
+        },
         'operationIds': [
             'createTusUpload',
         ],
@@ -3368,6 +3454,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'endpoint',
                 'requestIndex': 0,
+                'expectedUrl': 'https://tus.io/uploads',
             },
         ],
         'retryDecisions': [],
@@ -3395,6 +3482,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'metadata': {
                 'filename': 'hello.txt',
             },
+        },
+        'inputSource': {
+            'content': 'hello world',
+            'kind': 'blob',
         },
         'operationIds': [
             'createTusUpload',
@@ -3429,6 +3520,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'endpoint',
                 'requestIndex': 0,
+                'expectedUrl': 'https://tus.io/uploads',
             },
             {
                 'absentHeaders': [],
@@ -3456,6 +3548,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'upload',
                 'requestIndex': 1,
+                'expectedUrl': 'https://tus.io/uploads/upload-body-headers-contract',
             },
         ],
         'retryDecisions': [],
@@ -3487,6 +3580,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'metadata': {
                 'filename': 'hello.txt',
             },
+        },
+        'inputSource': {
+            'content': 'hello world',
+            'kind': 'blob',
         },
         'operationIds': [
             'createTusUpload',
@@ -3523,6 +3620,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'endpoint',
                 'requestIndex': 0,
+                'expectedUrl': 'https://tus.io/uploads',
             },
             {
                 'absentHeaders': [],
@@ -3552,6 +3650,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'upload',
                 'requestIndex': 1,
+                'expectedUrl': 'https://tus.io/uploads/custom-headers-contract',
             },
         ],
         'retryDecisions': [],
@@ -3584,6 +3683,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'metadata': {
                 'filename': 'hello.txt',
             },
+        },
+        'inputSource': {
+            'content': 'hello world',
+            'kind': 'blob',
         },
         'operationIds': [
             'createTusUpload',
@@ -3620,6 +3723,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'endpoint',
                 'requestIndex': 0,
+                'expectedUrl': 'https://tus.io/uploads',
             },
             {
                 'absentHeaders': [],
@@ -3648,6 +3752,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'upload',
                 'requestIndex': 1,
+                'expectedUrl': 'https://tus.io/uploads/request-id-contract',
             },
         ],
         'retryDecisions': [],
@@ -3725,6 +3830,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'urlStorageKey': 'tus::contract-resume-fingerprint::1337',
             },
         },
+        'inputSource': {
+            'content': 'hello world',
+            'kind': 'blob',
+        },
         'operationIds': [
             'getTusUploadOffset',
             'patchTusUpload',
@@ -3759,6 +3868,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'upload',
                 'requestIndex': 0,
+                'expectedUrl': 'https://tus.io/uploads/resume-contract',
             },
             {
                 'absentHeaders': [],
@@ -3786,6 +3896,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'upload',
                 'requestIndex': 1,
+                'expectedUrl': 'https://tus.io/uploads/resume-contract',
             },
         ],
         'retryDecisions': [],
@@ -3838,6 +3949,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'filename': 'hello.txt',
             },
         },
+        'inputSource': {
+            'content': 'hello world',
+            'kind': 'blob',
+        },
         'operationIds': [
             'createTusUpload',
             'patchTusUpload',
@@ -3871,6 +3986,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'endpoint',
                 'requestIndex': 0,
+                'expectedUrl': 'https://tus.io/files/',
             },
             {
                 'absentHeaders': [],
@@ -3898,6 +4014,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'upload',
                 'requestIndex': 1,
+                'expectedUrl': 'https://tus.io/files/relative-contract',
             },
         ],
         'retryDecisions': [],
@@ -3938,6 +4055,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'filename': 'hello.txt',
             },
         },
+        'inputSource': {
+            'content': 'hello world',
+            'kind': 'array-buffer',
+        },
         'operationIds': [
             'createTusUpload',
             'patchTusUpload',
@@ -3971,6 +4092,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'endpoint',
                 'requestIndex': 0,
+                'expectedUrl': 'https://tus.io/uploads',
             },
             {
                 'absentHeaders': [],
@@ -3998,6 +4120,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'upload',
                 'requestIndex': 1,
+                'expectedUrl': 'https://tus.io/uploads/array-buffer-contract',
             },
         ],
         'retryDecisions': [],
@@ -4038,6 +4161,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'filename': 'hello.txt',
             },
         },
+        'inputSource': {
+            'content': 'hello world',
+            'kind': 'array-buffer-view',
+        },
         'operationIds': [
             'createTusUpload',
             'patchTusUpload',
@@ -4071,6 +4198,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'endpoint',
                 'requestIndex': 0,
+                'expectedUrl': 'https://tus.io/uploads',
             },
             {
                 'absentHeaders': [],
@@ -4098,6 +4226,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'upload',
                 'requestIndex': 1,
+                'expectedUrl': 'https://tus.io/uploads/array-buffer-view-contract',
             },
         ],
         'retryDecisions': [],
@@ -4140,6 +4269,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
             'uploadLengthDeferred': True,
         },
+        'inputSource': {
+            'content': 'hello world',
+            'kind': 'web-readable-stream',
+        },
         'operationIds': [
             'createTusUpload',
             'patchTusUpload',
@@ -4175,6 +4308,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'endpoint',
                 'requestIndex': 0,
+                'expectedUrl': 'https://tus.io/uploads',
             },
             {
                 'absentHeaders': [],
@@ -4203,6 +4337,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'upload',
                 'requestIndex': 1,
+                'expectedUrl': 'https://tus.io/uploads/web-stream-contract',
             },
         ],
         'retryDecisions': [],
@@ -4245,6 +4380,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
             'uploadLengthDeferred': True,
         },
+        'inputSource': {
+            'content': 'hello world',
+            'kind': 'node-readable-stream',
+        },
         'operationIds': [
             'createTusUpload',
             'patchTusUpload',
@@ -4280,6 +4419,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'endpoint',
                 'requestIndex': 0,
+                'expectedUrl': 'https://tus.io/uploads',
             },
             {
                 'absentHeaders': [],
@@ -4308,6 +4448,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'upload',
                 'requestIndex': 1,
+                'expectedUrl': 'https://tus.io/uploads/node-stream-contract',
             },
         ],
         'retryDecisions': [],
@@ -4351,6 +4492,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'filename': 'hello.txt',
             },
         },
+        'inputSource': {
+            'content': 'hello world',
+            'kind': 'node-path-reference',
+        },
         'operationIds': [
             'createTusUpload',
             'patchTusUpload',
@@ -4384,6 +4529,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'endpoint',
                 'requestIndex': 0,
+                'expectedUrl': 'https://tus.io/uploads',
             },
             {
                 'absentHeaders': [],
@@ -4411,6 +4557,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'upload',
                 'requestIndex': 1,
+                'expectedUrl': 'https://tus.io/uploads/node-path-contract',
             },
         ],
         'retryDecisions': [],
@@ -4469,6 +4616,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
             'uploadLengthDeferred': True,
         },
+        'inputSource': {
+            'content': 'hello world',
+            'kind': 'web-readable-stream',
+        },
         'operationIds': [
             'createTusUpload',
             'patchTusUpload',
@@ -4505,6 +4656,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'endpoint',
                 'requestIndex': 0,
+                'expectedUrl': 'https://tus.io/uploads',
             },
             {
                 'absentHeaders': [],
@@ -4533,6 +4685,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'upload',
                 'requestIndex': 1,
+                'expectedUrl': 'https://tus.io/uploads/deferred-contract',
             },
         ],
         'retryDecisions': [],
@@ -4612,6 +4765,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
             'uploadLengthDeferred': True,
         },
+        'inputSource': {
+            'content': 'hello world',
+            'kind': 'blob',
+        },
         'operationIds': [
             'createTusUpload',
             'patchTusUpload',
@@ -4649,6 +4806,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'endpoint',
                 'requestIndex': 0,
+                'expectedUrl': 'https://tus.io/uploads',
             },
             {
                 'absentHeaders': [],
@@ -4676,6 +4834,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'upload',
                 'requestIndex': 1,
+                'expectedUrl': 'https://tus.io/uploads/deferred-chunked-contract',
             },
             {
                 'absentHeaders': [],
@@ -4703,6 +4862,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'upload',
                 'requestIndex': 2,
+                'expectedUrl': 'https://tus.io/uploads/deferred-chunked-contract',
             },
             {
                 'absentHeaders': [],
@@ -4731,6 +4891,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'upload',
                 'requestIndex': 3,
+                'expectedUrl': 'https://tus.io/uploads/deferred-chunked-contract',
             },
         ],
         'retryDecisions': [],
@@ -4757,6 +4918,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'kind': 'blob',
             'overridePatchMethod': True,
             'uploadUrl': 'https://tus.io/uploads/override-contract',
+        },
+        'inputSource': {
+            'content': 'hello world',
+            'kind': 'blob',
         },
         'operationIds': [
             'getTusUploadOffset',
@@ -4790,6 +4955,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': 'https://tus.io/uploads/override-contract',
                 'url': 'upload',
                 'requestIndex': 0,
+                'expectedUrl': 'https://tus.io/uploads/override-contract',
             },
             {
                 'absentHeaders': [],
@@ -4817,6 +4983,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': 'https://tus.io/uploads/override-contract',
                 'url': 'upload',
                 'requestIndex': 1,
+                'expectedUrl': 'https://tus.io/uploads/override-contract',
             },
         ],
         'retryDecisions': [],
@@ -4885,6 +5052,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
             'parallelUploads': 2,
         },
+        'inputSource': {
+            'content': 'hello world',
+            'kind': 'blob',
+        },
         'operationIds': [
             'createTusUpload',
             'createTusUpload',
@@ -4923,6 +5094,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'endpoint',
                 'requestIndex': 0,
+                'expectedUrl': 'https://tus.io/uploads',
             },
             {
                 'absentHeaders': [],
@@ -4950,6 +5122,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'endpoint',
                 'requestIndex': 1,
+                'expectedUrl': 'https://tus.io/uploads',
             },
             {
                 'absentHeaders': [],
@@ -4977,6 +5150,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': 'https://tus.io/uploads/parallel-part-1',
                 'url': 'upload',
                 'requestIndex': 2,
+                'expectedUrl': 'https://tus.io/uploads/parallel-part-1',
             },
             {
                 'absentHeaders': [],
@@ -5004,6 +5178,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': 'https://tus.io/uploads/parallel-part-2',
                 'url': 'upload',
                 'requestIndex': 3,
+                'expectedUrl': 'https://tus.io/uploads/parallel-part-2',
             },
             {
                 'absentHeaders': [
@@ -5032,6 +5207,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'endpoint',
                 'requestIndex': 4,
+                'expectedUrl': 'https://tus.io/uploads',
             },
         ],
         'retryDecisions': [],
@@ -5093,6 +5269,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'parallelUploads': 2,
             'terminateUploadOnAbort': True,
         },
+        'inputSource': {
+            'content': 'hello world',
+            'kind': 'blob',
+        },
         'operationIds': [
             'createTusUpload',
             'createTusUpload',
@@ -5135,6 +5315,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'endpoint',
                 'requestIndex': 0,
+                'expectedUrl': 'https://tus.io/uploads',
             },
             {
                 'absentHeaders': [],
@@ -5164,6 +5345,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'endpoint',
                 'requestIndex': 1,
+                'expectedUrl': 'https://tus.io/uploads',
             },
             {
                 'absentHeaders': [],
@@ -5191,6 +5373,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': 'https://tus.io/uploads/parallel-cleanup-part-1',
                 'url': 'upload',
                 'requestIndex': 2,
+                'expectedUrl': 'https://tus.io/uploads/parallel-cleanup-part-1',
             },
             {
                 'absentHeaders': [],
@@ -5212,6 +5395,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': 'https://tus.io/uploads/parallel-cleanup-part-2',
                 'url': 'upload',
                 'requestIndex': 3,
+                'expectedUrl': 'https://tus.io/uploads/parallel-cleanup-part-2',
             },
             {
                 'absentHeaders': [],
@@ -5237,6 +5421,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': 'https://tus.io/uploads/parallel-cleanup-part-1',
                 'url': 'upload',
                 'requestIndex': 4,
+                'expectedUrl': 'https://tus.io/uploads/parallel-cleanup-part-1',
             },
             {
                 'absentHeaders': [],
@@ -5262,6 +5447,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': 'https://tus.io/uploads/parallel-cleanup-part-2',
                 'url': 'upload',
                 'requestIndex': 5,
+                'expectedUrl': 'https://tus.io/uploads/parallel-cleanup-part-2',
             },
         ],
         'retryDecisions': [],
@@ -5306,6 +5492,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 0,
             ],
         },
+        'inputSource': {
+            'content': 'hello world',
+            'kind': 'blob',
+        },
         'operationIds': [
             'createTusUpload',
             'patchTusUpload',
@@ -5344,6 +5534,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'endpoint',
                 'requestIndex': 0,
+                'expectedUrl': 'https://tus.io/uploads',
             },
             {
                 'absentHeaders': [],
@@ -5369,6 +5560,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'upload',
                 'requestIndex': 1,
+                'expectedUrl': 'https://tus.io/uploads/retry-contract',
             },
             {
                 'absentHeaders': [],
@@ -5394,6 +5586,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'upload',
                 'requestIndex': 2,
+                'expectedUrl': 'https://tus.io/uploads/retry-contract',
             },
             {
                 'absentHeaders': [],
@@ -5419,6 +5612,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'upload',
                 'requestIndex': 3,
+                'expectedUrl': 'https://tus.io/uploads/retry-contract',
             },
             {
                 'absentHeaders': [],
@@ -5444,6 +5638,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'upload',
                 'requestIndex': 4,
+                'expectedUrl': 'https://tus.io/uploads/retry-contract',
             },
             {
                 'absentHeaders': [],
@@ -5471,6 +5666,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'upload',
                 'requestIndex': 5,
+                'expectedUrl': 'https://tus.io/uploads/retry-contract',
             },
         ],
         'retryDecisions': [
@@ -5521,6 +5717,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'kind': 'blob',
             'uploadUrl': 'https://tus.io/uploads/request-hooks-contract',
         },
+        'inputSource': {
+            'content': 'hello world',
+            'kind': 'blob',
+        },
         'operationIds': [
             'getTusUploadOffset',
         ],
@@ -5552,6 +5752,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'upload',
                 'requestIndex': 0,
+                'expectedUrl': 'https://tus.io/uploads/request-hooks-contract',
             },
         ],
         'retryDecisions': [],
@@ -5596,6 +5797,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'filename': 'hello.txt',
             },
         },
+        'inputSource': {
+            'content': 'hello world',
+            'kind': 'blob',
+        },
         'operationIds': [
             'createTusUpload',
         ],
@@ -5620,6 +5825,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'endpoint',
                 'requestIndex': 0,
+                'expectedUrl': 'https://tus.io/uploads',
             },
         ],
         'retryDecisions': [],
@@ -5671,6 +5877,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'overridePatchMethod': True,
             'terminateUploadOnAbort': True,
         },
+        'inputSource': {
+            'content': 'hello world',
+            'kind': 'blob',
+        },
         'operationIds': [
             'createTusUpload',
             'patchTusUpload',
@@ -5708,6 +5918,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'endpoint',
                 'requestIndex': 0,
+                'expectedUrl': 'https://tus.io/uploads',
             },
             {
                 'absentHeaders': [],
@@ -5729,6 +5940,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'upload',
                 'requestIndex': 1,
+                'expectedUrl': 'https://tus.io/uploads/abort-terminate-contract',
             },
             {
                 'absentHeaders': [],
@@ -5754,6 +5966,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'upload',
                 'requestIndex': 2,
+                'expectedUrl': 'https://tus.io/uploads/abort-terminate-contract',
             },
         ],
         'retryDecisions': [],
@@ -5806,6 +6019,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 0,
             ],
         },
+        'inputSource': {
+            'content': 'hello world',
+            'kind': 'blob',
+        },
         'operationIds': [
             'createTusUpload',
             'patchTusUpload',
@@ -5842,6 +6059,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'endpoint',
                 'requestIndex': 0,
+                'expectedUrl': 'https://tus.io/uploads',
             },
             {
                 'absentHeaders': [],
@@ -5869,6 +6087,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'upload',
                 'requestIndex': 1,
+                'expectedUrl': 'https://tus.io/uploads/terminate-contract',
             },
             {
                 'absentHeaders': [],
@@ -5891,6 +6110,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'upload',
                 'requestIndex': 2,
+                'expectedUrl': 'https://tus.io/uploads/terminate-contract',
             },
             {
                 'absentHeaders': [],
@@ -5913,6 +6133,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'upload',
                 'requestIndex': 3,
+                'expectedUrl': 'https://tus.io/uploads/terminate-contract',
             },
         ],
         'retryDecisions': [
