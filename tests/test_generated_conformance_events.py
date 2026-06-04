@@ -698,7 +698,7 @@ class GeneratedTusConformanceEventsTest(unittest.TestCase):
             feature = client_feature(case["featureId"])
 
             self.assertEqual(scenario["behavior"], case["behavior"])
-            self.assertEqual(scenario["completion"]["kind"], case["completionKind"])
+            self.assertEqual(scenario["completionKind"], case["completionKind"])
             self.assertEqual(scenario["featureId"], case["featureId"])
             self.assertIn(scenario["scenarioId"], feature["conformance"]["scenarioIds"])
             self.assertEqual(scenario["operationIds"], case["operationIds"])
