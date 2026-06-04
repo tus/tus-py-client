@@ -2329,6 +2329,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
         ],
         'retryDecisions': [],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': False,
+            },
+            'fingerprint': {
+                'install': True,
+                'value': 'contract-single-fingerprint',
+            },
+            'requestId': {
+                'enabled': False,
+                'generatedRequestId': None,
+            },
+            'urlStorage': {
+                'install': True,
+                'storedUpload': None,
+            },
+        },
         'scenarioId': 'singleUploadLifecycle',
     },
     {
@@ -2435,6 +2452,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
         ],
         'retryDecisions': [],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': False,
+            },
+            'fingerprint': {
+                'install': False,
+                'value': None,
+            },
+            'requestId': {
+                'enabled': False,
+                'generatedRequestId': None,
+            },
+            'urlStorage': {
+                'install': False,
+                'storedUpload': None,
+            },
+        },
         'scenarioId': 'creationWithUpload',
     },
     {
@@ -2618,6 +2652,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
         ],
         'retryDecisions': [],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': False,
+            },
+            'fingerprint': {
+                'install': False,
+                'value': None,
+            },
+            'requestId': {
+                'enabled': False,
+                'generatedRequestId': None,
+            },
+            'urlStorage': {
+                'install': False,
+                'storedUpload': None,
+            },
+        },
         'scenarioId': 'creationWithUploadPartialChunk',
     },
     {
@@ -2731,6 +2782,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
         ],
         'retryDecisions': [],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': False,
+            },
+            'fingerprint': {
+                'install': False,
+                'value': None,
+            },
+            'requestId': {
+                'enabled': False,
+                'generatedRequestId': None,
+            },
+            'urlStorage': {
+                'install': False,
+                'storedUpload': None,
+            },
+        },
         'scenarioId': 'ietfDraft05CreationWithUpload',
     },
     {
@@ -2945,6 +3013,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
         ],
         'retryDecisions': [],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': False,
+            },
+            'fingerprint': {
+                'install': False,
+                'value': None,
+            },
+            'requestId': {
+                'enabled': False,
+                'generatedRequestId': None,
+            },
+            'urlStorage': {
+                'install': False,
+                'storedUpload': None,
+            },
+        },
         'scenarioId': 'ietfDraft05ChunkedUploadComplete',
     },
     {
@@ -3084,6 +3169,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
         ],
         'retryDecisions': [],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': False,
+            },
+            'fingerprint': {
+                'install': False,
+                'value': None,
+            },
+            'requestId': {
+                'enabled': False,
+                'generatedRequestId': None,
+            },
+            'urlStorage': {
+                'install': False,
+                'storedUpload': None,
+            },
+        },
         'scenarioId': 'ietfDraft03ResumeWithoutKnownLength',
     },
     {
@@ -3122,6 +3224,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'requests': [],
         'retryDecisions': [],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': False,
+            },
+            'fingerprint': {
+                'install': False,
+                'value': None,
+            },
+            'requestId': {
+                'enabled': False,
+                'generatedRequestId': None,
+            },
+            'urlStorage': {
+                'install': False,
+                'storedUpload': None,
+            },
+        },
         'scenarioId': 'startValidationMissingInput',
     },
     {
@@ -3154,6 +3273,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'requests': [],
         'retryDecisions': [],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': False,
+            },
+            'fingerprint': {
+                'install': False,
+                'value': None,
+            },
+            'requestId': {
+                'enabled': False,
+                'generatedRequestId': None,
+            },
+            'urlStorage': {
+                'install': False,
+                'storedUpload': None,
+            },
+        },
         'scenarioId': 'startValidationMissingEndpointOrUploadUrl',
     },
     {
@@ -3197,6 +3333,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'requests': [],
         'retryDecisions': [],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': False,
+            },
+            'fingerprint': {
+                'install': False,
+                'value': None,
+            },
+            'requestId': {
+                'enabled': False,
+                'generatedRequestId': None,
+            },
+            'urlStorage': {
+                'install': False,
+                'storedUpload': None,
+            },
+        },
         'scenarioId': 'startValidationUnsupportedProtocol',
     },
     {
@@ -3244,6 +3397,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'requests': [],
         'retryDecisions': [],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': False,
+            },
+            'fingerprint': {
+                'install': False,
+                'value': None,
+            },
+            'requestId': {
+                'enabled': False,
+                'generatedRequestId': None,
+            },
+            'urlStorage': {
+                'install': False,
+                'storedUpload': None,
+            },
+        },
         'scenarioId': 'startValidationRetryDelaysNotArray',
     },
     {
@@ -3292,6 +3462,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'requests': [],
         'retryDecisions': [],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': False,
+            },
+            'fingerprint': {
+                'install': False,
+                'value': None,
+            },
+            'requestId': {
+                'enabled': False,
+                'generatedRequestId': None,
+            },
+            'urlStorage': {
+                'install': False,
+                'storedUpload': None,
+            },
+        },
         'scenarioId': 'startValidationParallelUploadsWithUploadUrl',
     },
     {
@@ -3340,6 +3527,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'requests': [],
         'retryDecisions': [],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': False,
+            },
+            'fingerprint': {
+                'install': False,
+                'value': None,
+            },
+            'requestId': {
+                'enabled': False,
+                'generatedRequestId': None,
+            },
+            'urlStorage': {
+                'install': False,
+                'storedUpload': None,
+            },
+        },
         'scenarioId': 'startValidationParallelUploadsWithUploadSize',
     },
     {
@@ -3388,6 +3592,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'requests': [],
         'retryDecisions': [],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': False,
+            },
+            'fingerprint': {
+                'install': False,
+                'value': None,
+            },
+            'requestId': {
+                'enabled': False,
+                'generatedRequestId': None,
+            },
+            'urlStorage': {
+                'install': False,
+                'storedUpload': None,
+            },
+        },
         'scenarioId': 'startValidationParallelUploadsWithDeferredLength',
     },
     {
@@ -3436,6 +3657,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'requests': [],
         'retryDecisions': [],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': False,
+            },
+            'fingerprint': {
+                'install': False,
+                'value': None,
+            },
+            'requestId': {
+                'enabled': False,
+                'generatedRequestId': None,
+            },
+            'urlStorage': {
+                'install': False,
+                'storedUpload': None,
+            },
+        },
         'scenarioId': 'startValidationParallelUploadsWithUploadDataDuringCreation',
     },
     {
@@ -3489,6 +3727,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'requests': [],
         'retryDecisions': [],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': False,
+            },
+            'fingerprint': {
+                'install': False,
+                'value': None,
+            },
+            'requestId': {
+                'enabled': False,
+                'generatedRequestId': None,
+            },
+            'urlStorage': {
+                'install': False,
+                'storedUpload': None,
+            },
+        },
         'scenarioId': 'startValidationParallelBoundariesWithoutParallelUploads',
     },
     {
@@ -3547,6 +3802,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'requests': [],
         'retryDecisions': [],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': False,
+            },
+            'fingerprint': {
+                'install': False,
+                'value': None,
+            },
+            'requestId': {
+                'enabled': False,
+                'generatedRequestId': None,
+            },
+            'urlStorage': {
+                'install': False,
+                'storedUpload': None,
+            },
+        },
         'scenarioId': 'startValidationParallelBoundariesLengthMismatch',
     },
     {
@@ -3641,6 +3913,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
         ],
         'retryDecisions': [],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': False,
+            },
+            'fingerprint': {
+                'install': False,
+                'value': None,
+            },
+            'requestId': {
+                'enabled': False,
+                'generatedRequestId': None,
+            },
+            'urlStorage': {
+                'install': False,
+                'storedUpload': None,
+            },
+        },
         'scenarioId': 'detailedCreateResponseError',
     },
     {
@@ -3729,6 +4018,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
         ],
         'retryDecisions': [],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': False,
+            },
+            'fingerprint': {
+                'install': False,
+                'value': None,
+            },
+            'requestId': {
+                'enabled': False,
+                'generatedRequestId': None,
+            },
+            'urlStorage': {
+                'install': False,
+                'storedUpload': None,
+            },
+        },
         'scenarioId': 'detailedCreateRequestError',
     },
     {
@@ -3835,6 +4141,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
         ],
         'retryDecisions': [],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': False,
+            },
+            'fingerprint': {
+                'install': False,
+                'value': None,
+            },
+            'requestId': {
+                'enabled': False,
+                'generatedRequestId': None,
+            },
+            'urlStorage': {
+                'install': False,
+                'storedUpload': None,
+            },
+        },
         'scenarioId': 'uploadBodyHeaders',
     },
     {
@@ -3956,6 +4279,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
         ],
         'retryDecisions': [],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': False,
+            },
+            'fingerprint': {
+                'install': False,
+                'value': None,
+            },
+            'requestId': {
+                'enabled': False,
+                'generatedRequestId': None,
+            },
+            'urlStorage': {
+                'install': False,
+                'storedUpload': None,
+            },
+        },
         'scenarioId': 'customRequestHeaders',
     },
     {
@@ -4080,6 +4420,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
         ],
         'retryDecisions': [],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': False,
+            },
+            'fingerprint': {
+                'install': False,
+                'value': None,
+            },
+            'requestId': {
+                'enabled': True,
+                'generatedRequestId': '00000000-0000-4000-8000-000000000000',
+            },
+            'urlStorage': {
+                'install': False,
+                'storedUpload': None,
+            },
+        },
         'scenarioId': 'requestIdHeaders',
     },
     {
@@ -4234,6 +4591,27 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
         ],
         'retryDecisions': [],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': False,
+            },
+            'fingerprint': {
+                'install': True,
+                'value': 'contract-resume-fingerprint',
+            },
+            'requestId': {
+                'enabled': False,
+                'generatedRequestId': None,
+            },
+            'urlStorage': {
+                'install': True,
+                'storedUpload': {
+                    'fingerprint': 'contract-resume-fingerprint',
+                    'uploadUrl': 'https://tus.io/uploads/resume-contract',
+                    'urlStorageKey': 'tus::contract-resume-fingerprint::1337',
+                },
+            },
+        },
         'scenarioId': 'resumeFromPreviousUpload',
     },
     {
@@ -4364,6 +4742,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
         ],
         'retryDecisions': [],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': False,
+            },
+            'fingerprint': {
+                'install': False,
+                'value': None,
+            },
+            'requestId': {
+                'enabled': False,
+                'generatedRequestId': None,
+            },
+            'urlStorage': {
+                'install': False,
+                'storedUpload': None,
+            },
+        },
         'scenarioId': 'relativeLocationResolution',
     },
     {
@@ -4482,6 +4877,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
         ],
         'retryDecisions': [],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': False,
+            },
+            'fingerprint': {
+                'install': False,
+                'value': None,
+            },
+            'requestId': {
+                'enabled': False,
+                'generatedRequestId': None,
+            },
+            'urlStorage': {
+                'install': False,
+                'storedUpload': None,
+            },
+        },
         'scenarioId': 'arrayBufferInput',
     },
     {
@@ -4600,6 +5012,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
         ],
         'retryDecisions': [],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': False,
+            },
+            'fingerprint': {
+                'install': False,
+                'value': None,
+            },
+            'requestId': {
+                'enabled': False,
+                'generatedRequestId': None,
+            },
+            'urlStorage': {
+                'install': False,
+                'storedUpload': None,
+            },
+        },
         'scenarioId': 'arrayBufferViewInput',
     },
     {
@@ -4731,6 +5160,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
         ],
         'retryDecisions': [],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': False,
+            },
+            'fingerprint': {
+                'install': True,
+                'value': None,
+            },
+            'requestId': {
+                'enabled': False,
+                'generatedRequestId': None,
+            },
+            'urlStorage': {
+                'install': False,
+                'storedUpload': None,
+            },
+        },
         'scenarioId': 'webReadableStreamInput',
     },
     {
@@ -4862,6 +5308,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
         ],
         'retryDecisions': [],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': False,
+            },
+            'fingerprint': {
+                'install': True,
+                'value': None,
+            },
+            'requestId': {
+                'enabled': False,
+                'generatedRequestId': None,
+            },
+            'urlStorage': {
+                'install': False,
+                'storedUpload': None,
+            },
+        },
         'scenarioId': 'nodeReadableStreamInput',
         'runtimes': [
             'node',
@@ -4983,6 +5446,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
         ],
         'retryDecisions': [],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': False,
+            },
+            'fingerprint': {
+                'install': False,
+                'value': None,
+            },
+            'requestId': {
+                'enabled': False,
+                'generatedRequestId': None,
+            },
+            'urlStorage': {
+                'install': False,
+                'storedUpload': None,
+            },
+        },
         'scenarioId': 'nodePathInput',
         'runtimes': [
             'node',
@@ -5131,6 +5611,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
         ],
         'retryDecisions': [],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': False,
+            },
+            'fingerprint': {
+                'install': True,
+                'value': None,
+            },
+            'requestId': {
+                'enabled': False,
+                'generatedRequestId': None,
+            },
+            'urlStorage': {
+                'install': False,
+                'storedUpload': None,
+            },
+        },
         'scenarioId': 'deferredLengthUpload',
     },
     {
@@ -5357,6 +5854,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
         ],
         'retryDecisions': [],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': False,
+            },
+            'fingerprint': {
+                'install': False,
+                'value': None,
+            },
+            'requestId': {
+                'enabled': False,
+                'generatedRequestId': None,
+            },
+            'urlStorage': {
+                'install': False,
+                'storedUpload': None,
+            },
+        },
         'scenarioId': 'deferredLengthChunkedUpload',
     },
     {
@@ -5463,6 +5977,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
         ],
         'retryDecisions': [],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': False,
+            },
+            'fingerprint': {
+                'install': False,
+                'value': None,
+            },
+            'requestId': {
+                'enabled': False,
+                'generatedRequestId': None,
+            },
+            'urlStorage': {
+                'install': False,
+                'storedUpload': None,
+            },
+        },
         'scenarioId': 'overridePatchMethod',
     },
     {
@@ -5709,6 +6240,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
         ],
         'retryDecisions': [],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': False,
+            },
+            'fingerprint': {
+                'install': False,
+                'value': None,
+            },
+            'requestId': {
+                'enabled': False,
+                'generatedRequestId': None,
+            },
+            'urlStorage': {
+                'install': False,
+                'storedUpload': None,
+            },
+        },
         'scenarioId': 'parallelUploadConcat',
     },
     {
@@ -5976,6 +6524,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
         ],
         'retryDecisions': [],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': True,
+            },
+            'fingerprint': {
+                'install': True,
+                'value': 'contract-parallel-cleanup-fingerprint',
+            },
+            'requestId': {
+                'enabled': False,
+                'generatedRequestId': None,
+            },
+            'urlStorage': {
+                'install': False,
+                'storedUpload': None,
+            },
+        },
         'scenarioId': 'parallelUploadAbortCleanup',
     },
     {
@@ -6222,6 +6787,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'retryAttempt': 0,
             },
         ],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': False,
+            },
+            'fingerprint': {
+                'install': False,
+                'value': None,
+            },
+            'requestId': {
+                'enabled': False,
+                'generatedRequestId': None,
+            },
+            'urlStorage': {
+                'install': False,
+                'storedUpload': None,
+            },
+        },
         'scenarioId': 'retryPatchAfterOffsetRecovery',
     },
     {
@@ -6309,6 +6891,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
         ],
         'retryDecisions': [],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': False,
+            },
+            'fingerprint': {
+                'install': False,
+                'value': None,
+            },
+            'requestId': {
+                'enabled': False,
+                'generatedRequestId': None,
+            },
+            'urlStorage': {
+                'install': False,
+                'storedUpload': None,
+            },
+        },
         'scenarioId': 'requestLifecycleHooks',
     },
     {
@@ -6394,6 +6993,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
         ],
         'retryDecisions': [],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': False,
+            },
+            'fingerprint': {
+                'install': False,
+                'value': None,
+            },
+            'requestId': {
+                'enabled': False,
+                'generatedRequestId': None,
+            },
+            'urlStorage': {
+                'install': False,
+                'storedUpload': None,
+            },
+        },
         'scenarioId': 'abortUpload',
     },
     {
@@ -6558,6 +7174,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
         ],
         'retryDecisions': [],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': True,
+            },
+            'fingerprint': {
+                'install': True,
+                'value': 'contract-abort-terminate-fingerprint',
+            },
+            'requestId': {
+                'enabled': False,
+                'generatedRequestId': None,
+            },
+            'urlStorage': {
+                'install': False,
+                'storedUpload': None,
+            },
+        },
         'scenarioId': 'abortUploadAfterStoredUrl',
     },
     {
@@ -6753,6 +7386,23 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'retryAttempt': 0,
             },
         ],
+        'runtimeSetup': {
+            'abort': {
+                'terminateUpload': False,
+            },
+            'fingerprint': {
+                'install': False,
+                'value': None,
+            },
+            'requestId': {
+                'enabled': False,
+                'generatedRequestId': None,
+            },
+            'urlStorage': {
+                'install': False,
+                'storedUpload': None,
+            },
+        },
         'scenarioId': 'terminateWithRetry',
     },
 ]
