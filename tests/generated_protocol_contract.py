@@ -555,6 +555,41 @@ TUS_CLIENT_FEATURES = [
     {
         'conformance': {
             'scenarioIds': [
+                'requestIdHeaders',
+            ],
+            'status': 'covered-by-generated-scenario',
+        },
+        'description': 'Add generated request IDs after protocol and custom request headers.',
+        'featureId': 'requestIdHeaders',
+        'flow': [
+            {
+                'kind': 'primitive',
+                'primitive': 'add-request-id-header',
+                'summary': 'Generate a request ID and apply it after custom request headers so it is authoritative.',
+            },
+            {
+                'kind': 'operation',
+                'operationId': 'createTusUpload',
+                'summary': 'Create uploads with a generated request ID.',
+            },
+            {
+                'kind': 'operation',
+                'operationId': 'patchTusUpload',
+                'summary': 'Upload bytes with a generated request ID.',
+            },
+        ],
+        'operationIds': [
+            'createTusUpload',
+            'patchTusUpload',
+        ],
+        'primitives': [
+            'add-request-id-header',
+            'apply-custom-request-headers',
+        ],
+    },
+    {
+        'conformance': {
+            'scenarioIds': [
                 'overridePatchMethod',
             ],
             'status': 'covered-by-generated-scenario',
@@ -2320,7 +2355,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
-                    'Content-Type': 'application/offset+octet-stream',
                     'Upload-Length': '11',
                 },
                 'headersSpecified': True,
@@ -2408,7 +2442,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
-                    'Content-Type': 'application/offset+octet-stream',
                     'Upload-Length': '11',
                 },
                 'headersSpecified': True,
@@ -2436,7 +2469,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
-                    'Content-Type': 'application/offset+octet-stream',
                     'Upload-Offset': '5',
                 },
                 'headersSpecified': True,
@@ -2463,7 +2495,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
-                    'Content-Type': 'application/offset+octet-stream',
                     'Upload-Offset': '10',
                 },
                 'headersSpecified': True,
@@ -2595,10 +2626,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'errorMessage': None,
                 'headerMode': 'exact',
                 'headers': {
-                    'Content-Type': 'application/partial-upload',
-                    'Upload-Complete': '?1',
-                    'Upload-Draft-Interop-Version': '6',
                     'Upload-Length': '11',
+                    'Upload-Complete': '?1',
+                    'Content-Type': 'application/partial-upload',
+                    'Upload-Draft-Interop-Version': '6',
                 },
                 'headersSpecified': True,
                 'method': None,
@@ -3170,7 +3201,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
-                    'Content-Type': 'application/offset+octet-stream',
                     'Upload-Offset': '0',
                 },
                 'headersSpecified': True,
@@ -3205,6 +3235,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'content': 'hello world',
             'endpointUrl': 'https://tus.io/uploads',
             'headers': {
+                'Content-Type': 'application/x-tus-custom-body',
                 'X-Tus-Contract': 'custom-header',
                 'X-Tus-Trace': 'trace-123',
             },
@@ -3229,6 +3260,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'headerMode': None,
                 'headers': {
                     'Upload-Length': '11',
+                    'Content-Type': 'application/x-tus-custom-body',
                     'X-Tus-Contract': 'custom-header',
                     'X-Tus-Trace': 'trace-123',
                 },
@@ -3256,8 +3288,8 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
-                    'Content-Type': 'application/offset+octet-stream',
                     'Upload-Offset': '0',
+                    'Content-Type': 'application/x-tus-custom-body',
                     'X-Tus-Contract': 'custom-header',
                     'X-Tus-Trace': 'trace-123',
                 },
@@ -3280,6 +3312,93 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
         ],
         'scenarioId': 'customRequestHeaders',
+        'events': [],
+    },
+    {
+        'behavior': 'request-id-headers',
+        'completion': {
+            'kind': 'success',
+            'uploadUrl': 'https://tus.io/uploads/request-id-contract',
+        },
+        'featureId': 'requestIdHeaders',
+        'input': {
+            'addRequestId': True,
+            'content': 'hello world',
+            'endpointUrl': 'https://tus.io/uploads',
+            'generatedRequestId': '00000000-0000-4000-8000-000000000000',
+            'headers': {
+                'X-Request-ID': 'custom-request-id',
+            },
+            'kind': 'blob',
+            'metadata': {
+                'filename': 'hello.txt',
+            },
+        },
+        'operationIds': [
+            'createTusUpload',
+            'patchTusUpload',
+        ],
+        'primitives': [
+            'add-request-id-header',
+            'apply-custom-request-headers',
+        ],
+        'requests': [
+            {
+                'absentHeaders': [],
+                'abort': False,
+                'bodySize': None,
+                'errorMessage': None,
+                'headerMode': None,
+                'headers': {
+                    'Upload-Length': '11',
+                    'X-Request-ID': '00000000-0000-4000-8000-000000000000',
+                },
+                'headersSpecified': True,
+                'method': None,
+                'operationId': 'createTusUpload',
+                'response': {
+                    'body': None,
+                    'headerMode': None,
+                    'headers': {
+                        'Location': 'https://tus.io/uploads/request-id-contract',
+                    },
+                    'headersSpecified': True,
+                    'statusCode': 201,
+                },
+                'role': 'create-upload',
+                'uploadUrl': None,
+                'url': 'endpoint',
+                'requestIndex': 0,
+            },
+            {
+                'absentHeaders': [],
+                'abort': False,
+                'bodySize': 11,
+                'errorMessage': None,
+                'headerMode': None,
+                'headers': {
+                    'Upload-Offset': '0',
+                    'X-Request-ID': '00000000-0000-4000-8000-000000000000',
+                },
+                'headersSpecified': True,
+                'method': None,
+                'operationId': 'patchTusUpload',
+                'response': {
+                    'body': None,
+                    'headerMode': None,
+                    'headers': {
+                        'Upload-Offset': '11',
+                    },
+                    'headersSpecified': True,
+                    'statusCode': 204,
+                },
+                'role': 'upload-chunk',
+                'uploadUrl': None,
+                'url': 'upload',
+                'requestIndex': 1,
+            },
+        ],
+        'scenarioId': 'requestIdHeaders',
         'events': [],
     },
     {
@@ -4210,12 +4329,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
-                    'Content-Type': 'application/offset+octet-stream',
                     'Upload-Offset': '3',
-                    'X-HTTP-Method-Override': 'PATCH',
                 },
                 'headersSpecified': True,
-                'method': 'POST',
+                'method': None,
                 'operationId': 'patchTusUpload',
                 'response': {
                     'body': None,
@@ -4297,7 +4414,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'headers': {
                     'Upload-Concat': 'partial',
                     'Upload-Length': '5',
-                    'Upload-Metadata': 'test d29ybGQ=',
                 },
                 'headersSpecified': True,
                 'method': None,
@@ -4325,7 +4441,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'headers': {
                     'Upload-Concat': 'partial',
                     'Upload-Length': '6',
-                    'Upload-Metadata': 'test d29ybGQ=',
                 },
                 'headersSpecified': True,
                 'method': None,
@@ -4406,7 +4521,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'headerMode': None,
                 'headers': {
                     'Upload-Concat': 'final;https://tus.io/uploads/parallel-part-1 https://tus.io/uploads/parallel-part-2',
-                    'Upload-Metadata': 'foo aGVsbG8=',
                 },
                 'headersSpecified': True,
                 'method': None,
@@ -4518,7 +4632,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'headers': {
                     'Upload-Concat': 'partial',
                     'Upload-Length': '5',
-                    'Upload-Metadata': 'test d29ybGQ=',
                     'X-Tus-Contract': 'parallel-cleanup-policy',
                     'X-Tus-Trace': 'parallel-cleanup-trace-123',
                 },
@@ -4548,7 +4661,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'headers': {
                     'Upload-Concat': 'partial',
                     'Upload-Length': '6',
-                    'Upload-Metadata': 'test d29ybGQ=',
                     'X-Tus-Contract': 'parallel-cleanup-policy',
                     'X-Tus-Trace': 'parallel-cleanup-trace-123',
                 },
@@ -4576,14 +4688,12 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
-                    'Content-Type': 'application/offset+octet-stream',
                     'Upload-Offset': '0',
-                    'X-HTTP-Method-Override': 'PATCH',
                     'X-Tus-Contract': 'parallel-cleanup-policy',
                     'X-Tus-Trace': 'parallel-cleanup-trace-123',
                 },
                 'headersSpecified': True,
-                'method': 'POST',
+                'method': None,
                 'operationId': 'patchTusUpload',
                 'response': {
                     'body': None,
@@ -4604,14 +4714,12 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
-                    'Content-Type': 'application/offset+octet-stream',
                     'Upload-Offset': '0',
-                    'X-HTTP-Method-Override': 'PATCH',
                     'X-Tus-Contract': 'parallel-cleanup-policy',
                     'X-Tus-Trace': 'parallel-cleanup-trace-123',
                 },
                 'headersSpecified': True,
-                'method': 'POST',
+                'method': None,
                 'operationId': 'patchTusUpload',
                 'response': None,
                 'role': 'upload-partial-chunk',
@@ -5060,6 +5168,8 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'headerMode': None,
                 'headers': {
                     'Upload-Length': '11',
+                    'X-Tus-Contract': 'abort-policy',
+                    'X-Tus-Trace': 'abort-trace-123',
                 },
                 'headersSpecified': True,
                 'method': None,
@@ -5085,14 +5195,12 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
-                    'Content-Type': 'application/offset+octet-stream',
                     'Upload-Offset': '0',
-                    'X-HTTP-Method-Override': 'PATCH',
                     'X-Tus-Contract': 'abort-policy',
                     'X-Tus-Trace': 'abort-trace-123',
                 },
                 'headersSpecified': True,
-                'method': 'POST',
+                'method': None,
                 'operationId': 'patchTusUpload',
                 'response': None,
                 'role': 'abort-upload-chunk',
