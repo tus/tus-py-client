@@ -517,7 +517,7 @@ def has_allowed_extra_event_prefix(event_key, prefixes):
 
 
 def execution_actions(case, phase):
-    execution = case.get('execution') or {}
+    execution = case['execution'] or {}
     return execution.get(phase, [])
 
 
