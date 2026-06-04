@@ -33,7 +33,7 @@ CASES = [
             'chunk-complete:11:11:11',
         ],
         'eventPolicy': {
-            'matching': 'exact-except-extra-progress',
+            'matching': 'exact-except-allowed-extra-events',
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
@@ -98,7 +98,7 @@ CASES = [
             'chunk-complete:6:11:11',
         ],
         'eventPolicy': {
-            'matching': 'exact-except-extra-progress',
+            'matching': 'exact-except-allowed-extra-events',
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
@@ -171,7 +171,7 @@ CASES = [
             'chunk-complete:11:11:11',
         ],
         'eventPolicy': {
-            'matching': 'exact-except-extra-progress',
+            'matching': 'exact-except-allowed-extra-events',
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
@@ -237,7 +237,7 @@ CASES = [
         ],
         'eventPolicy': {
             'deferredLengthBytesTotal': 'allow-known-total-before-declaration',
-            'matching': 'exact-except-extra-progress',
+            'matching': 'exact-except-allowed-extra-events',
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
@@ -328,7 +328,7 @@ CASES = [
         ],
         'eventPolicy': {
             'deferredLengthBytesTotal': 'allow-known-total-before-declaration',
-            'matching': 'exact-except-extra-progress',
+            'matching': 'exact-except-allowed-extra-events',
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
@@ -567,7 +567,7 @@ def assert_events(test, case, events):
         test.assertEqual(events, expected_events, case['scenarioId'])
         return
 
-    if matching == 'exact-except-extra-progress':
+    if matching == 'exact-except-allowed-extra-events':
         expected_index = 0
         for event in events:
             if (

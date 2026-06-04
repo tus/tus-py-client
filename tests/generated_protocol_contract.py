@@ -2209,7 +2209,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'progress:',
         ],
         'eventPolicy': {
-            'matching': 'exact-except-extra-progress',
+            'matching': 'exact-except-allowed-extra-events',
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
@@ -2353,7 +2353,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'progress:',
         ],
         'eventPolicy': {
-            'matching': 'exact-except-extra-progress',
+            'matching': 'exact-except-allowed-extra-events',
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
@@ -2456,7 +2456,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'progress:',
         ],
         'eventPolicy': {
-            'matching': 'exact-except-extra-progress',
+            'matching': 'exact-except-allowed-extra-events',
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
@@ -2653,7 +2653,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'progress:',
         ],
         'eventPolicy': {
-            'matching': 'exact-except-extra-progress',
+            'matching': 'exact-except-allowed-extra-events',
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
@@ -2759,7 +2759,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'progress:',
         ],
         'eventPolicy': {
-            'matching': 'exact-except-extra-progress',
+            'matching': 'exact-except-allowed-extra-events',
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
@@ -2989,7 +2989,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'progress:',
         ],
         'eventPolicy': {
-            'matching': 'exact-except-extra-progress',
+            'matching': 'exact-except-allowed-extra-events',
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
@@ -3754,7 +3754,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'progress:',
         ],
         'eventPolicy': {
-            'matching': 'exact-except-extra-progress',
+            'matching': 'exact-except-allowed-extra-events',
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
@@ -3916,7 +3916,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'progress:',
         ],
         'eventPolicy': {
-            'matching': 'exact-except-extra-progress',
+            'matching': 'exact-except-allowed-extra-events',
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
@@ -4566,7 +4566,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'eventPolicy': {
             'deferredLengthBytesTotal': 'allow-known-total-before-declaration',
-            'matching': 'exact-except-extra-progress',
+            'matching': 'exact-except-allowed-extra-events',
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
@@ -4719,7 +4719,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'eventPolicy': {
             'deferredLengthBytesTotal': 'allow-known-total-before-declaration',
-            'matching': 'exact-except-extra-progress',
+            'matching': 'exact-except-allowed-extra-events',
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
@@ -5024,7 +5024,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'progress:',
         ],
         'eventPolicy': {
-            'matching': 'exact-except-extra-progress',
+            'matching': 'exact-except-allowed-extra-events',
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
