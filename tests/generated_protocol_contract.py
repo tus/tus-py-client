@@ -2218,6 +2218,15 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'success',
             'source-close',
         ],
+        'eventKinds': [
+            'fingerprint',
+            'upload-url-available',
+            'url-storage-add',
+            'progress',
+            'chunk-complete',
+            'success',
+            'source-close',
+        ],
         'eventPolicy': {
             'matching': 'exact-except-allowed-extra-events',
             'progress': 'milestone',
@@ -2302,50 +2311,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'retryDecisions': [],
         'scenarioId': 'singleUploadLifecycle',
-        'events': [
-            {
-                'fingerprint': 'contract-single-fingerprint',
-                'kind': 'fingerprint',
-                'key': 'fingerprint:contract-single-fingerprint',
-            },
-            {
-                'kind': 'upload-url-available',
-                'key': 'upload-url-available',
-            },
-            {
-                'fingerprint': 'contract-single-fingerprint',
-                'kind': 'url-storage-add',
-                'uploadUrl': 'https://tus.io/uploads/generated-contract',
-                'key': 'url-storage-add:contract-single-fingerprint:https://tus.io/uploads/generated-contract',
-            },
-            {
-                'bytesSent': 0,
-                'bytesTotal': 11,
-                'kind': 'progress',
-                'key': 'progress:0:11',
-            },
-            {
-                'bytesSent': 11,
-                'bytesTotal': 11,
-                'kind': 'progress',
-                'key': 'progress:11:11',
-            },
-            {
-                'bytesAccepted': 11,
-                'bytesTotal': 11,
-                'chunkSize': 11,
-                'kind': 'chunk-complete',
-                'key': 'chunk-complete:11:11:11',
-            },
-            {
-                'kind': 'success',
-                'key': 'success',
-            },
-            {
-                'kind': 'source-close',
-                'key': 'source-close',
-            },
-        ],
     },
     {
         'behavior': 'creation-with-upload',
@@ -2366,6 +2331,12 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'eventKeys': [
             'progress:0:11',
             'progress:11:11',
+            'upload-url-available',
+            'success',
+            'source-close',
+        ],
+        'eventKinds': [
+            'progress',
             'upload-url-available',
             'success',
             'source-close',
@@ -2424,32 +2395,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'retryDecisions': [],
         'scenarioId': 'creationWithUpload',
-        'events': [
-            {
-                'bytesSent': 0,
-                'bytesTotal': 11,
-                'kind': 'progress',
-                'key': 'progress:0:11',
-            },
-            {
-                'bytesSent': 11,
-                'bytesTotal': 11,
-                'kind': 'progress',
-                'key': 'progress:11:11',
-            },
-            {
-                'kind': 'upload-url-available',
-                'key': 'upload-url-available',
-            },
-            {
-                'kind': 'success',
-                'key': 'success',
-            },
-            {
-                'kind': 'source-close',
-                'key': 'source-close',
-            },
-        ],
     },
     {
         'behavior': 'creation-with-upload-partial-chunk',
@@ -2485,6 +2430,13 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'progress:10:11',
             'progress:11:11',
             'chunk-complete:1:11:11',
+            'success',
+            'source-close',
+        ],
+        'eventKinds': [
+            'progress',
+            'upload-url-available',
+            'chunk-complete',
             'success',
             'source-close',
         ],
@@ -2598,77 +2550,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'retryDecisions': [],
         'scenarioId': 'creationWithUploadPartialChunk',
-        'events': [
-            {
-                'bytesSent': 0,
-                'bytesTotal': 11,
-                'kind': 'progress',
-                'key': 'progress:0:11',
-            },
-            {
-                'bytesSent': 5,
-                'bytesTotal': 11,
-                'kind': 'progress',
-                'key': 'progress:5:11',
-            },
-            {
-                'kind': 'upload-url-available',
-                'key': 'upload-url-available',
-            },
-            {
-                'bytesAccepted': 5,
-                'bytesTotal': 11,
-                'chunkSize': 5,
-                'kind': 'chunk-complete',
-                'key': 'chunk-complete:5:5:11',
-            },
-            {
-                'bytesSent': 5,
-                'bytesTotal': 11,
-                'kind': 'progress',
-                'key': 'progress:5:11',
-            },
-            {
-                'bytesSent': 10,
-                'bytesTotal': 11,
-                'kind': 'progress',
-                'key': 'progress:10:11',
-            },
-            {
-                'bytesAccepted': 10,
-                'bytesTotal': 11,
-                'chunkSize': 5,
-                'kind': 'chunk-complete',
-                'key': 'chunk-complete:5:10:11',
-            },
-            {
-                'bytesSent': 10,
-                'bytesTotal': 11,
-                'kind': 'progress',
-                'key': 'progress:10:11',
-            },
-            {
-                'bytesSent': 11,
-                'bytesTotal': 11,
-                'kind': 'progress',
-                'key': 'progress:11:11',
-            },
-            {
-                'bytesAccepted': 11,
-                'bytesTotal': 11,
-                'chunkSize': 1,
-                'kind': 'chunk-complete',
-                'key': 'chunk-complete:1:11:11',
-            },
-            {
-                'kind': 'success',
-                'key': 'success',
-            },
-            {
-                'kind': 'source-close',
-                'key': 'source-close',
-            },
-        ],
     },
     {
         'behavior': 'creation-with-upload',
@@ -2689,6 +2570,12 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'eventKeys': [
             'progress:0:11',
             'progress:11:11',
+            'upload-url-available',
+            'success',
+            'source-close',
+        ],
+        'eventKinds': [
+            'progress',
             'upload-url-available',
             'success',
             'source-close',
@@ -2750,32 +2637,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'retryDecisions': [],
         'scenarioId': 'ietfDraft05CreationWithUpload',
-        'events': [
-            {
-                'bytesSent': 0,
-                'bytesTotal': 11,
-                'kind': 'progress',
-                'key': 'progress:0:11',
-            },
-            {
-                'bytesSent': 11,
-                'bytesTotal': 11,
-                'kind': 'progress',
-                'key': 'progress:11:11',
-            },
-            {
-                'kind': 'upload-url-available',
-                'key': 'upload-url-available',
-            },
-            {
-                'kind': 'success',
-                'key': 'success',
-            },
-            {
-                'kind': 'source-close',
-                'key': 'source-close',
-            },
-        ],
     },
     {
         'behavior': 'upload-body-headers',
@@ -2811,6 +2672,13 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'progress:10:11',
             'progress:11:11',
             'chunk-complete:1:11:11',
+            'success',
+            'source-close',
+        ],
+        'eventKinds': [
+            'upload-url-available',
+            'progress',
+            'chunk-complete',
             'success',
             'source-close',
         ],
@@ -2956,77 +2824,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'retryDecisions': [],
         'scenarioId': 'ietfDraft05ChunkedUploadComplete',
-        'events': [
-            {
-                'kind': 'upload-url-available',
-                'key': 'upload-url-available',
-            },
-            {
-                'bytesSent': 0,
-                'bytesTotal': 11,
-                'kind': 'progress',
-                'key': 'progress:0:11',
-            },
-            {
-                'bytesSent': 5,
-                'bytesTotal': 11,
-                'kind': 'progress',
-                'key': 'progress:5:11',
-            },
-            {
-                'bytesAccepted': 5,
-                'bytesTotal': 11,
-                'chunkSize': 5,
-                'kind': 'chunk-complete',
-                'key': 'chunk-complete:5:5:11',
-            },
-            {
-                'bytesSent': 5,
-                'bytesTotal': 11,
-                'kind': 'progress',
-                'key': 'progress:5:11',
-            },
-            {
-                'bytesSent': 10,
-                'bytesTotal': 11,
-                'kind': 'progress',
-                'key': 'progress:10:11',
-            },
-            {
-                'bytesAccepted': 10,
-                'bytesTotal': 11,
-                'chunkSize': 5,
-                'kind': 'chunk-complete',
-                'key': 'chunk-complete:5:10:11',
-            },
-            {
-                'bytesSent': 10,
-                'bytesTotal': 11,
-                'kind': 'progress',
-                'key': 'progress:10:11',
-            },
-            {
-                'bytesSent': 11,
-                'bytesTotal': 11,
-                'kind': 'progress',
-                'key': 'progress:11:11',
-            },
-            {
-                'bytesAccepted': 11,
-                'bytesTotal': 11,
-                'chunkSize': 1,
-                'kind': 'chunk-complete',
-                'key': 'chunk-complete:1:11:11',
-            },
-            {
-                'kind': 'success',
-                'key': 'success',
-            },
-            {
-                'kind': 'source-close',
-                'key': 'source-close',
-            },
-        ],
     },
     {
         'behavior': 'upload-body-headers',
@@ -3050,6 +2847,13 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'progress:5:11',
             'progress:11:11',
             'chunk-complete:6:11:11',
+            'success',
+            'source-close',
+        ],
+        'eventKinds': [
+            'upload-url-available',
+            'progress',
+            'chunk-complete',
             'success',
             'source-close',
         ],
@@ -3134,39 +2938,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'retryDecisions': [],
         'scenarioId': 'ietfDraft03ResumeWithoutKnownLength',
-        'events': [
-            {
-                'kind': 'upload-url-available',
-                'key': 'upload-url-available',
-            },
-            {
-                'bytesSent': 5,
-                'bytesTotal': 11,
-                'kind': 'progress',
-                'key': 'progress:5:11',
-            },
-            {
-                'bytesSent': 11,
-                'bytesTotal': 11,
-                'kind': 'progress',
-                'key': 'progress:11:11',
-            },
-            {
-                'bytesAccepted': 11,
-                'bytesTotal': 11,
-                'chunkSize': 6,
-                'kind': 'chunk-complete',
-                'key': 'chunk-complete:6:11:11',
-            },
-            {
-                'kind': 'success',
-                'key': 'success',
-            },
-            {
-                'kind': 'source-close',
-                'key': 'source-close',
-            },
-        ],
     },
     {
         'behavior': 'start-option-validation',
@@ -3178,6 +2949,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'eventKeyAlternativeGroups': [],
         'eventKeyExtraPrefixes': [],
         'eventKeys': [],
+        'eventKinds': [],
         'eventPolicy': {
             'matching': 'exact',
         },
@@ -3194,7 +2966,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'requests': [],
         'retryDecisions': [],
         'scenarioId': 'startValidationMissingInput',
-        'events': [],
     },
     {
         'behavior': 'start-option-validation',
@@ -3206,6 +2977,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'eventKeyAlternativeGroups': [],
         'eventKeyExtraPrefixes': [],
         'eventKeys': [],
+        'eventKinds': [],
         'eventPolicy': {
             'matching': 'exact',
         },
@@ -3221,7 +2993,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'requests': [],
         'retryDecisions': [],
         'scenarioId': 'startValidationMissingEndpointOrUploadUrl',
-        'events': [],
     },
     {
         'behavior': 'start-option-validation',
@@ -3233,6 +3004,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'eventKeyAlternativeGroups': [],
         'eventKeyExtraPrefixes': [],
         'eventKeys': [],
+        'eventKinds': [],
         'eventPolicy': {
             'matching': 'exact',
         },
@@ -3250,7 +3022,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'requests': [],
         'retryDecisions': [],
         'scenarioId': 'startValidationUnsupportedProtocol',
-        'events': [],
     },
     {
         'behavior': 'start-option-validation',
@@ -3262,6 +3033,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'eventKeyAlternativeGroups': [],
         'eventKeyExtraPrefixes': [],
         'eventKeys': [],
+        'eventKinds': [],
         'eventPolicy': {
             'matching': 'exact',
         },
@@ -3281,7 +3053,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'requests': [],
         'retryDecisions': [],
         'scenarioId': 'startValidationRetryDelaysNotArray',
-        'events': [],
     },
     {
         'behavior': 'start-option-validation',
@@ -3293,6 +3064,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'eventKeyAlternativeGroups': [],
         'eventKeyExtraPrefixes': [],
         'eventKeys': [],
+        'eventKinds': [],
         'eventPolicy': {
             'matching': 'exact',
         },
@@ -3311,7 +3083,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'requests': [],
         'retryDecisions': [],
         'scenarioId': 'startValidationParallelUploadsWithUploadUrl',
-        'events': [],
     },
     {
         'behavior': 'start-option-validation',
@@ -3323,6 +3094,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'eventKeyAlternativeGroups': [],
         'eventKeyExtraPrefixes': [],
         'eventKeys': [],
+        'eventKinds': [],
         'eventPolicy': {
             'matching': 'exact',
         },
@@ -3341,7 +3113,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'requests': [],
         'retryDecisions': [],
         'scenarioId': 'startValidationParallelUploadsWithUploadSize',
-        'events': [],
     },
     {
         'behavior': 'start-option-validation',
@@ -3353,6 +3124,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'eventKeyAlternativeGroups': [],
         'eventKeyExtraPrefixes': [],
         'eventKeys': [],
+        'eventKinds': [],
         'eventPolicy': {
             'matching': 'exact',
         },
@@ -3371,7 +3143,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'requests': [],
         'retryDecisions': [],
         'scenarioId': 'startValidationParallelUploadsWithDeferredLength',
-        'events': [],
     },
     {
         'behavior': 'start-option-validation',
@@ -3383,6 +3154,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'eventKeyAlternativeGroups': [],
         'eventKeyExtraPrefixes': [],
         'eventKeys': [],
+        'eventKinds': [],
         'eventPolicy': {
             'matching': 'exact',
         },
@@ -3401,7 +3173,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'requests': [],
         'retryDecisions': [],
         'scenarioId': 'startValidationParallelUploadsWithUploadDataDuringCreation',
-        'events': [],
     },
     {
         'behavior': 'start-option-validation',
@@ -3413,6 +3184,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'eventKeyAlternativeGroups': [],
         'eventKeyExtraPrefixes': [],
         'eventKeys': [],
+        'eventKinds': [],
         'eventPolicy': {
             'matching': 'exact',
         },
@@ -3435,7 +3207,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'requests': [],
         'retryDecisions': [],
         'scenarioId': 'startValidationParallelBoundariesWithoutParallelUploads',
-        'events': [],
     },
     {
         'behavior': 'start-option-validation',
@@ -3447,6 +3218,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'eventKeyAlternativeGroups': [],
         'eventKeyExtraPrefixes': [],
         'eventKeys': [],
+        'eventKinds': [],
         'eventPolicy': {
             'matching': 'exact',
         },
@@ -3470,7 +3242,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'requests': [],
         'retryDecisions': [],
         'scenarioId': 'startValidationParallelBoundariesLengthMismatch',
-        'events': [],
     },
     {
         'behavior': 'detailed-error',
@@ -3482,6 +3253,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'eventKeyAlternativeGroups': [],
         'eventKeyExtraPrefixes': [],
         'eventKeys': [],
+        'eventKinds': [],
         'eventPolicy': {
             'matching': 'exact',
         },
@@ -3535,7 +3307,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'retryDecisions': [],
         'scenarioId': 'detailedCreateResponseError',
-        'events': [],
     },
     {
         'behavior': 'detailed-error',
@@ -3547,6 +3318,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'eventKeyAlternativeGroups': [],
         'eventKeyExtraPrefixes': [],
         'eventKeys': [],
+        'eventKinds': [],
         'eventPolicy': {
             'matching': 'exact',
         },
@@ -3594,7 +3366,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'retryDecisions': [],
         'scenarioId': 'detailedCreateRequestError',
-        'events': [],
     },
     {
         'behavior': 'upload-body-headers',
@@ -3605,6 +3376,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'eventKeyAlternativeGroups': [],
         'eventKeyExtraPrefixes': [],
         'eventKeys': [],
+        'eventKinds': [],
         'eventPolicy': {
             'matching': 'exact',
         },
@@ -3681,7 +3453,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'retryDecisions': [],
         'scenarioId': 'uploadBodyHeaders',
-        'events': [],
     },
     {
         'behavior': 'custom-request-headers',
@@ -3692,6 +3463,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'eventKeyAlternativeGroups': [],
         'eventKeyExtraPrefixes': [],
         'eventKeys': [],
+        'eventKinds': [],
         'eventPolicy': {
             'matching': 'exact',
         },
@@ -3776,7 +3548,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'retryDecisions': [],
         'scenarioId': 'customRequestHeaders',
-        'events': [],
     },
     {
         'behavior': 'request-id-headers',
@@ -3787,6 +3558,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'eventKeyAlternativeGroups': [],
         'eventKeyExtraPrefixes': [],
         'eventKeys': [],
+        'eventKinds': [],
         'eventPolicy': {
             'matching': 'exact',
         },
@@ -3871,7 +3643,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'retryDecisions': [],
         'scenarioId': 'requestIdHeaders',
-        'events': [],
     },
     {
         'behavior': 'resume-from-previous-upload',
@@ -3903,6 +3674,16 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'progress:11:11',
             'chunk-complete:6:11:11',
             'url-storage-remove:tus::contract-resume-fingerprint::1337',
+            'success',
+            'source-close',
+        ],
+        'eventKinds': [
+            'fingerprint',
+            'url-storage-find',
+            'upload-url-available',
+            'progress',
+            'chunk-complete',
+            'url-storage-remove',
             'success',
             'source-close',
         ],
@@ -3997,60 +3778,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'retryDecisions': [],
         'scenarioId': 'resumeFromPreviousUpload',
-        'events': [
-            {
-                'fingerprint': 'contract-resume-fingerprint',
-                'kind': 'fingerprint',
-                'key': 'fingerprint:contract-resume-fingerprint',
-            },
-            {
-                'count': 1,
-                'fingerprint': 'contract-resume-fingerprint',
-                'kind': 'url-storage-find',
-                'key': 'url-storage-find:contract-resume-fingerprint:1',
-            },
-            {
-                'fingerprint': 'contract-resume-fingerprint',
-                'kind': 'fingerprint',
-                'key': 'fingerprint:contract-resume-fingerprint',
-            },
-            {
-                'kind': 'upload-url-available',
-                'key': 'upload-url-available',
-            },
-            {
-                'bytesSent': 5,
-                'bytesTotal': 11,
-                'kind': 'progress',
-                'key': 'progress:5:11',
-            },
-            {
-                'bytesSent': 11,
-                'bytesTotal': 11,
-                'kind': 'progress',
-                'key': 'progress:11:11',
-            },
-            {
-                'bytesAccepted': 11,
-                'bytesTotal': 11,
-                'chunkSize': 6,
-                'kind': 'chunk-complete',
-                'key': 'chunk-complete:6:11:11',
-            },
-            {
-                'kind': 'url-storage-remove',
-                'urlStorageKey': 'tus::contract-resume-fingerprint::1337',
-                'key': 'url-storage-remove:tus::contract-resume-fingerprint::1337',
-            },
-            {
-                'kind': 'success',
-                'key': 'success',
-            },
-            {
-                'kind': 'source-close',
-                'key': 'source-close',
-            },
-        ],
     },
     {
         'behavior': 'relative-location-resolution',
@@ -4074,6 +3801,13 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'progress:0:11',
             'progress:11:11',
             'chunk-complete:11:11:11',
+            'success',
+            'source-close',
+        ],
+        'eventKinds': [
+            'upload-url-available',
+            'progress',
+            'chunk-complete',
             'success',
             'source-close',
         ],
@@ -4155,39 +3889,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'retryDecisions': [],
         'scenarioId': 'relativeLocationResolution',
-        'events': [
-            {
-                'kind': 'upload-url-available',
-                'key': 'upload-url-available',
-            },
-            {
-                'bytesSent': 0,
-                'bytesTotal': 11,
-                'kind': 'progress',
-                'key': 'progress:0:11',
-            },
-            {
-                'bytesSent': 11,
-                'bytesTotal': 11,
-                'kind': 'progress',
-                'key': 'progress:11:11',
-            },
-            {
-                'bytesAccepted': 11,
-                'bytesTotal': 11,
-                'chunkSize': 11,
-                'kind': 'chunk-complete',
-                'key': 'chunk-complete:11:11:11',
-            },
-            {
-                'kind': 'success',
-                'key': 'success',
-            },
-            {
-                'kind': 'source-close',
-                'key': 'source-close',
-            },
-        ],
     },
     {
         'behavior': 'array-buffer-input',
@@ -4203,6 +3904,11 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'eventKeyExtraPrefixes': [],
         'eventKeys': [
             'source-open:array-buffer:11',
+            'success',
+            'source-close',
+        ],
+        'eventKinds': [
+            'source-open',
             'success',
             'source-close',
         ],
@@ -4282,22 +3988,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'retryDecisions': [],
         'scenarioId': 'arrayBufferInput',
-        'events': [
-            {
-                'inputKind': 'array-buffer',
-                'kind': 'source-open',
-                'size': 11,
-                'key': 'source-open:array-buffer:11',
-            },
-            {
-                'kind': 'success',
-                'key': 'success',
-            },
-            {
-                'kind': 'source-close',
-                'key': 'source-close',
-            },
-        ],
     },
     {
         'behavior': 'array-buffer-view-input',
@@ -4313,6 +4003,11 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'eventKeyExtraPrefixes': [],
         'eventKeys': [
             'source-open:array-buffer-view:11',
+            'success',
+            'source-close',
+        ],
+        'eventKinds': [
+            'source-open',
             'success',
             'source-close',
         ],
@@ -4392,22 +4087,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'retryDecisions': [],
         'scenarioId': 'arrayBufferViewInput',
-        'events': [
-            {
-                'inputKind': 'array-buffer-view',
-                'kind': 'source-open',
-                'size': 11,
-                'key': 'source-open:array-buffer-view:11',
-            },
-            {
-                'kind': 'success',
-                'key': 'success',
-            },
-            {
-                'kind': 'source-close',
-                'key': 'source-close',
-            },
-        ],
     },
     {
         'behavior': 'web-readable-stream-input',
@@ -4423,6 +4102,11 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'eventKeyExtraPrefixes': [],
         'eventKeys': [
             'source-open:web-readable-stream:null',
+            'success',
+            'source-close',
+        ],
+        'eventKinds': [
+            'source-open',
             'success',
             'source-close',
         ],
@@ -4507,22 +4191,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'retryDecisions': [],
         'scenarioId': 'webReadableStreamInput',
-        'events': [
-            {
-                'inputKind': 'web-readable-stream',
-                'kind': 'source-open',
-                'size': None,
-                'key': 'source-open:web-readable-stream:null',
-            },
-            {
-                'kind': 'success',
-                'key': 'success',
-            },
-            {
-                'kind': 'source-close',
-                'key': 'source-close',
-            },
-        ],
     },
     {
         'behavior': 'node-readable-stream-input',
@@ -4538,6 +4206,11 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'eventKeyExtraPrefixes': [],
         'eventKeys': [
             'source-open:node-readable-stream:null',
+            'success',
+            'source-close',
+        ],
+        'eventKinds': [
+            'source-open',
             'success',
             'source-close',
         ],
@@ -4622,22 +4295,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'retryDecisions': [],
         'scenarioId': 'nodeReadableStreamInput',
-        'events': [
-            {
-                'inputKind': 'node-readable-stream',
-                'kind': 'source-open',
-                'size': None,
-                'key': 'source-open:node-readable-stream:null',
-            },
-            {
-                'kind': 'success',
-                'key': 'success',
-            },
-            {
-                'kind': 'source-close',
-                'key': 'source-close',
-            },
-        ],
         'runtimes': [
             'node',
         ],
@@ -4656,6 +4313,11 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'eventKeyExtraPrefixes': [],
         'eventKeys': [
             'source-open:node-path-reference:11',
+            'success',
+            'source-close',
+        ],
+        'eventKinds': [
+            'source-open',
             'success',
             'source-close',
         ],
@@ -4735,22 +4397,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'retryDecisions': [],
         'scenarioId': 'nodePathInput',
-        'events': [
-            {
-                'inputKind': 'node-path-reference',
-                'kind': 'source-open',
-                'size': 11,
-                'key': 'source-open:node-path-reference:11',
-            },
-            {
-                'kind': 'success',
-                'key': 'success',
-            },
-            {
-                'kind': 'source-close',
-                'key': 'source-close',
-            },
-        ],
         'runtimes': [
             'node',
         ],
@@ -4777,6 +4423,13 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'progress:0:11',
             'progress:11:11',
             'chunk-complete:11:11:11',
+            'success',
+            'source-close',
+        ],
+        'eventKinds': [
+            'upload-url-available',
+            'progress',
+            'chunk-complete',
             'success',
             'source-close',
         ],
@@ -4865,39 +4518,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'retryDecisions': [],
         'scenarioId': 'deferredLengthUpload',
-        'events': [
-            {
-                'kind': 'upload-url-available',
-                'key': 'upload-url-available',
-            },
-            {
-                'bytesSent': 0,
-                'bytesTotal': 11,
-                'kind': 'progress',
-                'key': 'progress:0:11',
-            },
-            {
-                'bytesSent': 11,
-                'bytesTotal': 11,
-                'kind': 'progress',
-                'key': 'progress:11:11',
-            },
-            {
-                'bytesAccepted': 11,
-                'bytesTotal': 11,
-                'chunkSize': 11,
-                'kind': 'chunk-complete',
-                'key': 'chunk-complete:11:11:11',
-            },
-            {
-                'kind': 'success',
-                'key': 'success',
-            },
-            {
-                'kind': 'source-close',
-                'key': 'source-close',
-            },
-        ],
     },
     {
         'behavior': 'deferred-length-upload',
@@ -4945,6 +4565,13 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'progress:10:11',
             'progress:11:11',
             'chunk-complete:1:11:11',
+            'success',
+            'source-close',
+        ],
+        'eventKinds': [
+            'upload-url-available',
+            'progress',
+            'chunk-complete',
             'success',
             'source-close',
         ],
@@ -5088,77 +4715,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'retryDecisions': [],
         'scenarioId': 'deferredLengthChunkedUpload',
-        'events': [
-            {
-                'kind': 'upload-url-available',
-                'key': 'upload-url-available',
-            },
-            {
-                'bytesSent': 0,
-                'bytesTotal': None,
-                'kind': 'progress',
-                'key': 'progress:0:null',
-            },
-            {
-                'bytesSent': 5,
-                'bytesTotal': None,
-                'kind': 'progress',
-                'key': 'progress:5:null',
-            },
-            {
-                'bytesAccepted': 5,
-                'bytesTotal': None,
-                'chunkSize': 5,
-                'kind': 'chunk-complete',
-                'key': 'chunk-complete:5:5:null',
-            },
-            {
-                'bytesSent': 5,
-                'bytesTotal': None,
-                'kind': 'progress',
-                'key': 'progress:5:null',
-            },
-            {
-                'bytesSent': 10,
-                'bytesTotal': None,
-                'kind': 'progress',
-                'key': 'progress:10:null',
-            },
-            {
-                'bytesAccepted': 10,
-                'bytesTotal': None,
-                'chunkSize': 5,
-                'kind': 'chunk-complete',
-                'key': 'chunk-complete:5:10:null',
-            },
-            {
-                'bytesSent': 10,
-                'bytesTotal': 11,
-                'kind': 'progress',
-                'key': 'progress:10:11',
-            },
-            {
-                'bytesSent': 11,
-                'bytesTotal': 11,
-                'kind': 'progress',
-                'key': 'progress:11:11',
-            },
-            {
-                'bytesAccepted': 11,
-                'bytesTotal': 11,
-                'chunkSize': 1,
-                'kind': 'chunk-complete',
-                'key': 'chunk-complete:1:11:11',
-            },
-            {
-                'kind': 'success',
-                'key': 'success',
-            },
-            {
-                'kind': 'source-close',
-                'key': 'source-close',
-            },
-        ],
     },
     {
         'behavior': 'override-patch-method',
@@ -5169,6 +4725,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'eventKeyAlternativeGroups': [],
         'eventKeyExtraPrefixes': [],
         'eventKeys': [],
+        'eventKinds': [],
         'eventPolicy': {
             'matching': 'exact',
         },
@@ -5243,7 +4800,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'retryDecisions': [],
         'scenarioId': 'overridePatchMethod',
-        'events': [],
     },
     {
         'behavior': 'parallel-upload-concat',
@@ -5265,6 +4821,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'chunk-complete:5:5:11',
             'progress:11:11',
             'chunk-complete:6:11:11',
+        ],
+        'eventKinds': [
+            'progress',
+            'chunk-complete',
         ],
         'eventPolicy': {
             'matching': 'exact-except-allowed-extra-events',
@@ -5452,34 +5012,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'retryDecisions': [],
         'scenarioId': 'parallelUploadConcat',
-        'events': [
-            {
-                'bytesSent': 5,
-                'bytesTotal': 11,
-                'kind': 'progress',
-                'key': 'progress:5:11',
-            },
-            {
-                'bytesAccepted': 5,
-                'bytesTotal': 11,
-                'chunkSize': 5,
-                'kind': 'chunk-complete',
-                'key': 'chunk-complete:5:5:11',
-            },
-            {
-                'bytesSent': 11,
-                'bytesTotal': 11,
-                'kind': 'progress',
-                'key': 'progress:11:11',
-            },
-            {
-                'bytesAccepted': 11,
-                'bytesTotal': 11,
-                'chunkSize': 6,
-                'kind': 'chunk-complete',
-                'key': 'chunk-complete:6:11:11',
-            },
-        ],
     },
     {
         'behavior': 'parallel-upload-abort-cleanup',
@@ -5492,6 +5024,9 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'eventKeyExtraPrefixes': [],
         'eventKeys': [
             'request-abort:3',
+        ],
+        'eventKinds': [
+            'request-abort',
         ],
         'eventPolicy': {
             'matching': 'exact',
@@ -5703,13 +5238,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'retryDecisions': [],
         'scenarioId': 'parallelUploadAbortCleanup',
-        'events': [
-            {
-                'kind': 'request-abort',
-                'requestIndex': 3,
-                'key': 'request-abort:3',
-            },
-        ],
     },
     {
         'behavior': 'retry-patch-after-offset-recovery',
@@ -5729,6 +5257,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'retry-schedule:0',
             'should-retry:0:true',
             'retry-schedule:0',
+        ],
+        'eventKinds': [
+            'should-retry',
+            'retry-schedule',
         ],
         'eventPolicy': {
             'matching': 'exact',
@@ -5923,30 +5455,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
         ],
         'scenarioId': 'retryPatchAfterOffsetRecovery',
-        'events': [
-            {
-                'decision': True,
-                'kind': 'should-retry',
-                'retryAttempt': 0,
-                'key': 'should-retry:0:true',
-            },
-            {
-                'delay': 0,
-                'kind': 'retry-schedule',
-                'key': 'retry-schedule:0',
-            },
-            {
-                'decision': True,
-                'kind': 'should-retry',
-                'retryAttempt': 0,
-                'key': 'should-retry:0:true',
-            },
-            {
-                'delay': 0,
-                'kind': 'retry-schedule',
-                'key': 'retry-schedule:0',
-            },
-        ],
     },
     {
         'behavior': 'request-lifecycle-hooks',
@@ -5964,6 +5472,12 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'eventKeys': [
             'before-request:0',
             'after-response:0',
+            'success',
+            'source-close',
+        ],
+        'eventKinds': [
+            'before-request',
+            'after-response',
             'success',
             'source-close',
         ],
@@ -6012,26 +5526,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'retryDecisions': [],
         'scenarioId': 'requestLifecycleHooks',
-        'events': [
-            {
-                'kind': 'before-request',
-                'requestIndex': 0,
-                'key': 'before-request:0',
-            },
-            {
-                'kind': 'after-response',
-                'requestIndex': 0,
-                'key': 'after-response:0',
-            },
-            {
-                'kind': 'success',
-                'key': 'success',
-            },
-            {
-                'kind': 'source-close',
-                'key': 'source-close',
-            },
-        ],
     },
     {
         'behavior': 'abort-upload',
@@ -6044,6 +5538,9 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'eventKeyExtraPrefixes': [],
         'eventKeys': [
             'request-abort:0',
+        ],
+        'eventKinds': [
+            'request-abort',
         ],
         'eventPolicy': {
             'matching': 'exact',
@@ -6093,13 +5590,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'retryDecisions': [],
         'scenarioId': 'abortUpload',
-        'events': [
-            {
-                'kind': 'request-abort',
-                'requestIndex': 0,
-                'key': 'request-abort:0',
-            },
-        ],
     },
     {
         'behavior': 'abort-upload-after-stored-url',
@@ -6113,6 +5603,9 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'eventKeyExtraPrefixes': [],
         'eventKeys': [
             'request-abort:1',
+        ],
+        'eventKinds': [
+            'request-abort',
         ],
         'eventPolicy': {
             'matching': 'exact',
@@ -6228,13 +5721,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         ],
         'retryDecisions': [],
         'scenarioId': 'abortUploadAfterStoredUrl',
-        'events': [
-            {
-                'kind': 'request-abort',
-                'requestIndex': 1,
-                'key': 'request-abort:1',
-            },
-        ],
     },
     {
         'behavior': 'terminate-with-retry',
@@ -6250,6 +5736,10 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'eventKeys': [
             'should-retry:0:true',
             'retry-schedule:0',
+        ],
+        'eventKinds': [
+            'should-retry',
+            'retry-schedule',
         ],
         'eventPolicy': {
             'matching': 'exact',
@@ -6392,18 +5882,5 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
         ],
         'scenarioId': 'terminateWithRetry',
-        'events': [
-            {
-                'decision': True,
-                'kind': 'should-retry',
-                'retryAttempt': 0,
-                'key': 'should-retry:0:true',
-            },
-            {
-                'delay': 0,
-                'kind': 'retry-schedule',
-                'key': 'retry-schedule:0',
-            },
-        ],
     },
 ]
