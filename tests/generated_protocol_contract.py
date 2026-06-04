@@ -2234,15 +2234,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         },
         'executionActionPhases': [],
         'featureId': 'singleUploadLifecycle',
-        'input': {
-            'content': 'hello world',
-            'endpointUrl': 'https://tus.io/uploads',
-            'fingerprint': 'contract-single-fingerprint',
-            'kind': 'blob',
-            'metadata': {
-                'filename': 'hello.txt',
-            },
-        },
         'inputOptionEntries': [
             {
                 'key': 'endpointUrl',
@@ -2384,15 +2375,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         },
         'executionActionPhases': [],
         'featureId': 'creationWithUpload',
-        'input': {
-            'content': 'hello world',
-            'endpointUrl': 'https://tus.io/uploads',
-            'kind': 'blob',
-            'metadata': {
-                'filename': 'hello.txt',
-            },
-            'uploadDataDuringCreation': True,
-        },
         'inputOptionEntries': [
             {
                 'key': 'endpointUrl',
@@ -2522,16 +2504,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         },
         'executionActionPhases': [],
         'featureId': 'creationWithUpload',
-        'input': {
-            'chunkSize': 5,
-            'content': 'hello world',
-            'endpointUrl': 'https://tus.io/uploads',
-            'kind': 'blob',
-            'metadata': {
-                'filename': 'hello.txt',
-            },
-            'uploadDataDuringCreation': True,
-        },
         'inputOptionEntries': [
             {
                 'key': 'endpointUrl',
@@ -2707,16 +2679,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         },
         'executionActionPhases': [],
         'featureId': 'protocolVersionSelection',
-        'input': {
-            'content': 'hello world',
-            'endpointUrl': 'https://tus.io/uploads',
-            'kind': 'blob',
-            'metadata': {
-                'filename': 'hello.txt',
-            },
-            'protocol': 'ietf-draft-05',
-            'uploadDataDuringCreation': True,
-        },
         'inputOptionEntries': [
             {
                 'key': 'endpointUrl',
@@ -2852,14 +2814,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         },
         'executionActionPhases': [],
         'featureId': 'protocolVersionSelection',
-        'input': {
-            'chunkSize': 5,
-            'content': 'hello world',
-            'endpointUrl': 'https://tus.io/uploads',
-            'kind': 'blob',
-            'protocol': 'ietf-draft-05',
-            'uploadUrl': 'https://tus.io/uploads/ietf-draft-05-chunked-contract',
-        },
         'inputOptionEntries': [
             {
                 'key': 'endpointUrl',
@@ -3071,14 +3025,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         },
         'executionActionPhases': [],
         'featureId': 'protocolVersionSelection',
-        'input': {
-            'chunkSize': 6,
-            'content': 'hello world',
-            'endpointUrl': 'https://tus.io/uploads',
-            'kind': 'blob',
-            'protocol': 'ietf-draft-03',
-            'uploadUrl': 'https://tus.io/uploads/ietf-draft-03-resume-contract',
-        },
         'inputOptionEntries': [
             {
                 'key': 'endpointUrl',
@@ -3203,11 +3149,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         },
         'executionActionPhases': [],
         'featureId': 'startOptionValidation',
-        'input': {
-            'content': '',
-            'endpointUrl': 'https://tus.io/uploads',
-            'kind': 'none',
-        },
         'inputOptionEntries': [
             {
                 'key': 'endpointUrl',
@@ -3258,10 +3199,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         },
         'executionActionPhases': [],
         'featureId': 'startOptionValidation',
-        'input': {
-            'content': 'hello world',
-            'kind': 'blob',
-        },
         'inputOptionEntries': [],
         'inputSource': {
             'content': 'hello world',
@@ -3307,12 +3244,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         },
         'executionActionPhases': [],
         'featureId': 'startOptionValidation',
-        'input': {
-            'content': 'hello world',
-            'endpointUrl': 'https://tus.io/uploads',
-            'kind': 'blob',
-            'protocol': 'tus-v9',
-        },
         'inputOptionEntries': [
             {
                 'key': 'endpointUrl',
@@ -3367,14 +3298,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         },
         'executionActionPhases': [],
         'featureId': 'startOptionValidation',
-        'input': {
-            'content': 'hello world',
-            'endpointUrl': 'https://tus.io/uploads',
-            'kind': 'blob',
-            'rawOptions': {
-                'retryDelays': 44,
-            },
-        },
         'inputOptionEntries': [
             {
                 'key': 'endpointUrl',
@@ -3431,13 +3354,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         },
         'executionActionPhases': [],
         'featureId': 'startOptionValidation',
-        'input': {
-            'content': 'hello world',
-            'endpointUrl': 'https://tus.io/uploads',
-            'kind': 'blob',
-            'parallelUploads': 2,
-            'uploadUrl': 'https://tus.io/uploads/start-validation-upload-url',
-        },
         'inputOptionEntries': [
             {
                 'key': 'endpointUrl',
@@ -3496,13 +3412,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         },
         'executionActionPhases': [],
         'featureId': 'startOptionValidation',
-        'input': {
-            'content': 'hello world',
-            'endpointUrl': 'https://tus.io/uploads',
-            'kind': 'blob',
-            'parallelUploads': 2,
-            'uploadSize': 11,
-        },
         'inputOptionEntries': [
             {
                 'key': 'endpointUrl',
@@ -3561,13 +3470,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         },
         'executionActionPhases': [],
         'featureId': 'startOptionValidation',
-        'input': {
-            'content': 'hello world',
-            'endpointUrl': 'https://tus.io/uploads',
-            'kind': 'blob',
-            'parallelUploads': 2,
-            'uploadLengthDeferred': True,
-        },
         'inputOptionEntries': [
             {
                 'key': 'endpointUrl',
@@ -3626,13 +3528,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         },
         'executionActionPhases': [],
         'featureId': 'startOptionValidation',
-        'input': {
-            'content': 'hello world',
-            'endpointUrl': 'https://tus.io/uploads',
-            'kind': 'blob',
-            'parallelUploads': 2,
-            'uploadDataDuringCreation': True,
-        },
         'inputOptionEntries': [
             {
                 'key': 'endpointUrl',
@@ -3691,17 +3586,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         },
         'executionActionPhases': [],
         'featureId': 'startOptionValidation',
-        'input': {
-            'content': 'hello world',
-            'endpointUrl': 'https://tus.io/uploads',
-            'kind': 'blob',
-            'parallelUploadBoundaries': [
-                {
-                    'end': 5,
-                    'start': 0,
-                },
-            ],
-        },
         'inputOptionEntries': [
             {
                 'key': 'endpointUrl',
@@ -3761,18 +3645,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         },
         'executionActionPhases': [],
         'featureId': 'startOptionValidation',
-        'input': {
-            'content': 'hello world',
-            'endpointUrl': 'https://tus.io/uploads',
-            'kind': 'blob',
-            'parallelUploadBoundaries': [
-                {
-                    'end': 5,
-                    'start': 0,
-                },
-            ],
-            'parallelUploads': 2,
-        },
         'inputOptionEntries': [
             {
                 'key': 'endpointUrl',
@@ -3836,20 +3708,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         },
         'executionActionPhases': [],
         'featureId': 'detailedErrors',
-        'input': {
-            'content': 'hello world',
-            'endpointUrl': 'https://tus.io/uploads',
-            'headers': {
-                'X-Request-ID': 'contract-request-id',
-            },
-            'kind': 'blob',
-            'metadata': {
-                'filename': 'hello.txt',
-            },
-            'rawOptions': {
-                'retryDelays': None,
-            },
-        },
         'inputOptionEntries': [
             {
                 'key': 'endpointUrl',
@@ -3947,20 +3805,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         },
         'executionActionPhases': [],
         'featureId': 'detailedErrors',
-        'input': {
-            'content': 'hello world',
-            'endpointUrl': 'https://tus.io/uploads',
-            'headers': {
-                'X-Request-ID': 'contract-request-id',
-            },
-            'kind': 'blob',
-            'metadata': {
-                'filename': 'hello.txt',
-            },
-            'rawOptions': {
-                'retryDelays': None,
-            },
-        },
         'inputOptionEntries': [
             {
                 'key': 'endpointUrl',
@@ -4052,14 +3896,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         },
         'executionActionPhases': [],
         'featureId': 'uploadBodyHeaders',
-        'input': {
-            'content': 'hello world',
-            'endpointUrl': 'https://tus.io/uploads',
-            'kind': 'blob',
-            'metadata': {
-                'filename': 'hello.txt',
-            },
-        },
         'inputOptionEntries': [
             {
                 'key': 'endpointUrl',
@@ -4175,18 +4011,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         },
         'executionActionPhases': [],
         'featureId': 'customRequestHeaders',
-        'input': {
-            'content': 'hello world',
-            'endpointUrl': 'https://tus.io/uploads',
-            'headers': {
-                'X-Tus-Contract': 'custom-header',
-                'X-Tus-Trace': 'trace-123',
-            },
-            'kind': 'blob',
-            'metadata': {
-                'filename': 'hello.txt',
-            },
-        },
         'inputOptionEntries': [
             {
                 'key': 'endpointUrl',
@@ -4313,19 +4137,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         },
         'executionActionPhases': [],
         'featureId': 'requestIdHeaders',
-        'input': {
-            'addRequestId': True,
-            'content': 'hello world',
-            'endpointUrl': 'https://tus.io/uploads',
-            'generatedRequestId': '00000000-0000-4000-8000-000000000000',
-            'headers': {
-                'X-Request-ID': 'custom-request-id',
-            },
-            'kind': 'blob',
-            'metadata': {
-                'filename': 'hello.txt',
-            },
-        },
         'inputOptionEntries': [
             {
                 'key': 'endpointUrl',
@@ -4500,17 +4311,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
         ],
         'featureId': 'resumeUpload',
-        'input': {
-            'content': 'hello world',
-            'endpointUrl': 'https://tus.io/uploads',
-            'kind': 'blob',
-            'removeFingerprintOnSuccess': True,
-            'storedUpload': {
-                'fingerprint': 'contract-resume-fingerprint',
-                'uploadUrl': 'https://tus.io/uploads/resume-contract',
-                'urlStorageKey': 'tus::contract-resume-fingerprint::1337',
-            },
-        },
         'inputOptionEntries': [
             {
                 'key': 'endpointUrl',
@@ -4653,14 +4453,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         },
         'executionActionPhases': [],
         'featureId': 'relativeLocationResolution',
-        'input': {
-            'content': 'hello world',
-            'endpointUrl': 'https://tus.io/files/',
-            'kind': 'blob',
-            'metadata': {
-                'filename': 'hello.txt',
-            },
-        },
         'inputOptionEntries': [
             {
                 'key': 'endpointUrl',
@@ -4788,14 +4580,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         },
         'executionActionPhases': [],
         'featureId': 'inputSources',
-        'input': {
-            'content': 'hello world',
-            'endpointUrl': 'https://tus.io/uploads',
-            'kind': 'array-buffer',
-            'metadata': {
-                'filename': 'hello.txt',
-            },
-        },
         'inputOptionEntries': [
             {
                 'key': 'endpointUrl',
@@ -4923,14 +4707,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         },
         'executionActionPhases': [],
         'featureId': 'inputSources',
-        'input': {
-            'content': 'hello world',
-            'endpointUrl': 'https://tus.io/uploads',
-            'kind': 'array-buffer-view',
-            'metadata': {
-                'filename': 'hello.txt',
-            },
-        },
         'inputOptionEntries': [
             {
                 'key': 'endpointUrl',
@@ -5058,16 +4834,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         },
         'executionActionPhases': [],
         'featureId': 'inputSources',
-        'input': {
-            'chunkSize': 100,
-            'content': 'hello world',
-            'endpointUrl': 'https://tus.io/uploads',
-            'kind': 'web-readable-stream',
-            'metadata': {
-                'filename': 'hello.txt',
-            },
-            'uploadLengthDeferred': True,
-        },
         'inputOptionEntries': [
             {
                 'key': 'endpointUrl',
@@ -5206,16 +4972,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         },
         'executionActionPhases': [],
         'featureId': 'inputSources',
-        'input': {
-            'chunkSize': 100,
-            'content': 'hello world',
-            'endpointUrl': 'https://tus.io/uploads',
-            'kind': 'node-readable-stream',
-            'metadata': {
-                'filename': 'hello.txt',
-            },
-            'uploadLengthDeferred': True,
-        },
         'inputOptionEntries': [
             {
                 'key': 'endpointUrl',
@@ -5357,14 +5113,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         },
         'executionActionPhases': [],
         'featureId': 'inputSources',
-        'input': {
-            'content': 'hello world',
-            'endpointUrl': 'https://tus.io/uploads',
-            'kind': 'node-path-reference',
-            'metadata': {
-                'filename': 'hello.txt',
-            },
-        },
         'inputOptionEntries': [
             {
                 'key': 'endpointUrl',
@@ -5508,16 +5256,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         },
         'executionActionPhases': [],
         'featureId': 'deferredLengthUpload',
-        'input': {
-            'chunkSize': 100,
-            'content': 'hello world',
-            'endpointUrl': 'https://tus.io/uploads',
-            'kind': 'web-readable-stream',
-            'metadata': {
-                'filename': 'hello.txt',
-            },
-            'uploadLengthDeferred': True,
-        },
         'inputOptionEntries': [
             {
                 'key': 'endpointUrl',
@@ -5694,16 +5432,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         },
         'executionActionPhases': [],
         'featureId': 'deferredLengthUpload',
-        'input': {
-            'chunkSize': 5,
-            'content': 'hello world',
-            'endpointUrl': 'https://tus.io/uploads',
-            'kind': 'blob',
-            'metadata': {
-                'filename': 'hello.txt',
-            },
-            'uploadLengthDeferred': True,
-        },
         'inputOptionEntries': [
             {
                 'key': 'endpointUrl',
@@ -5888,13 +5616,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         },
         'executionActionPhases': [],
         'featureId': 'overridePatchMethod',
-        'input': {
-            'content': 'hello world',
-            'endpointUrl': 'https://tus.io/uploads',
-            'kind': 'blob',
-            'overridePatchMethod': True,
-            'uploadUrl': 'https://tus.io/uploads/override-contract',
-        },
         'inputOptionEntries': [
             {
                 'key': 'endpointUrl',
@@ -6047,18 +5768,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
         ],
         'featureId': 'parallelUploadConcat',
-        'input': {
-            'content': 'hello world',
-            'endpointUrl': 'https://tus.io/uploads',
-            'kind': 'blob',
-            'metadata': {
-                'foo': 'hello',
-            },
-            'metadataForPartialUploads': {
-                'test': 'world',
-            },
-            'parallelUploads': 2,
-        },
         'inputOptionEntries': [
             {
                 'key': 'endpointUrl',
@@ -6299,22 +6008,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
         ],
         'featureId': 'parallelUploadConcat',
-        'input': {
-            'content': 'hello world',
-            'endpointUrl': 'https://tus.io/uploads',
-            'fingerprint': 'contract-parallel-cleanup-fingerprint',
-            'headers': {
-                'X-Tus-Contract': 'parallel-cleanup-policy',
-                'X-Tus-Trace': 'parallel-cleanup-trace-123',
-            },
-            'kind': 'blob',
-            'metadataForPartialUploads': {
-                'test': 'world',
-            },
-            'overridePatchMethod': True,
-            'parallelUploads': 2,
-            'terminateUploadOnAbort': True,
-        },
         'inputOptionEntries': [
             {
                 'key': 'endpointUrl',
@@ -6571,17 +6264,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         },
         'executionActionPhases': [],
         'featureId': 'retryOffsetRecovery',
-        'input': {
-            'content': 'hello world',
-            'endpointUrl': 'https://tus.io/uploads',
-            'kind': 'blob',
-            'metadata': {
-                'filename': 'hello.txt',
-            },
-            'retryDelays': [
-                0,
-            ],
-        },
         'inputOptionEntries': [
             {
                 'key': 'endpointUrl',
@@ -6836,12 +6518,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         },
         'executionActionPhases': [],
         'featureId': 'requestLifecycleHooks',
-        'input': {
-            'content': 'hello world',
-            'endpointUrl': 'https://tus.io/uploads',
-            'kind': 'blob',
-            'uploadUrl': 'https://tus.io/uploads/request-hooks-contract',
-        },
         'inputOptionEntries': [
             {
                 'key': 'endpointUrl',
@@ -6941,14 +6617,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
         ],
         'featureId': 'abortUpload',
-        'input': {
-            'content': 'hello world',
-            'endpointUrl': 'https://tus.io/uploads',
-            'kind': 'blob',
-            'metadata': {
-                'filename': 'hello.txt',
-            },
-        },
         'inputOptionEntries': [
             {
                 'key': 'endpointUrl',
@@ -7043,21 +6711,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
         ],
         'featureId': 'abortUpload',
-        'input': {
-            'content': 'hello world',
-            'endpointUrl': 'https://tus.io/uploads',
-            'fingerprint': 'contract-abort-terminate-fingerprint',
-            'headers': {
-                'X-Tus-Contract': 'abort-policy',
-                'X-Tus-Trace': 'abort-trace-123',
-            },
-            'kind': 'blob',
-            'metadata': {
-                'filename': 'hello.txt',
-            },
-            'overridePatchMethod': True,
-            'terminateUploadOnAbort': True,
-        },
         'inputOptionEntries': [
             {
                 'key': 'endpointUrl',
@@ -7227,19 +6880,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
         ],
         'featureId': 'terminateUpload',
-        'input': {
-            'chunkSize': 5,
-            'content': 'hello world',
-            'endpointUrl': 'https://tus.io/uploads',
-            'kind': 'blob',
-            'metadata': {
-                'filename': 'hello.txt',
-            },
-            'retryDelays': [
-                0,
-                0,
-            ],
-        },
         'inputOptionEntries': [
             {
                 'key': 'endpointUrl',
