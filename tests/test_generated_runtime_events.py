@@ -37,7 +37,6 @@ CASES = [
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
-        'execution': None,
         'locationHeaderKind': 'absolute',
         'metadata': {
             'filename': 'hello.txt',
@@ -80,6 +79,13 @@ CASES = [
         'uploadUrl': 'https://tus.io/uploads/generated-contract',
     },
     {
+        'beforeStartActions': [
+            {
+                'expectedPreviousUploadCount': 1,
+                'kind': 'resume-from-previous-upload',
+                'selectedPreviousUploadIndex': 0,
+            },
+        ],
         'chunkSize': 6,
         'content': 'hello world',
         'endpointHasTrailingSlash': False,
@@ -101,15 +107,6 @@ CASES = [
             'matching': 'exact-except-allowed-extra-events',
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
-        },
-        'execution': {
-            'beforeStart': [
-                {
-                    'expectedPreviousUploadCount': 1,
-                    'kind': 'resume-from-previous-upload',
-                    'selectedPreviousUploadIndex': 0,
-                },
-            ],
         },
         'locationHeaderKind': 'stored',
         'metadata': {},
@@ -175,7 +172,6 @@ CASES = [
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
-        'execution': None,
         'locationHeaderKind': 'relative',
         'metadata': {
             'filename': 'hello.txt',
@@ -241,7 +237,6 @@ CASES = [
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
-        'execution': None,
         'locationHeaderKind': 'absolute',
         'metadata': {
             'filename': 'hello.txt',
@@ -332,7 +327,6 @@ CASES = [
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
-        'execution': None,
         'locationHeaderKind': 'absolute',
         'metadata': {
             'filename': 'hello.txt',
@@ -516,14 +510,9 @@ def has_allowed_extra_event_prefix(event_key, prefixes):
     return False
 
 
-def execution_actions(case, phase):
-    execution = case['execution'] or {}
-    return execution.get(phase, [])
-
-
 def resume_before_start_action(case):
     action = None
-    for candidate in execution_actions(case, 'beforeStart'):
+    for candidate in case.get('beforeStartActions', []):
         if candidate['kind'] != 'resume-from-previous-upload':
             raise AssertionError(
                 '{} uses unsupported generated beforeStart action {}'.format(
