@@ -676,7 +676,7 @@ class GeneratedTusConformanceEventsTest(unittest.TestCase):
             self.assertEqual(scenario["featureId"], case["featureId"])
             self.assertIn(scenario["scenarioId"], feature["conformance"]["scenarioIds"])
             self.assertEqual(
-                [event["key"] for event in scenario["events"]],
+                scenario["eventKeys"],
                 case["eventKeys"],
             )
             self.assertEqual(
@@ -688,7 +688,7 @@ class GeneratedTusConformanceEventsTest(unittest.TestCase):
                 case["eventKeyExtraPrefixes"],
             )
             self.assertEqual(
-                scenario.get("eventPolicy", {"matching": "exact"}),
+                scenario["eventPolicy"],
                 case["eventPolicy"],
             )
 
