@@ -432,10 +432,63 @@ def format_event_value(value):
     return 'null' if value is None else str(value)
 
 
+def generated_tus_event_key(kind, *parts):
+    return ':'.join((kind,) + parts)
+
+
+def generated_tus_event_key_after_response(request_index):
+    return generated_tus_event_key('after-response', request_index)
+
+def generated_tus_event_key_before_request(request_index):
+    return generated_tus_event_key('before-request', request_index)
+
+def generated_tus_event_key_chunk_complete(chunk_size, bytes_accepted, bytes_total):
+    return generated_tus_event_key('chunk-complete', chunk_size, bytes_accepted, bytes_total)
+
+def generated_tus_event_key_fingerprint(fingerprint):
+    return generated_tus_event_key('fingerprint', fingerprint)
+
+def generated_tus_event_key_progress(bytes_sent, bytes_total):
+    return generated_tus_event_key('progress', bytes_sent, bytes_total)
+
+def generated_tus_event_key_request_abort(request_index):
+    return generated_tus_event_key('request-abort', request_index)
+
+def generated_tus_event_key_retry_schedule(delay):
+    return generated_tus_event_key('retry-schedule', delay)
+
+def generated_tus_event_key_should_retry(retry_attempt, decision):
+    return generated_tus_event_key('should-retry', retry_attempt, decision)
+
+def generated_tus_event_key_source_close():
+    return generated_tus_event_key('source-close')
+
+def generated_tus_event_key_source_open(input_kind, size):
+    return generated_tus_event_key('source-open', input_kind, size)
+
+def generated_tus_event_key_success():
+    return generated_tus_event_key('success')
+
+def generated_tus_event_key_upload_url_available():
+    return generated_tus_event_key('upload-url-available')
+
+def generated_tus_event_key_url_storage_add(fingerprint, upload_url):
+    return generated_tus_event_key('url-storage-add', fingerprint, upload_url)
+
+def generated_tus_event_key_url_storage_find(fingerprint, count):
+    return generated_tus_event_key('url-storage-find', fingerprint, count)
+
+def generated_tus_event_key_url_storage_remove(url_storage_key):
+    return generated_tus_event_key('url-storage-remove', url_storage_key)
+
+
 def record_progress(events):
     def on_progress(bytes_sent, bytes_total):
         events.append(
-            'progress:{}:{}'.format(bytes_sent, format_event_value(bytes_total))
+            generated_tus_event_key_progress(
+                format_event_value(bytes_sent),
+                format_event_value(bytes_total),
+            )
         )
     return on_progress
 
@@ -443,9 +496,9 @@ def record_progress(events):
 def record_chunk_complete(events):
     def on_chunk_complete(chunk_size, bytes_accepted, bytes_total):
         events.append(
-            'chunk-complete:{}:{}:{}'.format(
-                chunk_size,
-                bytes_accepted,
+            generated_tus_event_key_chunk_complete(
+                format_event_value(chunk_size),
+                format_event_value(bytes_accepted),
                 format_event_value(bytes_total),
             )
         )
