@@ -452,8 +452,12 @@ def record_chunk_complete(events):
     return on_chunk_complete
 
 
-def is_progress_event_key(event_key):
-    return event_key.startswith('progress:')
+def has_allowed_extra_event_prefix(event_key, prefixes):
+    for prefix in prefixes:
+        if event_key.startswith(prefix):
+            return True
+
+    return False
 
 
 def execution_actions(case, phase):
@@ -502,6 +506,7 @@ def assert_before_start_actions(test, case, storage):
 
 def assert_events(test, case, events):
     expected_events = case['eventKeys']
+    extra_prefixes = case['eventKeyExtraPrefixes']
     event_policy = case.get('eventPolicy', {'matching': 'exact'})
     matching = event_policy['matching']
 
@@ -520,9 +525,9 @@ def assert_events(test, case, events):
                 continue
 
             test.assertTrue(
-                is_progress_event_key(event),
-                '{} emitted an unexpected non-progress event {}; expected {}'.format(
-                    case['scenarioId'], event, expected_events
+                has_allowed_extra_event_prefix(event, extra_prefixes),
+                '{} emitted an unexpected extra event {}; allowed prefixes {}; expected {}'.format(
+                    case['scenarioId'], event, extra_prefixes, expected_events
                 ),
             )
 
