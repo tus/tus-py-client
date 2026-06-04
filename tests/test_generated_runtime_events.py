@@ -52,8 +52,8 @@ CASES = [
             },
             {
                 'headers': {
-                    'Upload-Offset': '0',
                     'Content-Type': 'application/offset+octet-stream',
+                    'Upload-Offset': '0',
                 },
                 'method': 'PATCH',
                 'responseHeaders': {
@@ -113,8 +113,8 @@ CASES = [
             },
             {
                 'headers': {
-                    'Upload-Offset': '5',
                     'Content-Type': 'application/offset+octet-stream',
+                    'Upload-Offset': '5',
                 },
                 'method': 'PATCH',
                 'responseHeaders': {
@@ -174,8 +174,8 @@ CASES = [
             },
             {
                 'headers': {
-                    'Upload-Offset': '0',
                     'Content-Type': 'application/offset+octet-stream',
+                    'Upload-Offset': '0',
                 },
                 'method': 'PATCH',
                 'responseHeaders': {
@@ -204,6 +204,7 @@ CASES = [
             'chunk-complete:11:11:11',
         ],
         'eventPolicy': {
+            'deferredLengthBytesTotal': 'allow-known-total-before-declaration',
             'matching': 'exact-except-extra-progress',
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
@@ -232,8 +233,8 @@ CASES = [
             {
                 'headers': {
                     'Upload-Length': '11',
-                    'Upload-Offset': '0',
                     'Content-Type': 'application/offset+octet-stream',
+                    'Upload-Offset': '0',
                 },
                 'method': 'PATCH',
                 'responseHeaders': {
@@ -250,6 +251,99 @@ CASES = [
         'uploadLengthDeferred': True,
         'uploadPath': 'deferred-contract',
         'uploadUrl': 'https://tus.io/uploads/deferred-contract',
+    },
+    {
+        'chunkSize': 5,
+        'content': 'hello world',
+        'endpointHasTrailingSlash': False,
+        'endpointUrl': 'https://tus.io/uploads',
+        'eventKeys': [
+            'progress:0:null',
+            'progress:5:null',
+            'chunk-complete:5:5:null',
+            'progress:5:null',
+            'progress:10:null',
+            'chunk-complete:5:10:null',
+            'progress:10:11',
+            'progress:11:11',
+            'chunk-complete:1:11:11',
+        ],
+        'eventPolicy': {
+            'deferredLengthBytesTotal': 'allow-known-total-before-declaration',
+            'matching': 'exact-except-extra-progress',
+            'progress': 'milestone',
+            'transportProgress': 'may-emit-extra-samples',
+        },
+        'execution': None,
+        'locationHeaderKind': 'absolute',
+        'metadata': {
+            'filename': 'hello.txt',
+        },
+        'removeFingerprintOnSuccess': False,
+        'requests': [
+            {
+                'headers': {
+                    'Upload-Defer-Length': '1',
+                    'Upload-Metadata': 'filename aGVsbG8udHh0',
+                },
+                'method': 'POST',
+                'responseHeaders': {
+                    'Location': 'https://tus.io/uploads/deferred-chunked-contract',
+                },
+                'statusCode': 201,
+                'url': 'endpoint',
+                'includesDefaultProtocolRequestHeaders': True,
+                'includesDefaultProtocolResponseHeaders': True,
+            },
+            {
+                'headers': {
+                    'Content-Type': 'application/offset+octet-stream',
+                    'Upload-Offset': '0',
+                },
+                'method': 'PATCH',
+                'responseHeaders': {
+                    'Upload-Offset': '5',
+                },
+                'statusCode': 204,
+                'url': 'upload',
+                'includesDefaultProtocolRequestHeaders': True,
+                'includesDefaultProtocolResponseHeaders': True,
+            },
+            {
+                'headers': {
+                    'Content-Type': 'application/offset+octet-stream',
+                    'Upload-Offset': '5',
+                },
+                'method': 'PATCH',
+                'responseHeaders': {
+                    'Upload-Offset': '10',
+                },
+                'statusCode': 204,
+                'url': 'upload',
+                'includesDefaultProtocolRequestHeaders': True,
+                'includesDefaultProtocolResponseHeaders': True,
+            },
+            {
+                'headers': {
+                    'Upload-Length': '11',
+                    'Content-Type': 'application/offset+octet-stream',
+                    'Upload-Offset': '10',
+                },
+                'method': 'PATCH',
+                'responseHeaders': {
+                    'Upload-Offset': '11',
+                },
+                'statusCode': 204,
+                'url': 'upload',
+                'includesDefaultProtocolRequestHeaders': True,
+                'includesDefaultProtocolResponseHeaders': True,
+            },
+        ],
+        'scenarioId': 'deferredLengthChunkedUpload',
+        'storedUpload': None,
+        'uploadLengthDeferred': True,
+        'uploadPath': 'deferred-chunked-contract',
+        'uploadUrl': 'https://tus.io/uploads/deferred-chunked-contract',
     },
 ]
 

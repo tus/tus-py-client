@@ -90,6 +90,29 @@ CASES = [
     {
         'eventKeys': [
             'upload-url-available',
+            'progress:0:11',
+            'progress:5:11',
+            'chunk-complete:5:5:11',
+            'progress:5:11',
+            'progress:10:11',
+            'chunk-complete:5:10:11',
+            'progress:10:11',
+            'progress:11:11',
+            'chunk-complete:1:11:11',
+            'success',
+            'source-close',
+        ],
+        'eventPolicy': {
+            'matching': 'exact-except-extra-progress',
+            'progress': 'milestone',
+            'transportProgress': 'may-emit-extra-samples',
+        },
+        'featureId': 'protocolVersionSelection',
+        'scenarioId': 'ietfDraft05ChunkedUploadComplete',
+    },
+    {
+        'eventKeys': [
+            'upload-url-available',
             'progress:5:11',
             'progress:11:11',
             'chunk-complete:6:11:11',
@@ -212,12 +235,37 @@ CASES = [
             'source-close',
         ],
         'eventPolicy': {
+            'deferredLengthBytesTotal': 'allow-known-total-before-declaration',
             'matching': 'exact-except-extra-progress',
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
         'featureId': 'deferredLengthUpload',
         'scenarioId': 'deferredLengthUpload',
+    },
+    {
+        'eventKeys': [
+            'upload-url-available',
+            'progress:0:null',
+            'progress:5:null',
+            'chunk-complete:5:5:null',
+            'progress:5:null',
+            'progress:10:null',
+            'chunk-complete:5:10:null',
+            'progress:10:11',
+            'progress:11:11',
+            'chunk-complete:1:11:11',
+            'success',
+            'source-close',
+        ],
+        'eventPolicy': {
+            'deferredLengthBytesTotal': 'allow-known-total-before-declaration',
+            'matching': 'exact-except-extra-progress',
+            'progress': 'milestone',
+            'transportProgress': 'may-emit-extra-samples',
+        },
+        'featureId': 'deferredLengthUpload',
+        'scenarioId': 'deferredLengthChunkedUpload',
     },
     {
         'eventKeys': [

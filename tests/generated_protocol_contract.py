@@ -427,10 +427,11 @@ TUS_CLIENT_FEATURES = [
         'conformance': {
             'scenarioIds': [
                 'deferredLengthUpload',
+                'deferredLengthChunkedUpload',
             ],
             'status': 'covered-by-generated-scenario',
         },
-        'description': 'Create an upload without a known length and declare the length on final PATCH.',
+        'description': 'Create an upload without a known length and declare the length on the final upload request.',
         'featureId': 'deferredLengthUpload',
         'flow': [
             {
@@ -441,12 +442,12 @@ TUS_CLIENT_FEATURES = [
             {
                 'kind': 'primitive',
                 'primitive': 'defer-upload-length',
-                'summary': 'Track the source until the final chunk reveals the total size.',
+                'summary': 'Track the source until the final upload request reveals the total size.',
             },
             {
                 'kind': 'operation',
                 'operationId': 'patchTusUpload',
-                'summary': 'Declare Upload-Length on the final chunk request.',
+                'summary': 'Declare Upload-Length on the final upload request.',
             },
         ],
         'operationIds': [
@@ -455,6 +456,7 @@ TUS_CLIENT_FEATURES = [
         ],
         'primitives': [
             'defer-upload-length',
+            'emit-chunk-complete',
             'emit-progress',
         ],
     },
@@ -953,6 +955,7 @@ TUS_CLIENT_FEATURES = [
         'conformance': {
             'scenarioIds': [
                 'ietfDraft05CreationWithUpload',
+                'ietfDraft05ChunkedUploadComplete',
                 'ietfDraft03ResumeWithoutKnownLength',
             ],
             'status': 'covered-by-generated-scenario',
@@ -2253,6 +2256,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
+                    'Content-Type': 'application/offset+octet-stream',
                     'Upload-Offset': '0',
                 },
                 'headersSpecified': True,
@@ -2356,6 +2360,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'headerMode': None,
                 'headers': {
                     'Upload-Length': '11',
+                    'Content-Type': 'application/offset+octet-stream',
                 },
                 'headersSpecified': True,
                 'method': None,
@@ -2443,6 +2448,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'headerMode': None,
                 'headers': {
                     'Upload-Length': '11',
+                    'Content-Type': 'application/offset+octet-stream',
                 },
                 'headersSpecified': True,
                 'method': None,
@@ -2469,6 +2475,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
+                    'Content-Type': 'application/offset+octet-stream',
                     'Upload-Offset': '5',
                 },
                 'headersSpecified': True,
@@ -2495,6 +2502,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
+                    'Content-Type': 'application/offset+octet-stream',
                     'Upload-Offset': '10',
                 },
                 'headersSpecified': True,
@@ -2629,7 +2637,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                     'Upload-Length': '11',
                     'Upload-Complete': '?1',
                     'Content-Type': 'application/partial-upload',
-                    'Upload-Draft-Interop-Version': '6',
                 },
                 'headersSpecified': True,
                 'method': None,
@@ -2682,6 +2689,225 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'behavior': 'upload-body-headers',
         'completion': {
             'kind': 'success',
+            'uploadUrl': 'https://tus.io/uploads/ietf-draft-05-chunked-contract',
+        },
+        'eventPolicy': {
+            'matching': 'exact-except-extra-progress',
+            'progress': 'milestone',
+            'transportProgress': 'may-emit-extra-samples',
+        },
+        'featureId': 'protocolVersionSelection',
+        'input': {
+            'chunkSize': 5,
+            'content': 'hello world',
+            'endpointUrl': 'https://tus.io/uploads',
+            'kind': 'blob',
+            'protocol': 'ietf-draft-05',
+            'uploadUrl': 'https://tus.io/uploads/ietf-draft-05-chunked-contract',
+        },
+        'operationIds': [
+            'getTusUploadOffset',
+            'patchTusUpload',
+        ],
+        'primitives': [
+            'select-client-protocol',
+        ],
+        'requests': [
+            {
+                'absentHeaders': [
+                    'Tus-Resumable',
+                ],
+                'abort': False,
+                'bodySize': None,
+                'errorMessage': None,
+                'headerMode': 'exact',
+                'headers': {},
+                'headersSpecified': False,
+                'method': None,
+                'operationId': 'getTusUploadOffset',
+                'response': {
+                    'body': None,
+                    'headerMode': 'exact',
+                    'headers': {
+                        'Upload-Length': '11',
+                        'Upload-Offset': '0',
+                    },
+                    'headersSpecified': True,
+                    'statusCode': 200,
+                },
+                'role': None,
+                'uploadUrl': None,
+                'url': 'upload',
+                'requestIndex': 0,
+            },
+            {
+                'absentHeaders': [
+                    'Tus-Resumable',
+                ],
+                'abort': False,
+                'bodySize': 5,
+                'errorMessage': None,
+                'headerMode': 'exact',
+                'headers': {
+                    'Upload-Complete': '?0',
+                    'Content-Type': 'application/partial-upload',
+                    'Upload-Offset': '0',
+                },
+                'headersSpecified': True,
+                'method': None,
+                'operationId': 'patchTusUpload',
+                'response': {
+                    'body': None,
+                    'headerMode': 'exact',
+                    'headers': {
+                        'Upload-Offset': '5',
+                    },
+                    'headersSpecified': True,
+                    'statusCode': 204,
+                },
+                'role': 'upload-chunk',
+                'uploadUrl': None,
+                'url': 'upload',
+                'requestIndex': 1,
+            },
+            {
+                'absentHeaders': [
+                    'Tus-Resumable',
+                ],
+                'abort': False,
+                'bodySize': 5,
+                'errorMessage': None,
+                'headerMode': 'exact',
+                'headers': {
+                    'Upload-Complete': '?0',
+                    'Content-Type': 'application/partial-upload',
+                    'Upload-Offset': '5',
+                },
+                'headersSpecified': True,
+                'method': None,
+                'operationId': 'patchTusUpload',
+                'response': {
+                    'body': None,
+                    'headerMode': 'exact',
+                    'headers': {
+                        'Upload-Offset': '10',
+                    },
+                    'headersSpecified': True,
+                    'statusCode': 204,
+                },
+                'role': 'upload-chunk',
+                'uploadUrl': None,
+                'url': 'upload',
+                'requestIndex': 2,
+            },
+            {
+                'absentHeaders': [
+                    'Tus-Resumable',
+                ],
+                'abort': False,
+                'bodySize': 1,
+                'errorMessage': None,
+                'headerMode': 'exact',
+                'headers': {
+                    'Upload-Complete': '?1',
+                    'Content-Type': 'application/partial-upload',
+                    'Upload-Offset': '10',
+                },
+                'headersSpecified': True,
+                'method': None,
+                'operationId': 'patchTusUpload',
+                'response': {
+                    'body': None,
+                    'headerMode': 'exact',
+                    'headers': {
+                        'Upload-Offset': '11',
+                    },
+                    'headersSpecified': True,
+                    'statusCode': 204,
+                },
+                'role': 'upload-final-chunk',
+                'uploadUrl': None,
+                'url': 'upload',
+                'requestIndex': 3,
+            },
+        ],
+        'scenarioId': 'ietfDraft05ChunkedUploadComplete',
+        'events': [
+            {
+                'kind': 'upload-url-available',
+                'key': 'upload-url-available',
+            },
+            {
+                'bytesSent': 0,
+                'bytesTotal': 11,
+                'kind': 'progress',
+                'key': 'progress:0:11',
+            },
+            {
+                'bytesSent': 5,
+                'bytesTotal': 11,
+                'kind': 'progress',
+                'key': 'progress:5:11',
+            },
+            {
+                'bytesAccepted': 5,
+                'bytesTotal': 11,
+                'chunkSize': 5,
+                'kind': 'chunk-complete',
+                'key': 'chunk-complete:5:5:11',
+            },
+            {
+                'bytesSent': 5,
+                'bytesTotal': 11,
+                'kind': 'progress',
+                'key': 'progress:5:11',
+            },
+            {
+                'bytesSent': 10,
+                'bytesTotal': 11,
+                'kind': 'progress',
+                'key': 'progress:10:11',
+            },
+            {
+                'bytesAccepted': 10,
+                'bytesTotal': 11,
+                'chunkSize': 5,
+                'kind': 'chunk-complete',
+                'key': 'chunk-complete:5:10:11',
+            },
+            {
+                'bytesSent': 10,
+                'bytesTotal': 11,
+                'kind': 'progress',
+                'key': 'progress:10:11',
+            },
+            {
+                'bytesSent': 11,
+                'bytesTotal': 11,
+                'kind': 'progress',
+                'key': 'progress:11:11',
+            },
+            {
+                'bytesAccepted': 11,
+                'bytesTotal': 11,
+                'chunkSize': 1,
+                'kind': 'chunk-complete',
+                'key': 'chunk-complete:1:11:11',
+            },
+            {
+                'kind': 'success',
+                'key': 'success',
+            },
+            {
+                'kind': 'source-close',
+                'key': 'source-close',
+            },
+        ],
+    },
+    {
+        'behavior': 'upload-body-headers',
+        'completion': {
+            'kind': 'success',
             'uploadUrl': 'https://tus.io/uploads/ietf-draft-03-resume-contract',
         },
         'eventPolicy': {
@@ -2714,10 +2940,8 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'bodySize': None,
                 'errorMessage': None,
                 'headerMode': 'exact',
-                'headers': {
-                    'Upload-Draft-Interop-Version': '5',
-                },
-                'headersSpecified': True,
+                'headers': {},
+                'headersSpecified': False,
                 'method': None,
                 'operationId': 'getTusUploadOffset',
                 'response': {
@@ -2745,7 +2969,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'headerMode': 'exact',
                 'headers': {
                     'Upload-Complete': '?1',
-                    'Upload-Draft-Interop-Version': '5',
                     'Upload-Offset': '5',
                 },
                 'headersSpecified': True,
@@ -3201,6 +3424,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
+                    'Content-Type': 'application/offset+octet-stream',
                     'Upload-Offset': '0',
                 },
                 'headersSpecified': True,
@@ -3235,7 +3459,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'content': 'hello world',
             'endpointUrl': 'https://tus.io/uploads',
             'headers': {
-                'Content-Type': 'application/x-tus-custom-body',
                 'X-Tus-Contract': 'custom-header',
                 'X-Tus-Trace': 'trace-123',
             },
@@ -3260,7 +3483,6 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'headerMode': None,
                 'headers': {
                     'Upload-Length': '11',
-                    'Content-Type': 'application/x-tus-custom-body',
                     'X-Tus-Contract': 'custom-header',
                     'X-Tus-Trace': 'trace-123',
                 },
@@ -3288,8 +3510,8 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
+                    'Content-Type': 'application/offset+octet-stream',
                     'Upload-Offset': '0',
-                    'Content-Type': 'application/x-tus-custom-body',
                     'X-Tus-Contract': 'custom-header',
                     'X-Tus-Trace': 'trace-123',
                 },
@@ -3377,6 +3599,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
+                    'Content-Type': 'application/offset+octet-stream',
                     'Upload-Offset': '0',
                     'X-Request-ID': '00000000-0000-4000-8000-000000000000',
                 },
@@ -3475,6 +3698,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
+                    'Content-Type': 'application/offset+octet-stream',
                     'Upload-Offset': '5',
                 },
                 'headersSpecified': True,
@@ -3612,6 +3836,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
+                    'Content-Type': 'application/offset+octet-stream',
                     'Upload-Offset': '0',
                 },
                 'headersSpecified': True,
@@ -3723,6 +3948,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
+                    'Content-Type': 'application/offset+octet-stream',
                     'Upload-Offset': '0',
                 },
                 'headersSpecified': True,
@@ -3817,6 +4043,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
+                    'Content-Type': 'application/offset+octet-stream',
                     'Upload-Offset': '0',
                 },
                 'headersSpecified': True,
@@ -3916,6 +4143,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'headerMode': None,
                 'headers': {
                     'Upload-Length': '11',
+                    'Content-Type': 'application/offset+octet-stream',
                     'Upload-Offset': '0',
                 },
                 'headersSpecified': True,
@@ -4015,6 +4243,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'headerMode': None,
                 'headers': {
                     'Upload-Length': '11',
+                    'Content-Type': 'application/offset+octet-stream',
                     'Upload-Offset': '0',
                 },
                 'headersSpecified': True,
@@ -4112,6 +4341,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
+                    'Content-Type': 'application/offset+octet-stream',
                     'Upload-Offset': '0',
                 },
                 'headersSpecified': True,
@@ -4160,6 +4390,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'uploadUrl': 'https://tus.io/uploads/deferred-contract',
         },
         'eventPolicy': {
+            'deferredLengthBytesTotal': 'allow-known-total-before-declaration',
             'matching': 'exact-except-extra-progress',
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
@@ -4220,6 +4451,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'headerMode': None,
                 'headers': {
                     'Upload-Length': '11',
+                    'Content-Type': 'application/offset+octet-stream',
                     'Upload-Offset': '0',
                 },
                 'headersSpecified': True,
@@ -4264,6 +4496,223 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'chunkSize': 11,
                 'kind': 'chunk-complete',
                 'key': 'chunk-complete:11:11:11',
+            },
+            {
+                'kind': 'success',
+                'key': 'success',
+            },
+            {
+                'kind': 'source-close',
+                'key': 'source-close',
+            },
+        ],
+    },
+    {
+        'behavior': 'deferred-length-upload',
+        'completion': {
+            'kind': 'success',
+            'uploadUrl': 'https://tus.io/uploads/deferred-chunked-contract',
+        },
+        'eventPolicy': {
+            'deferredLengthBytesTotal': 'allow-known-total-before-declaration',
+            'matching': 'exact-except-extra-progress',
+            'progress': 'milestone',
+            'transportProgress': 'may-emit-extra-samples',
+        },
+        'featureId': 'deferredLengthUpload',
+        'input': {
+            'chunkSize': 5,
+            'content': 'hello world',
+            'endpointUrl': 'https://tus.io/uploads',
+            'kind': 'blob',
+            'metadata': {
+                'filename': 'hello.txt',
+            },
+            'uploadLengthDeferred': True,
+        },
+        'operationIds': [
+            'createTusUpload',
+            'patchTusUpload',
+        ],
+        'primitives': [
+            'defer-upload-length',
+            'emit-chunk-complete',
+            'emit-progress',
+        ],
+        'requests': [
+            {
+                'absentHeaders': [
+                    'Upload-Length',
+                ],
+                'abort': False,
+                'bodySize': None,
+                'errorMessage': None,
+                'headerMode': None,
+                'headers': {
+                    'Upload-Defer-Length': '1',
+                },
+                'headersSpecified': True,
+                'method': None,
+                'operationId': 'createTusUpload',
+                'response': {
+                    'body': None,
+                    'headerMode': None,
+                    'headers': {
+                        'Location': 'https://tus.io/uploads/deferred-chunked-contract',
+                    },
+                    'headersSpecified': True,
+                    'statusCode': 201,
+                },
+                'role': 'create-upload',
+                'uploadUrl': None,
+                'url': 'endpoint',
+                'requestIndex': 0,
+            },
+            {
+                'absentHeaders': [],
+                'abort': False,
+                'bodySize': 5,
+                'errorMessage': None,
+                'headerMode': None,
+                'headers': {
+                    'Content-Type': 'application/offset+octet-stream',
+                    'Upload-Offset': '0',
+                },
+                'headersSpecified': True,
+                'method': None,
+                'operationId': 'patchTusUpload',
+                'response': {
+                    'body': None,
+                    'headerMode': None,
+                    'headers': {
+                        'Upload-Offset': '5',
+                    },
+                    'headersSpecified': True,
+                    'statusCode': 204,
+                },
+                'role': 'upload-chunk',
+                'uploadUrl': None,
+                'url': 'upload',
+                'requestIndex': 1,
+            },
+            {
+                'absentHeaders': [],
+                'abort': False,
+                'bodySize': 5,
+                'errorMessage': None,
+                'headerMode': None,
+                'headers': {
+                    'Content-Type': 'application/offset+octet-stream',
+                    'Upload-Offset': '5',
+                },
+                'headersSpecified': True,
+                'method': None,
+                'operationId': 'patchTusUpload',
+                'response': {
+                    'body': None,
+                    'headerMode': None,
+                    'headers': {
+                        'Upload-Offset': '10',
+                    },
+                    'headersSpecified': True,
+                    'statusCode': 204,
+                },
+                'role': 'upload-chunk',
+                'uploadUrl': None,
+                'url': 'upload',
+                'requestIndex': 2,
+            },
+            {
+                'absentHeaders': [],
+                'abort': False,
+                'bodySize': 1,
+                'errorMessage': None,
+                'headerMode': None,
+                'headers': {
+                    'Upload-Length': '11',
+                    'Content-Type': 'application/offset+octet-stream',
+                    'Upload-Offset': '10',
+                },
+                'headersSpecified': True,
+                'method': None,
+                'operationId': 'patchTusUpload',
+                'response': {
+                    'body': None,
+                    'headerMode': None,
+                    'headers': {
+                        'Upload-Offset': '11',
+                    },
+                    'headersSpecified': True,
+                    'statusCode': 204,
+                },
+                'role': 'upload-final-chunk',
+                'uploadUrl': None,
+                'url': 'upload',
+                'requestIndex': 3,
+            },
+        ],
+        'scenarioId': 'deferredLengthChunkedUpload',
+        'events': [
+            {
+                'kind': 'upload-url-available',
+                'key': 'upload-url-available',
+            },
+            {
+                'bytesSent': 0,
+                'bytesTotal': None,
+                'kind': 'progress',
+                'key': 'progress:0:null',
+            },
+            {
+                'bytesSent': 5,
+                'bytesTotal': None,
+                'kind': 'progress',
+                'key': 'progress:5:null',
+            },
+            {
+                'bytesAccepted': 5,
+                'bytesTotal': None,
+                'chunkSize': 5,
+                'kind': 'chunk-complete',
+                'key': 'chunk-complete:5:5:null',
+            },
+            {
+                'bytesSent': 5,
+                'bytesTotal': None,
+                'kind': 'progress',
+                'key': 'progress:5:null',
+            },
+            {
+                'bytesSent': 10,
+                'bytesTotal': None,
+                'kind': 'progress',
+                'key': 'progress:10:null',
+            },
+            {
+                'bytesAccepted': 10,
+                'bytesTotal': None,
+                'chunkSize': 5,
+                'kind': 'chunk-complete',
+                'key': 'chunk-complete:5:10:null',
+            },
+            {
+                'bytesSent': 10,
+                'bytesTotal': 11,
+                'kind': 'progress',
+                'key': 'progress:10:11',
+            },
+            {
+                'bytesSent': 11,
+                'bytesTotal': 11,
+                'kind': 'progress',
+                'key': 'progress:11:11',
+            },
+            {
+                'bytesAccepted': 11,
+                'bytesTotal': 11,
+                'chunkSize': 1,
+                'kind': 'chunk-complete',
+                'key': 'chunk-complete:1:11:11',
             },
             {
                 'kind': 'success',
@@ -4329,6 +4778,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
+                    'Content-Type': 'application/offset+octet-stream',
                     'Upload-Offset': '3',
                 },
                 'headersSpecified': True,
@@ -4466,6 +4916,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
+                    'Content-Type': 'application/offset+octet-stream',
                     'Upload-Offset': '0',
                 },
                 'headersSpecified': True,
@@ -4492,6 +4943,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
+                    'Content-Type': 'application/offset+octet-stream',
                     'Upload-Offset': '0',
                 },
                 'headersSpecified': True,
@@ -4688,6 +5140,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
+                    'Content-Type': 'application/offset+octet-stream',
                     'Upload-Offset': '0',
                     'X-Tus-Contract': 'parallel-cleanup-policy',
                     'X-Tus-Trace': 'parallel-cleanup-trace-123',
@@ -4714,6 +5167,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
+                    'Content-Type': 'application/offset+octet-stream',
                     'Upload-Offset': '0',
                     'X-Tus-Contract': 'parallel-cleanup-policy',
                     'X-Tus-Trace': 'parallel-cleanup-trace-123',
@@ -4851,6 +5305,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
+                    'Content-Type': 'application/offset+octet-stream',
                     'Upload-Offset': '0',
                 },
                 'headersSpecified': True,
@@ -4900,6 +5355,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
+                    'Content-Type': 'application/offset+octet-stream',
                     'Upload-Offset': '5',
                 },
                 'headersSpecified': True,
@@ -4949,6 +5405,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
+                    'Content-Type': 'application/offset+octet-stream',
                     'Upload-Offset': '5',
                 },
                 'headersSpecified': True,
@@ -5195,6 +5652,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
+                    'Content-Type': 'application/offset+octet-stream',
                     'Upload-Offset': '0',
                     'X-Tus-Contract': 'abort-policy',
                     'X-Tus-Trace': 'abort-trace-123',
@@ -5315,6 +5773,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
+                    'Content-Type': 'application/offset+octet-stream',
                     'Upload-Offset': '0',
                 },
                 'headersSpecified': True,
