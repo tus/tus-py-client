@@ -432,8 +432,11 @@ def format_event_value(value):
     return 'null' if value is None else str(value)
 
 
-def generated_tus_event_key(kind, *parts):
-    return ':'.join((kind,) + parts)
+GENERATED_TUS_EVENT_KEY_PART_SEPARATOR = ':'
+
+
+def generated_tus_event_key(*parts):
+    return GENERATED_TUS_EVENT_KEY_PART_SEPARATOR.join(parts)
 
 
 def generated_tus_event_key_after_response(request_index):
