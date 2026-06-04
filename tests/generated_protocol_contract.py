@@ -2243,6 +2243,18 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'filename': 'hello.txt',
             },
         },
+        'inputOptionEntries': [
+            {
+                'key': 'endpointUrl',
+                'value': 'https://tus.io/uploads',
+            },
+            {
+                'key': 'metadata',
+                'value': {
+                    'filename': 'hello.txt',
+                },
+            },
+        ],
         'inputSource': {
             'content': 'hello world',
             'kind': 'blob',
@@ -2364,6 +2376,22 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
             'uploadDataDuringCreation': True,
         },
+        'inputOptionEntries': [
+            {
+                'key': 'endpointUrl',
+                'value': 'https://tus.io/uploads',
+            },
+            {
+                'key': 'metadata',
+                'value': {
+                    'filename': 'hello.txt',
+                },
+            },
+            {
+                'key': 'uploadDataDuringCreation',
+                'value': True,
+            },
+        ],
         'inputSource': {
             'content': 'hello world',
             'kind': 'blob',
@@ -2470,6 +2498,26 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
             'uploadDataDuringCreation': True,
         },
+        'inputOptionEntries': [
+            {
+                'key': 'endpointUrl',
+                'value': 'https://tus.io/uploads',
+            },
+            {
+                'key': 'chunkSize',
+                'value': 5,
+            },
+            {
+                'key': 'metadata',
+                'value': {
+                    'filename': 'hello.txt',
+                },
+            },
+            {
+                'key': 'uploadDataDuringCreation',
+                'value': True,
+            },
+        ],
         'inputSource': {
             'content': 'hello world',
             'kind': 'blob',
@@ -2618,6 +2666,26 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'protocol': 'ietf-draft-05',
             'uploadDataDuringCreation': True,
         },
+        'inputOptionEntries': [
+            {
+                'key': 'endpointUrl',
+                'value': 'https://tus.io/uploads',
+            },
+            {
+                'key': 'metadata',
+                'value': {
+                    'filename': 'hello.txt',
+                },
+            },
+            {
+                'key': 'protocol',
+                'value': 'ietf-draft-05',
+            },
+            {
+                'key': 'uploadDataDuringCreation',
+                'value': True,
+            },
+        ],
         'inputSource': {
             'content': 'hello world',
             'kind': 'blob',
@@ -2724,6 +2792,24 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'protocol': 'ietf-draft-05',
             'uploadUrl': 'https://tus.io/uploads/ietf-draft-05-chunked-contract',
         },
+        'inputOptionEntries': [
+            {
+                'key': 'endpointUrl',
+                'value': 'https://tus.io/uploads',
+            },
+            {
+                'key': 'chunkSize',
+                'value': 5,
+            },
+            {
+                'key': 'protocol',
+                'value': 'ietf-draft-05',
+            },
+            {
+                'key': 'uploadUrl',
+                'value': 'https://tus.io/uploads/ietf-draft-05-chunked-contract',
+            },
+        ],
         'inputSource': {
             'content': 'hello world',
             'kind': 'blob',
@@ -2908,6 +2994,24 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'protocol': 'ietf-draft-03',
             'uploadUrl': 'https://tus.io/uploads/ietf-draft-03-resume-contract',
         },
+        'inputOptionEntries': [
+            {
+                'key': 'endpointUrl',
+                'value': 'https://tus.io/uploads',
+            },
+            {
+                'key': 'chunkSize',
+                'value': 6,
+            },
+            {
+                'key': 'protocol',
+                'value': 'ietf-draft-03',
+            },
+            {
+                'key': 'uploadUrl',
+                'value': 'https://tus.io/uploads/ietf-draft-03-resume-contract',
+            },
+        ],
         'inputSource': {
             'content': 'hello world',
             'kind': 'blob',
@@ -3002,6 +3106,12 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'endpointUrl': 'https://tus.io/uploads',
             'kind': 'none',
         },
+        'inputOptionEntries': [
+            {
+                'key': 'endpointUrl',
+                'value': 'https://tus.io/uploads',
+            },
+        ],
         'inputSource': {
             'content': '',
             'kind': 'none',
@@ -3033,6 +3143,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'content': 'hello world',
             'kind': 'blob',
         },
+        'inputOptionEntries': [],
         'inputSource': {
             'content': 'hello world',
             'kind': 'blob',
@@ -3066,6 +3177,16 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'kind': 'blob',
             'protocol': 'tus-v9',
         },
+        'inputOptionEntries': [
+            {
+                'key': 'endpointUrl',
+                'value': 'https://tus.io/uploads',
+            },
+            {
+                'key': 'protocol',
+                'value': 'tus-v9',
+            },
+        ],
         'inputSource': {
             'content': 'hello world',
             'kind': 'blob',
@@ -3101,6 +3222,18 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'retryDelays': 44,
             },
         },
+        'inputOptionEntries': [
+            {
+                'key': 'endpointUrl',
+                'value': 'https://tus.io/uploads',
+            },
+            {
+                'key': 'rawOptions',
+                'value': {
+                    'retryDelays': 44,
+                },
+            },
+        ],
         'inputSource': {
             'content': 'hello world',
             'kind': 'blob',
@@ -3135,6 +3268,20 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'parallelUploads': 2,
             'uploadUrl': 'https://tus.io/uploads/start-validation-upload-url',
         },
+        'inputOptionEntries': [
+            {
+                'key': 'endpointUrl',
+                'value': 'https://tus.io/uploads',
+            },
+            {
+                'key': 'parallelUploads',
+                'value': 2,
+            },
+            {
+                'key': 'uploadUrl',
+                'value': 'https://tus.io/uploads/start-validation-upload-url',
+            },
+        ],
         'inputSource': {
             'content': 'hello world',
             'kind': 'blob',
@@ -3169,6 +3316,20 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'parallelUploads': 2,
             'uploadSize': 11,
         },
+        'inputOptionEntries': [
+            {
+                'key': 'endpointUrl',
+                'value': 'https://tus.io/uploads',
+            },
+            {
+                'key': 'parallelUploads',
+                'value': 2,
+            },
+            {
+                'key': 'uploadSize',
+                'value': 11,
+            },
+        ],
         'inputSource': {
             'content': 'hello world',
             'kind': 'blob',
@@ -3203,6 +3364,20 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'parallelUploads': 2,
             'uploadLengthDeferred': True,
         },
+        'inputOptionEntries': [
+            {
+                'key': 'endpointUrl',
+                'value': 'https://tus.io/uploads',
+            },
+            {
+                'key': 'parallelUploads',
+                'value': 2,
+            },
+            {
+                'key': 'uploadLengthDeferred',
+                'value': True,
+            },
+        ],
         'inputSource': {
             'content': 'hello world',
             'kind': 'blob',
@@ -3237,6 +3412,20 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'parallelUploads': 2,
             'uploadDataDuringCreation': True,
         },
+        'inputOptionEntries': [
+            {
+                'key': 'endpointUrl',
+                'value': 'https://tus.io/uploads',
+            },
+            {
+                'key': 'parallelUploads',
+                'value': 2,
+            },
+            {
+                'key': 'uploadDataDuringCreation',
+                'value': True,
+            },
+        ],
         'inputSource': {
             'content': 'hello world',
             'kind': 'blob',
@@ -3275,6 +3464,21 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 },
             ],
         },
+        'inputOptionEntries': [
+            {
+                'key': 'endpointUrl',
+                'value': 'https://tus.io/uploads',
+            },
+            {
+                'key': 'parallelUploadBoundaries',
+                'value': [
+                    {
+                        'end': 5,
+                        'start': 0,
+                    },
+                ],
+            },
+        ],
         'inputSource': {
             'content': 'hello world',
             'kind': 'blob',
@@ -3314,6 +3518,25 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             ],
             'parallelUploads': 2,
         },
+        'inputOptionEntries': [
+            {
+                'key': 'endpointUrl',
+                'value': 'https://tus.io/uploads',
+            },
+            {
+                'key': 'parallelUploads',
+                'value': 2,
+            },
+            {
+                'key': 'parallelUploadBoundaries',
+                'value': [
+                    {
+                        'end': 5,
+                        'start': 0,
+                    },
+                ],
+            },
+        ],
         'inputSource': {
             'content': 'hello world',
             'kind': 'blob',
@@ -3355,6 +3578,30 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'retryDelays': None,
             },
         },
+        'inputOptionEntries': [
+            {
+                'key': 'endpointUrl',
+                'value': 'https://tus.io/uploads',
+            },
+            {
+                'key': 'metadata',
+                'value': {
+                    'filename': 'hello.txt',
+                },
+            },
+            {
+                'key': 'headers',
+                'value': {
+                    'X-Request-ID': 'contract-request-id',
+                },
+            },
+            {
+                'key': 'rawOptions',
+                'value': {
+                    'retryDelays': None,
+                },
+            },
+        ],
         'inputSource': {
             'content': 'hello world',
             'kind': 'blob',
@@ -3425,6 +3672,30 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'retryDelays': None,
             },
         },
+        'inputOptionEntries': [
+            {
+                'key': 'endpointUrl',
+                'value': 'https://tus.io/uploads',
+            },
+            {
+                'key': 'metadata',
+                'value': {
+                    'filename': 'hello.txt',
+                },
+            },
+            {
+                'key': 'headers',
+                'value': {
+                    'X-Request-ID': 'contract-request-id',
+                },
+            },
+            {
+                'key': 'rawOptions',
+                'value': {
+                    'retryDelays': None,
+                },
+            },
+        ],
         'inputSource': {
             'content': 'hello world',
             'kind': 'blob',
@@ -3483,6 +3754,18 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'filename': 'hello.txt',
             },
         },
+        'inputOptionEntries': [
+            {
+                'key': 'endpointUrl',
+                'value': 'https://tus.io/uploads',
+            },
+            {
+                'key': 'metadata',
+                'value': {
+                    'filename': 'hello.txt',
+                },
+            },
+        ],
         'inputSource': {
             'content': 'hello world',
             'kind': 'blob',
@@ -3581,6 +3864,25 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'filename': 'hello.txt',
             },
         },
+        'inputOptionEntries': [
+            {
+                'key': 'endpointUrl',
+                'value': 'https://tus.io/uploads',
+            },
+            {
+                'key': 'metadata',
+                'value': {
+                    'filename': 'hello.txt',
+                },
+            },
+            {
+                'key': 'headers',
+                'value': {
+                    'X-Tus-Contract': 'custom-header',
+                    'X-Tus-Trace': 'trace-123',
+                },
+            },
+        ],
         'inputSource': {
             'content': 'hello world',
             'kind': 'blob',
@@ -3684,6 +3986,28 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'filename': 'hello.txt',
             },
         },
+        'inputOptionEntries': [
+            {
+                'key': 'endpointUrl',
+                'value': 'https://tus.io/uploads',
+            },
+            {
+                'key': 'metadata',
+                'value': {
+                    'filename': 'hello.txt',
+                },
+            },
+            {
+                'key': 'headers',
+                'value': {
+                    'X-Request-ID': 'custom-request-id',
+                },
+            },
+            {
+                'key': 'addRequestId',
+                'value': True,
+            },
+        ],
         'inputSource': {
             'content': 'hello world',
             'kind': 'blob',
@@ -3830,6 +4154,16 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'urlStorageKey': 'tus::contract-resume-fingerprint::1337',
             },
         },
+        'inputOptionEntries': [
+            {
+                'key': 'endpointUrl',
+                'value': 'https://tus.io/uploads',
+            },
+            {
+                'key': 'removeFingerprintOnSuccess',
+                'value': True,
+            },
+        ],
         'inputSource': {
             'content': 'hello world',
             'kind': 'blob',
@@ -3949,6 +4283,18 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'filename': 'hello.txt',
             },
         },
+        'inputOptionEntries': [
+            {
+                'key': 'endpointUrl',
+                'value': 'https://tus.io/files/',
+            },
+            {
+                'key': 'metadata',
+                'value': {
+                    'filename': 'hello.txt',
+                },
+            },
+        ],
         'inputSource': {
             'content': 'hello world',
             'kind': 'blob',
@@ -4055,6 +4401,18 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'filename': 'hello.txt',
             },
         },
+        'inputOptionEntries': [
+            {
+                'key': 'endpointUrl',
+                'value': 'https://tus.io/uploads',
+            },
+            {
+                'key': 'metadata',
+                'value': {
+                    'filename': 'hello.txt',
+                },
+            },
+        ],
         'inputSource': {
             'content': 'hello world',
             'kind': 'array-buffer',
@@ -4161,6 +4519,18 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'filename': 'hello.txt',
             },
         },
+        'inputOptionEntries': [
+            {
+                'key': 'endpointUrl',
+                'value': 'https://tus.io/uploads',
+            },
+            {
+                'key': 'metadata',
+                'value': {
+                    'filename': 'hello.txt',
+                },
+            },
+        ],
         'inputSource': {
             'content': 'hello world',
             'kind': 'array-buffer-view',
@@ -4269,6 +4639,26 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
             'uploadLengthDeferred': True,
         },
+        'inputOptionEntries': [
+            {
+                'key': 'endpointUrl',
+                'value': 'https://tus.io/uploads',
+            },
+            {
+                'key': 'chunkSize',
+                'value': 100,
+            },
+            {
+                'key': 'metadata',
+                'value': {
+                    'filename': 'hello.txt',
+                },
+            },
+            {
+                'key': 'uploadLengthDeferred',
+                'value': True,
+            },
+        ],
         'inputSource': {
             'content': 'hello world',
             'kind': 'web-readable-stream',
@@ -4380,6 +4770,26 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
             'uploadLengthDeferred': True,
         },
+        'inputOptionEntries': [
+            {
+                'key': 'endpointUrl',
+                'value': 'https://tus.io/uploads',
+            },
+            {
+                'key': 'chunkSize',
+                'value': 100,
+            },
+            {
+                'key': 'metadata',
+                'value': {
+                    'filename': 'hello.txt',
+                },
+            },
+            {
+                'key': 'uploadLengthDeferred',
+                'value': True,
+            },
+        ],
         'inputSource': {
             'content': 'hello world',
             'kind': 'node-readable-stream',
@@ -4492,6 +4902,18 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'filename': 'hello.txt',
             },
         },
+        'inputOptionEntries': [
+            {
+                'key': 'endpointUrl',
+                'value': 'https://tus.io/uploads',
+            },
+            {
+                'key': 'metadata',
+                'value': {
+                    'filename': 'hello.txt',
+                },
+            },
+        ],
         'inputSource': {
             'content': 'hello world',
             'kind': 'node-path-reference',
@@ -4616,6 +5038,26 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
             'uploadLengthDeferred': True,
         },
+        'inputOptionEntries': [
+            {
+                'key': 'endpointUrl',
+                'value': 'https://tus.io/uploads',
+            },
+            {
+                'key': 'chunkSize',
+                'value': 100,
+            },
+            {
+                'key': 'metadata',
+                'value': {
+                    'filename': 'hello.txt',
+                },
+            },
+            {
+                'key': 'uploadLengthDeferred',
+                'value': True,
+            },
+        ],
         'inputSource': {
             'content': 'hello world',
             'kind': 'web-readable-stream',
@@ -4765,6 +5207,26 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
             'uploadLengthDeferred': True,
         },
+        'inputOptionEntries': [
+            {
+                'key': 'endpointUrl',
+                'value': 'https://tus.io/uploads',
+            },
+            {
+                'key': 'chunkSize',
+                'value': 5,
+            },
+            {
+                'key': 'metadata',
+                'value': {
+                    'filename': 'hello.txt',
+                },
+            },
+            {
+                'key': 'uploadLengthDeferred',
+                'value': True,
+            },
+        ],
         'inputSource': {
             'content': 'hello world',
             'kind': 'blob',
@@ -4919,6 +5381,20 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'overridePatchMethod': True,
             'uploadUrl': 'https://tus.io/uploads/override-contract',
         },
+        'inputOptionEntries': [
+            {
+                'key': 'endpointUrl',
+                'value': 'https://tus.io/uploads',
+            },
+            {
+                'key': 'overridePatchMethod',
+                'value': True,
+            },
+            {
+                'key': 'uploadUrl',
+                'value': 'https://tus.io/uploads/override-contract',
+            },
+        ],
         'inputSource': {
             'content': 'hello world',
             'kind': 'blob',
@@ -5052,6 +5528,28 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             },
             'parallelUploads': 2,
         },
+        'inputOptionEntries': [
+            {
+                'key': 'endpointUrl',
+                'value': 'https://tus.io/uploads',
+            },
+            {
+                'key': 'metadata',
+                'value': {
+                    'foo': 'hello',
+                },
+            },
+            {
+                'key': 'metadataForPartialUploads',
+                'value': {
+                    'test': 'world',
+                },
+            },
+            {
+                'key': 'parallelUploads',
+                'value': 2,
+            },
+        ],
         'inputSource': {
             'content': 'hello world',
             'kind': 'blob',
@@ -5269,6 +5767,33 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'parallelUploads': 2,
             'terminateUploadOnAbort': True,
         },
+        'inputOptionEntries': [
+            {
+                'key': 'endpointUrl',
+                'value': 'https://tus.io/uploads',
+            },
+            {
+                'key': 'metadataForPartialUploads',
+                'value': {
+                    'test': 'world',
+                },
+            },
+            {
+                'key': 'headers',
+                'value': {
+                    'X-Tus-Contract': 'parallel-cleanup-policy',
+                    'X-Tus-Trace': 'parallel-cleanup-trace-123',
+                },
+            },
+            {
+                'key': 'overridePatchMethod',
+                'value': True,
+            },
+            {
+                'key': 'parallelUploads',
+                'value': 2,
+            },
+        ],
         'inputSource': {
             'content': 'hello world',
             'kind': 'blob',
@@ -5492,6 +6017,24 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 0,
             ],
         },
+        'inputOptionEntries': [
+            {
+                'key': 'endpointUrl',
+                'value': 'https://tus.io/uploads',
+            },
+            {
+                'key': 'metadata',
+                'value': {
+                    'filename': 'hello.txt',
+                },
+            },
+            {
+                'key': 'retryDelays',
+                'value': [
+                    0,
+                ],
+            },
+        ],
         'inputSource': {
             'content': 'hello world',
             'kind': 'blob',
@@ -5717,6 +6260,16 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'kind': 'blob',
             'uploadUrl': 'https://tus.io/uploads/request-hooks-contract',
         },
+        'inputOptionEntries': [
+            {
+                'key': 'endpointUrl',
+                'value': 'https://tus.io/uploads',
+            },
+            {
+                'key': 'uploadUrl',
+                'value': 'https://tus.io/uploads/request-hooks-contract',
+            },
+        ],
         'inputSource': {
             'content': 'hello world',
             'kind': 'blob',
@@ -5797,6 +6350,18 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'filename': 'hello.txt',
             },
         },
+        'inputOptionEntries': [
+            {
+                'key': 'endpointUrl',
+                'value': 'https://tus.io/uploads',
+            },
+            {
+                'key': 'metadata',
+                'value': {
+                    'filename': 'hello.txt',
+                },
+            },
+        ],
         'inputSource': {
             'content': 'hello world',
             'kind': 'blob',
@@ -5877,6 +6442,29 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'overridePatchMethod': True,
             'terminateUploadOnAbort': True,
         },
+        'inputOptionEntries': [
+            {
+                'key': 'endpointUrl',
+                'value': 'https://tus.io/uploads',
+            },
+            {
+                'key': 'metadata',
+                'value': {
+                    'filename': 'hello.txt',
+                },
+            },
+            {
+                'key': 'headers',
+                'value': {
+                    'X-Tus-Contract': 'abort-policy',
+                    'X-Tus-Trace': 'abort-trace-123',
+                },
+            },
+            {
+                'key': 'overridePatchMethod',
+                'value': True,
+            },
+        ],
         'inputSource': {
             'content': 'hello world',
             'kind': 'blob',
@@ -6019,6 +6607,29 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 0,
             ],
         },
+        'inputOptionEntries': [
+            {
+                'key': 'endpointUrl',
+                'value': 'https://tus.io/uploads',
+            },
+            {
+                'key': 'chunkSize',
+                'value': 5,
+            },
+            {
+                'key': 'metadata',
+                'value': {
+                    'filename': 'hello.txt',
+                },
+            },
+            {
+                'key': 'retryDelays',
+                'value': [
+                    0,
+                    0,
+                ],
+            },
+        ],
         'inputSource': {
             'content': 'hello world',
             'kind': 'blob',
