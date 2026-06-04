@@ -2205,6 +2205,9 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             [],
             [],
         ],
+        'eventKeyExtraPrefixes': [
+            'progress:',
+        ],
         'eventPolicy': {
             'matching': 'exact-except-extra-progress',
             'progress': 'milestone',
@@ -2346,6 +2349,9 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             [],
             [],
         ],
+        'eventKeyExtraPrefixes': [
+            'progress:',
+        ],
         'eventPolicy': {
             'matching': 'exact-except-extra-progress',
             'progress': 'milestone',
@@ -2445,6 +2451,9 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             [],
             [],
             [],
+        ],
+        'eventKeyExtraPrefixes': [
+            'progress:',
         ],
         'eventPolicy': {
             'matching': 'exact-except-extra-progress',
@@ -2640,6 +2649,9 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             [],
             [],
         ],
+        'eventKeyExtraPrefixes': [
+            'progress:',
+        ],
         'eventPolicy': {
             'matching': 'exact-except-extra-progress',
             'progress': 'milestone',
@@ -2742,6 +2754,9 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             [],
             [],
             [],
+        ],
+        'eventKeyExtraPrefixes': [
+            'progress:',
         ],
         'eventPolicy': {
             'matching': 'exact-except-extra-progress',
@@ -2970,6 +2985,9 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             [],
             [],
         ],
+        'eventKeyExtraPrefixes': [
+            'progress:',
+        ],
         'eventPolicy': {
             'matching': 'exact-except-extra-progress',
             'progress': 'milestone',
@@ -3092,6 +3110,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'reason': 'missingInput',
         },
         'eventKeyAlternativeGroups': [],
+        'eventKeyExtraPrefixes': [],
         'featureId': 'startOptionValidation',
         'input': {
             'content': '',
@@ -3114,6 +3133,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'reason': 'missingEndpointOrUploadUrl',
         },
         'eventKeyAlternativeGroups': [],
+        'eventKeyExtraPrefixes': [],
         'featureId': 'startOptionValidation',
         'input': {
             'content': 'hello world',
@@ -3135,6 +3155,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'reason': 'unsupportedProtocol',
         },
         'eventKeyAlternativeGroups': [],
+        'eventKeyExtraPrefixes': [],
         'featureId': 'startOptionValidation',
         'input': {
             'content': 'hello world',
@@ -3158,6 +3179,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'reason': 'retryDelaysNotArray',
         },
         'eventKeyAlternativeGroups': [],
+        'eventKeyExtraPrefixes': [],
         'featureId': 'startOptionValidation',
         'input': {
             'content': 'hello world',
@@ -3183,6 +3205,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'reason': 'parallelUploadsWithUploadUrl',
         },
         'eventKeyAlternativeGroups': [],
+        'eventKeyExtraPrefixes': [],
         'featureId': 'startOptionValidation',
         'input': {
             'content': 'hello world',
@@ -3207,6 +3230,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'reason': 'parallelUploadsWithUploadSize',
         },
         'eventKeyAlternativeGroups': [],
+        'eventKeyExtraPrefixes': [],
         'featureId': 'startOptionValidation',
         'input': {
             'content': 'hello world',
@@ -3231,6 +3255,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'reason': 'parallelUploadsWithDeferredLength',
         },
         'eventKeyAlternativeGroups': [],
+        'eventKeyExtraPrefixes': [],
         'featureId': 'startOptionValidation',
         'input': {
             'content': 'hello world',
@@ -3255,6 +3280,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'reason': 'parallelUploadsWithUploadDataDuringCreation',
         },
         'eventKeyAlternativeGroups': [],
+        'eventKeyExtraPrefixes': [],
         'featureId': 'startOptionValidation',
         'input': {
             'content': 'hello world',
@@ -3279,6 +3305,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'reason': 'parallelBoundariesWithoutParallelUploads',
         },
         'eventKeyAlternativeGroups': [],
+        'eventKeyExtraPrefixes': [],
         'featureId': 'startOptionValidation',
         'input': {
             'content': 'hello world',
@@ -3307,6 +3334,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'reason': 'parallelBoundariesLengthMismatch',
         },
         'eventKeyAlternativeGroups': [],
+        'eventKeyExtraPrefixes': [],
         'featureId': 'startOptionValidation',
         'input': {
             'content': 'hello world',
@@ -3336,6 +3364,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'reason': 'unexpectedCreateResponse',
         },
         'eventKeyAlternativeGroups': [],
+        'eventKeyExtraPrefixes': [],
         'featureId': 'detailedErrors',
         'input': {
             'content': 'hello world',
@@ -3395,6 +3424,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'reason': 'createUploadRequestFailed',
         },
         'eventKeyAlternativeGroups': [],
+        'eventKeyExtraPrefixes': [],
         'featureId': 'detailedErrors',
         'input': {
             'content': 'hello world',
@@ -3447,6 +3477,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'uploadUrl': 'https://tus.io/uploads/upload-body-headers-contract',
         },
         'eventKeyAlternativeGroups': [],
+        'eventKeyExtraPrefixes': [],
         'featureId': 'uploadBodyHeaders',
         'input': {
             'content': 'hello world',
@@ -3528,6 +3559,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'uploadUrl': 'https://tus.io/uploads/custom-headers-contract',
         },
         'eventKeyAlternativeGroups': [],
+        'eventKeyExtraPrefixes': [],
         'featureId': 'customRequestHeaders',
         'input': {
             'content': 'hello world',
@@ -3617,6 +3649,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'uploadUrl': 'https://tus.io/uploads/request-id-contract',
         },
         'eventKeyAlternativeGroups': [],
+        'eventKeyExtraPrefixes': [],
         'featureId': 'requestIdHeaders',
         'input': {
             'addRequestId': True,
@@ -3716,6 +3749,9 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             [],
             [],
             [],
+        ],
+        'eventKeyExtraPrefixes': [
+            'progress:',
         ],
         'eventPolicy': {
             'matching': 'exact-except-extra-progress',
@@ -3876,6 +3912,9 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             [],
             [],
         ],
+        'eventKeyExtraPrefixes': [
+            'progress:',
+        ],
         'eventPolicy': {
             'matching': 'exact-except-extra-progress',
             'progress': 'milestone',
@@ -3998,6 +4037,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             [],
             [],
         ],
+        'eventKeyExtraPrefixes': [],
         'featureId': 'inputSources',
         'input': {
             'content': 'hello world',
@@ -4098,6 +4138,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             [],
             [],
         ],
+        'eventKeyExtraPrefixes': [],
         'featureId': 'inputSources',
         'input': {
             'content': 'hello world',
@@ -4198,6 +4239,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             [],
             [],
         ],
+        'eventKeyExtraPrefixes': [],
         'featureId': 'inputSources',
         'input': {
             'chunkSize': 100,
@@ -4303,6 +4345,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             [],
             [],
         ],
+        'eventKeyExtraPrefixes': [],
         'featureId': 'inputSources',
         'input': {
             'chunkSize': 100,
@@ -4411,6 +4454,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             [],
             [],
         ],
+        'eventKeyExtraPrefixes': [],
         'featureId': 'inputSources',
         'input': {
             'content': 'hello world',
@@ -4516,6 +4560,9 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             [],
             [],
             [],
+        ],
+        'eventKeyExtraPrefixes': [
+            'progress:',
         ],
         'eventPolicy': {
             'deferredLengthBytesTotal': 'allow-known-total-before-declaration',
@@ -4666,6 +4713,9 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             [],
             [],
             [],
+        ],
+        'eventKeyExtraPrefixes': [
+            'progress:',
         ],
         'eventPolicy': {
             'deferredLengthBytesTotal': 'allow-known-total-before-declaration',
@@ -4885,6 +4935,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'uploadUrl': 'https://tus.io/uploads/override-contract',
         },
         'eventKeyAlternativeGroups': [],
+        'eventKeyExtraPrefixes': [],
         'featureId': 'overridePatchMethod',
         'input': {
             'content': 'hello world',
@@ -4968,6 +5019,9 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             [],
             [],
             [],
+        ],
+        'eventKeyExtraPrefixes': [
+            'progress:',
         ],
         'eventPolicy': {
             'matching': 'exact-except-extra-progress',
@@ -5191,6 +5245,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'eventKeyAlternativeGroups': [
             [],
         ],
+        'eventKeyExtraPrefixes': [],
         'execution': {
             'serverRequestGates': [
                 {
@@ -5417,6 +5472,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             [],
             [],
         ],
+        'eventKeyExtraPrefixes': [],
         'featureId': 'retryOffsetRecovery',
         'input': {
             'content': 'hello world',
@@ -5634,6 +5690,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             [],
             [],
         ],
+        'eventKeyExtraPrefixes': [],
         'featureId': 'requestLifecycleHooks',
         'input': {
             'content': 'hello world',
@@ -5704,6 +5761,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'eventKeyAlternativeGroups': [
             [],
         ],
+        'eventKeyExtraPrefixes': [],
         'execution': {
             'onRequestStart': [
                 {
@@ -5765,6 +5823,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
         'eventKeyAlternativeGroups': [
             [],
         ],
+        'eventKeyExtraPrefixes': [],
         'execution': {
             'onRequestStart': [
                 {
@@ -5893,6 +5952,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             [],
             [],
         ],
+        'eventKeyExtraPrefixes': [],
         'execution': {
             'onChunkComplete': [
                 {

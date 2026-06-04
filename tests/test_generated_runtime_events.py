@@ -23,6 +23,9 @@ CASES = [
             [],
             [],
         ],
+        'eventKeyExtraPrefixes': [
+            'progress:',
+        ],
         'endpointUrl': 'https://tus.io/uploads',
         'eventKeys': [
             'progress:0:11',
@@ -84,6 +87,9 @@ CASES = [
             [],
             [],
             [],
+        ],
+        'eventKeyExtraPrefixes': [
+            'progress:',
         ],
         'endpointUrl': 'https://tus.io/uploads',
         'eventKeys': [
@@ -155,6 +161,9 @@ CASES = [
             [],
             [],
         ],
+        'eventKeyExtraPrefixes': [
+            'progress:',
+        ],
         'endpointUrl': 'https://tus.io/files/',
         'eventKeys': [
             'progress:0:11',
@@ -216,6 +225,9 @@ CASES = [
             [],
             [],
             [],
+        ],
+        'eventKeyExtraPrefixes': [
+            'progress:',
         ],
         'endpointUrl': 'https://tus.io/uploads',
         'eventKeys': [
@@ -298,6 +310,9 @@ CASES = [
             [],
             [],
             [],
+        ],
+        'eventKeyExtraPrefixes': [
+            'progress:',
         ],
         'endpointUrl': 'https://tus.io/uploads',
         'eventKeys': [

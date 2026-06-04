@@ -24,6 +24,9 @@ CASES = [
             [],
             [],
         ],
+        'eventKeyExtraPrefixes': [
+            'progress:',
+        ],
         'eventKeys': [
             'fingerprint:contract-single-fingerprint',
             'upload-url-available',
@@ -49,6 +52,9 @@ CASES = [
             [],
             [],
             [],
+        ],
+        'eventKeyExtraPrefixes': [
+            'progress:',
         ],
         'eventKeys': [
             'progress:0:11',
@@ -80,6 +86,9 @@ CASES = [
             [],
             [],
         ],
+        'eventKeyExtraPrefixes': [
+            'progress:',
+        ],
         'eventKeys': [
             'progress:0:11',
             'progress:5:11',
@@ -110,6 +119,9 @@ CASES = [
             [],
             [],
         ],
+        'eventKeyExtraPrefixes': [
+            'progress:',
+        ],
         'eventKeys': [
             'progress:0:11',
             'progress:11:11',
@@ -139,6 +151,9 @@ CASES = [
             [],
             [],
             [],
+        ],
+        'eventKeyExtraPrefixes': [
+            'progress:',
         ],
         'eventKeys': [
             'upload-url-available',
@@ -171,6 +186,9 @@ CASES = [
             [],
             [],
         ],
+        'eventKeyExtraPrefixes': [
+            'progress:',
+        ],
         'eventKeys': [
             'upload-url-available',
             'progress:5:11',
@@ -199,6 +217,9 @@ CASES = [
             [],
             [],
             [],
+        ],
+        'eventKeyExtraPrefixes': [
+            'progress:',
         ],
         'eventKeys': [
             'fingerprint:contract-resume-fingerprint',
@@ -229,6 +250,9 @@ CASES = [
             [],
             [],
         ],
+        'eventKeyExtraPrefixes': [
+            'progress:',
+        ],
         'eventKeys': [
             'upload-url-available',
             'progress:0:11',
@@ -251,6 +275,7 @@ CASES = [
             [],
             [],
         ],
+        'eventKeyExtraPrefixes': [],
         'eventKeys': [
             'source-open:array-buffer:11',
             'success',
@@ -268,6 +293,7 @@ CASES = [
             [],
             [],
         ],
+        'eventKeyExtraPrefixes': [],
         'eventKeys': [
             'source-open:array-buffer-view:11',
             'success',
@@ -285,6 +311,7 @@ CASES = [
             [],
             [],
         ],
+        'eventKeyExtraPrefixes': [],
         'eventKeys': [
             'source-open:web-readable-stream:null',
             'success',
@@ -302,6 +329,7 @@ CASES = [
             [],
             [],
         ],
+        'eventKeyExtraPrefixes': [],
         'eventKeys': [
             'source-open:node-readable-stream:null',
             'success',
@@ -319,6 +347,7 @@ CASES = [
             [],
             [],
         ],
+        'eventKeyExtraPrefixes': [],
         'eventKeys': [
             'source-open:node-path-reference:11',
             'success',
@@ -338,6 +367,9 @@ CASES = [
             [],
             [],
             [],
+        ],
+        'eventKeyExtraPrefixes': [
+            'progress:',
         ],
         'eventKeys': [
             'upload-url-available',
@@ -383,6 +415,9 @@ CASES = [
             [],
             [],
         ],
+        'eventKeyExtraPrefixes': [
+            'progress:',
+        ],
         'eventKeys': [
             'upload-url-available',
             'progress:0:null',
@@ -413,6 +448,9 @@ CASES = [
             [],
             [],
         ],
+        'eventKeyExtraPrefixes': [
+            'progress:',
+        ],
         'eventKeys': [
             'progress:5:11',
             'chunk-complete:5:5:11',
@@ -431,6 +469,7 @@ CASES = [
         'eventKeyAlternativeGroups': [
             [],
         ],
+        'eventKeyExtraPrefixes': [],
         'eventKeys': [
             'request-abort:3',
         ],
@@ -447,6 +486,7 @@ CASES = [
             [],
             [],
         ],
+        'eventKeyExtraPrefixes': [],
         'eventKeys': [
             'should-retry:0:true',
             'retry-schedule:0',
@@ -466,6 +506,7 @@ CASES = [
             [],
             [],
         ],
+        'eventKeyExtraPrefixes': [],
         'eventKeys': [
             'before-request:0',
             'after-response:0',
@@ -482,6 +523,7 @@ CASES = [
         'eventKeyAlternativeGroups': [
             [],
         ],
+        'eventKeyExtraPrefixes': [],
         'eventKeys': [
             'request-abort:0',
         ],
@@ -495,6 +537,7 @@ CASES = [
         'eventKeyAlternativeGroups': [
             [],
         ],
+        'eventKeyExtraPrefixes': [],
         'eventKeys': [
             'request-abort:1',
         ],
@@ -509,6 +552,7 @@ CASES = [
             [],
             [],
         ],
+        'eventKeyExtraPrefixes': [],
         'eventKeys': [
             'should-retry:0:true',
             'retry-schedule:0',
@@ -638,6 +682,10 @@ class GeneratedTusConformanceEventsTest(unittest.TestCase):
             self.assertEqual(
                 scenario["eventKeyAlternativeGroups"],
                 case["eventKeyAlternativeGroups"],
+            )
+            self.assertEqual(
+                scenario["eventKeyExtraPrefixes"],
+                case["eventKeyExtraPrefixes"],
             )
             self.assertEqual(
                 scenario.get("eventPolicy", {"matching": "exact"}),
