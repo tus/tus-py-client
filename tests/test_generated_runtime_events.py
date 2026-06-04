@@ -563,7 +563,7 @@ def assert_before_start_actions(test, case, storage):
 def assert_events(test, case, events):
     expected_events = case['eventKeys']
     extra_prefixes = case['eventKeyExtraPrefixes']
-    event_policy = case.get('eventPolicy', {'matching': 'exact'})
+    event_policy = case['eventPolicy']
     matching = event_policy['matching']
 
     if matching == 'exact':
