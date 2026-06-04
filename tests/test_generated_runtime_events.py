@@ -18,6 +18,11 @@ CASES = [
         'chunkSize': 11,
         'content': 'hello world',
         'endpointHasTrailingSlash': False,
+        'eventKeyAlternativeGroups': [
+            [],
+            [],
+            [],
+        ],
         'endpointUrl': 'https://tus.io/uploads',
         'eventKeys': [
             'progress:0:11',
@@ -75,6 +80,11 @@ CASES = [
         'chunkSize': 6,
         'content': 'hello world',
         'endpointHasTrailingSlash': False,
+        'eventKeyAlternativeGroups': [
+            [],
+            [],
+            [],
+        ],
         'endpointUrl': 'https://tus.io/uploads',
         'eventKeys': [
             'progress:5:11',
@@ -140,6 +150,11 @@ CASES = [
         'chunkSize': 11,
         'content': 'hello world',
         'endpointHasTrailingSlash': True,
+        'eventKeyAlternativeGroups': [
+            [],
+            [],
+            [],
+        ],
         'endpointUrl': 'https://tus.io/files/',
         'eventKeys': [
             'progress:0:11',
@@ -197,6 +212,11 @@ CASES = [
         'chunkSize': 100,
         'content': 'hello world',
         'endpointHasTrailingSlash': False,
+        'eventKeyAlternativeGroups': [
+            [],
+            [],
+            [],
+        ],
         'endpointUrl': 'https://tus.io/uploads',
         'eventKeys': [
             'progress:0:11',
@@ -256,6 +276,29 @@ CASES = [
         'chunkSize': 5,
         'content': 'hello world',
         'endpointHasTrailingSlash': False,
+        'eventKeyAlternativeGroups': [
+            [
+                'progress:0:11',
+            ],
+            [
+                'progress:5:11',
+            ],
+            [
+                'chunk-complete:5:5:11',
+            ],
+            [
+                'progress:5:11',
+            ],
+            [
+                'progress:10:11',
+            ],
+            [
+                'chunk-complete:5:10:11',
+            ],
+            [],
+            [],
+            [],
+        ],
         'endpointUrl': 'https://tus.io/uploads',
         'eventKeys': [
             'progress:0:null',

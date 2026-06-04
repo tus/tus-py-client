@@ -14,6 +14,16 @@ from tests.generated_protocol_contract import (
 
 CASES = [
     {
+        'eventKeyAlternativeGroups': [
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+        ],
         'eventKeys': [
             'fingerprint:contract-single-fingerprint',
             'upload-url-available',
@@ -33,6 +43,13 @@ CASES = [
         'scenarioId': 'singleUploadLifecycle',
     },
     {
+        'eventKeyAlternativeGroups': [
+            [],
+            [],
+            [],
+            [],
+            [],
+        ],
         'eventKeys': [
             'progress:0:11',
             'progress:11:11',
@@ -49,6 +66,20 @@ CASES = [
         'scenarioId': 'creationWithUpload',
     },
     {
+        'eventKeyAlternativeGroups': [
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+        ],
         'eventKeys': [
             'progress:0:11',
             'progress:5:11',
@@ -72,6 +103,13 @@ CASES = [
         'scenarioId': 'creationWithUploadPartialChunk',
     },
     {
+        'eventKeyAlternativeGroups': [
+            [],
+            [],
+            [],
+            [],
+            [],
+        ],
         'eventKeys': [
             'progress:0:11',
             'progress:11:11',
@@ -88,6 +126,20 @@ CASES = [
         'scenarioId': 'ietfDraft05CreationWithUpload',
     },
     {
+        'eventKeyAlternativeGroups': [
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+        ],
         'eventKeys': [
             'upload-url-available',
             'progress:0:11',
@@ -111,6 +163,14 @@ CASES = [
         'scenarioId': 'ietfDraft05ChunkedUploadComplete',
     },
     {
+        'eventKeyAlternativeGroups': [
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+        ],
         'eventKeys': [
             'upload-url-available',
             'progress:5:11',
@@ -128,6 +188,18 @@ CASES = [
         'scenarioId': 'ietfDraft03ResumeWithoutKnownLength',
     },
     {
+        'eventKeyAlternativeGroups': [
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+        ],
         'eventKeys': [
             'fingerprint:contract-resume-fingerprint',
             'url-storage-find:contract-resume-fingerprint:1',
@@ -149,6 +221,14 @@ CASES = [
         'scenarioId': 'resumeFromPreviousUpload',
     },
     {
+        'eventKeyAlternativeGroups': [
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+        ],
         'eventKeys': [
             'upload-url-available',
             'progress:0:11',
@@ -166,6 +246,11 @@ CASES = [
         'scenarioId': 'relativeLocationResolution',
     },
     {
+        'eventKeyAlternativeGroups': [
+            [],
+            [],
+            [],
+        ],
         'eventKeys': [
             'source-open:array-buffer:11',
             'success',
@@ -178,6 +263,11 @@ CASES = [
         'scenarioId': 'arrayBufferInput',
     },
     {
+        'eventKeyAlternativeGroups': [
+            [],
+            [],
+            [],
+        ],
         'eventKeys': [
             'source-open:array-buffer-view:11',
             'success',
@@ -190,6 +280,11 @@ CASES = [
         'scenarioId': 'arrayBufferViewInput',
     },
     {
+        'eventKeyAlternativeGroups': [
+            [],
+            [],
+            [],
+        ],
         'eventKeys': [
             'source-open:web-readable-stream:null',
             'success',
@@ -202,6 +297,11 @@ CASES = [
         'scenarioId': 'webReadableStreamInput',
     },
     {
+        'eventKeyAlternativeGroups': [
+            [],
+            [],
+            [],
+        ],
         'eventKeys': [
             'source-open:node-readable-stream:null',
             'success',
@@ -214,6 +314,11 @@ CASES = [
         'scenarioId': 'nodeReadableStreamInput',
     },
     {
+        'eventKeyAlternativeGroups': [
+            [],
+            [],
+            [],
+        ],
         'eventKeys': [
             'source-open:node-path-reference:11',
             'success',
@@ -226,6 +331,14 @@ CASES = [
         'scenarioId': 'nodePathInput',
     },
     {
+        'eventKeyAlternativeGroups': [
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+        ],
         'eventKeys': [
             'upload-url-available',
             'progress:0:11',
@@ -244,6 +357,32 @@ CASES = [
         'scenarioId': 'deferredLengthUpload',
     },
     {
+        'eventKeyAlternativeGroups': [
+            [],
+            [
+                'progress:0:11',
+            ],
+            [
+                'progress:5:11',
+            ],
+            [
+                'chunk-complete:5:5:11',
+            ],
+            [
+                'progress:5:11',
+            ],
+            [
+                'progress:10:11',
+            ],
+            [
+                'chunk-complete:5:10:11',
+            ],
+            [],
+            [],
+            [],
+            [],
+            [],
+        ],
         'eventKeys': [
             'upload-url-available',
             'progress:0:null',
@@ -268,6 +407,12 @@ CASES = [
         'scenarioId': 'deferredLengthChunkedUpload',
     },
     {
+        'eventKeyAlternativeGroups': [
+            [],
+            [],
+            [],
+            [],
+        ],
         'eventKeys': [
             'progress:5:11',
             'chunk-complete:5:5:11',
@@ -283,6 +428,9 @@ CASES = [
         'scenarioId': 'parallelUploadConcat',
     },
     {
+        'eventKeyAlternativeGroups': [
+            [],
+        ],
         'eventKeys': [
             'request-abort:3',
         ],
@@ -293,6 +441,12 @@ CASES = [
         'scenarioId': 'parallelUploadAbortCleanup',
     },
     {
+        'eventKeyAlternativeGroups': [
+            [],
+            [],
+            [],
+            [],
+        ],
         'eventKeys': [
             'should-retry:0:true',
             'retry-schedule:0',
@@ -306,6 +460,12 @@ CASES = [
         'scenarioId': 'retryPatchAfterOffsetRecovery',
     },
     {
+        'eventKeyAlternativeGroups': [
+            [],
+            [],
+            [],
+            [],
+        ],
         'eventKeys': [
             'before-request:0',
             'after-response:0',
@@ -319,6 +479,9 @@ CASES = [
         'scenarioId': 'requestLifecycleHooks',
     },
     {
+        'eventKeyAlternativeGroups': [
+            [],
+        ],
         'eventKeys': [
             'request-abort:0',
         ],
@@ -329,6 +492,9 @@ CASES = [
         'scenarioId': 'abortUpload',
     },
     {
+        'eventKeyAlternativeGroups': [
+            [],
+        ],
         'eventKeys': [
             'request-abort:1',
         ],
@@ -339,6 +505,10 @@ CASES = [
         'scenarioId': 'abortUploadAfterStoredUrl',
     },
     {
+        'eventKeyAlternativeGroups': [
+            [],
+            [],
+        ],
         'eventKeys': [
             'should-retry:0:true',
             'retry-schedule:0',
@@ -464,6 +634,10 @@ class GeneratedTusConformanceEventsTest(unittest.TestCase):
             self.assertEqual(
                 [event["key"] for event in scenario["events"]],
                 case["eventKeys"],
+            )
+            self.assertEqual(
+                scenario["eventKeyAlternativeGroups"],
+                case["eventKeyAlternativeGroups"],
             )
             self.assertEqual(
                 scenario.get("eventPolicy", {"matching": "exact"}),
