@@ -2300,6 +2300,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'requestIndex': 1,
             },
         ],
+        'retryDecisions': [],
         'scenarioId': 'singleUploadLifecycle',
         'events': [
             {
@@ -2421,6 +2422,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'requestIndex': 0,
             },
         ],
+        'retryDecisions': [],
         'scenarioId': 'creationWithUpload',
         'events': [
             {
@@ -2594,6 +2596,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'requestIndex': 2,
             },
         ],
+        'retryDecisions': [],
         'scenarioId': 'creationWithUploadPartialChunk',
         'events': [
             {
@@ -2745,6 +2748,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'requestIndex': 0,
             },
         ],
+        'retryDecisions': [],
         'scenarioId': 'ietfDraft05CreationWithUpload',
         'events': [
             {
@@ -2950,6 +2954,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'requestIndex': 3,
             },
         ],
+        'retryDecisions': [],
         'scenarioId': 'ietfDraft05ChunkedUploadComplete',
         'events': [
             {
@@ -3127,6 +3132,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'requestIndex': 1,
             },
         ],
+        'retryDecisions': [],
         'scenarioId': 'ietfDraft03ResumeWithoutKnownLength',
         'events': [
             {
@@ -3186,6 +3192,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'validate-start-options',
         ],
         'requests': [],
+        'retryDecisions': [],
         'scenarioId': 'startValidationMissingInput',
         'events': [],
     },
@@ -3212,6 +3219,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'validate-start-options',
         ],
         'requests': [],
+        'retryDecisions': [],
         'scenarioId': 'startValidationMissingEndpointOrUploadUrl',
         'events': [],
     },
@@ -3240,6 +3248,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'validate-start-options',
         ],
         'requests': [],
+        'retryDecisions': [],
         'scenarioId': 'startValidationUnsupportedProtocol',
         'events': [],
     },
@@ -3270,6 +3279,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'validate-start-options',
         ],
         'requests': [],
+        'retryDecisions': [],
         'scenarioId': 'startValidationRetryDelaysNotArray',
         'events': [],
     },
@@ -3299,6 +3309,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'validate-start-options',
         ],
         'requests': [],
+        'retryDecisions': [],
         'scenarioId': 'startValidationParallelUploadsWithUploadUrl',
         'events': [],
     },
@@ -3328,6 +3339,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'validate-start-options',
         ],
         'requests': [],
+        'retryDecisions': [],
         'scenarioId': 'startValidationParallelUploadsWithUploadSize',
         'events': [],
     },
@@ -3357,6 +3369,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'validate-start-options',
         ],
         'requests': [],
+        'retryDecisions': [],
         'scenarioId': 'startValidationParallelUploadsWithDeferredLength',
         'events': [],
     },
@@ -3386,6 +3399,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'validate-start-options',
         ],
         'requests': [],
+        'retryDecisions': [],
         'scenarioId': 'startValidationParallelUploadsWithUploadDataDuringCreation',
         'events': [],
     },
@@ -3419,6 +3433,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'validate-start-options',
         ],
         'requests': [],
+        'retryDecisions': [],
         'scenarioId': 'startValidationParallelBoundariesWithoutParallelUploads',
         'events': [],
     },
@@ -3453,6 +3468,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
             'validate-start-options',
         ],
         'requests': [],
+        'retryDecisions': [],
         'scenarioId': 'startValidationParallelBoundariesLengthMismatch',
         'events': [],
     },
@@ -3517,6 +3533,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'requestIndex': 0,
             },
         ],
+        'retryDecisions': [],
         'scenarioId': 'detailedCreateResponseError',
         'events': [],
     },
@@ -3575,6 +3592,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'requestIndex': 0,
             },
         ],
+        'retryDecisions': [],
         'scenarioId': 'detailedCreateRequestError',
         'events': [],
     },
@@ -3661,6 +3679,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'requestIndex': 1,
             },
         ],
+        'retryDecisions': [],
         'scenarioId': 'uploadBodyHeaders',
         'events': [],
     },
@@ -3755,6 +3774,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'requestIndex': 1,
             },
         ],
+        'retryDecisions': [],
         'scenarioId': 'customRequestHeaders',
         'events': [],
     },
@@ -3849,6 +3869,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'requestIndex': 1,
             },
         ],
+        'retryDecisions': [],
         'scenarioId': 'requestIdHeaders',
         'events': [],
     },
@@ -3974,6 +3995,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'requestIndex': 1,
             },
         ],
+        'retryDecisions': [],
         'scenarioId': 'resumeFromPreviousUpload',
         'events': [
             {
@@ -4131,6 +4153,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'requestIndex': 1,
             },
         ],
+        'retryDecisions': [],
         'scenarioId': 'relativeLocationResolution',
         'events': [
             {
@@ -4257,6 +4280,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'requestIndex': 1,
             },
         ],
+        'retryDecisions': [],
         'scenarioId': 'arrayBufferInput',
         'events': [
             {
@@ -4366,6 +4390,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'requestIndex': 1,
             },
         ],
+        'retryDecisions': [],
         'scenarioId': 'arrayBufferViewInput',
         'events': [
             {
@@ -4480,6 +4505,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'requestIndex': 1,
             },
         ],
+        'retryDecisions': [],
         'scenarioId': 'webReadableStreamInput',
         'events': [
             {
@@ -4594,6 +4620,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'requestIndex': 1,
             },
         ],
+        'retryDecisions': [],
         'scenarioId': 'nodeReadableStreamInput',
         'events': [
             {
@@ -4706,6 +4733,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'requestIndex': 1,
             },
         ],
+        'retryDecisions': [],
         'scenarioId': 'nodePathInput',
         'events': [
             {
@@ -4835,6 +4863,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'requestIndex': 1,
             },
         ],
+        'retryDecisions': [],
         'scenarioId': 'deferredLengthUpload',
         'events': [
             {
@@ -5057,6 +5086,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'requestIndex': 3,
             },
         ],
+        'retryDecisions': [],
         'scenarioId': 'deferredLengthChunkedUpload',
         'events': [
             {
@@ -5211,6 +5241,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'requestIndex': 1,
             },
         ],
+        'retryDecisions': [],
         'scenarioId': 'overridePatchMethod',
         'events': [],
     },
@@ -5419,6 +5450,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'requestIndex': 4,
             },
         ],
+        'retryDecisions': [],
         'scenarioId': 'parallelUploadConcat',
         'events': [
             {
@@ -5669,6 +5701,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'requestIndex': 5,
             },
         ],
+        'retryDecisions': [],
         'scenarioId': 'parallelUploadAbortCleanup',
         'events': [
             {
@@ -5879,6 +5912,16 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'requestIndex': 5,
             },
         ],
+        'retryDecisions': [
+            {
+                'decision': True,
+                'retryAttempt': 0,
+            },
+            {
+                'decision': True,
+                'retryAttempt': 0,
+            },
+        ],
         'scenarioId': 'retryPatchAfterOffsetRecovery',
         'events': [
             {
@@ -5967,6 +6010,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'requestIndex': 0,
             },
         ],
+        'retryDecisions': [],
         'scenarioId': 'requestLifecycleHooks',
         'events': [
             {
@@ -6047,6 +6091,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'requestIndex': 0,
             },
         ],
+        'retryDecisions': [],
         'scenarioId': 'abortUpload',
         'events': [
             {
@@ -6181,6 +6226,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'requestIndex': 2,
             },
         ],
+        'retryDecisions': [],
         'scenarioId': 'abortUploadAfterStoredUrl',
         'events': [
             {
@@ -6337,6 +6383,12 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'uploadUrl': None,
                 'url': 'upload',
                 'requestIndex': 3,
+            },
+        ],
+        'retryDecisions': [
+            {
+                'decision': True,
+                'retryAttempt': 0,
             },
         ],
         'scenarioId': 'terminateWithRetry',
