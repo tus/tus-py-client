@@ -37,6 +37,7 @@ CASES = [
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
+        'locationHeaderName': 'Location',
         'locationHeaderKind': 'absolute',
         'metadata': {
             'filename': 'hello.txt',
@@ -108,6 +109,7 @@ CASES = [
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
+        'locationHeaderName': 'Location',
         'locationHeaderKind': 'stored',
         'metadata': {},
         'removeFingerprintOnSuccess': True,
@@ -172,6 +174,7 @@ CASES = [
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
+        'locationHeaderName': 'Location',
         'locationHeaderKind': 'relative',
         'metadata': {
             'filename': 'hello.txt',
@@ -237,6 +240,7 @@ CASES = [
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
+        'locationHeaderName': 'Location',
         'locationHeaderKind': 'absolute',
         'metadata': {
             'filename': 'hello.txt',
@@ -327,6 +331,7 @@ CASES = [
             'progress': 'milestone',
             'transportProgress': 'may-emit-extra-samples',
         },
+        'locationHeaderName': 'Location',
         'locationHeaderKind': 'absolute',
         'metadata': {
             'filename': 'hello.txt',

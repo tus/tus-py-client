@@ -1204,6 +1204,7 @@ TUS_MANAGED_UPLOAD = {
                 'reference-original-source',
             ],
             'stateBackend': 'platform-key-value-store',
+            'transportProfileId': 'java-http-url-connection',
         },
         {
             'networkConstraints': [
@@ -1241,6 +1242,7 @@ TUS_MANAGED_UPLOAD = {
                 'reference-original-source',
             ],
             'stateBackend': 'filesystem',
+            'transportProfileId': 'java-http-url-connection',
         },
         {
             'networkConstraints': [
@@ -4108,8 +4110,8 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'terminateUpload': False,
             },
             'fingerprint': {
-                'install': False,
-                'value': None,
+                'install': True,
+                'value': 'contract-custom-headers-fingerprint',
             },
             'requestId': {
                 'enabled': False,
@@ -5703,8 +5705,8 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'terminateUpload': False,
             },
             'fingerprint': {
-                'install': False,
-                'value': None,
+                'install': True,
+                'value': 'contract-override-fingerprint',
             },
             'requestId': {
                 'enabled': False,
