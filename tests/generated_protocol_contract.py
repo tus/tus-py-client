@@ -166,6 +166,21 @@ TUS_PROTOCOL_OPERATIONS = [
                     },
                 ],
             },
+            {
+                'statusCode': 500,
+                'bodyKind': 'empty',
+                'headerVariants': [
+                    {
+                        'fields': [
+                            {
+                                'displayName': 'Tus-Resumable',
+                                'name': 'tus-resumable',
+                                'required': True,
+                            },
+                        ],
+                    },
+                ],
+            },
         ],
     },
     {
@@ -286,6 +301,21 @@ TUS_PROTOCOL_OPERATIONS = [
                     },
                 ],
             },
+            {
+                'statusCode': 500,
+                'bodyKind': 'empty',
+                'headerVariants': [
+                    {
+                        'fields': [
+                            {
+                                'displayName': 'Tus-Resumable',
+                                'name': 'tus-resumable',
+                                'required': True,
+                            },
+                        ],
+                    },
+                ],
+            },
         ],
     },
     {
@@ -311,6 +341,21 @@ TUS_PROTOCOL_OPERATIONS = [
         'responses': [
             {
                 'statusCode': 204,
+                'bodyKind': 'empty',
+                'headerVariants': [
+                    {
+                        'fields': [
+                            {
+                                'displayName': 'Tus-Resumable',
+                                'name': 'tus-resumable',
+                                'required': True,
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
+                'statusCode': 423,
                 'bodyKind': 'empty',
                 'headerVariants': [
                     {
@@ -2269,10 +2314,12 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': None,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
                     'Upload-Length': '11',
+                    'Upload-Metadata': 'filename aGVsbG8udHh0',
                 },
                 'headersSpecified': True,
                 'method': None,
@@ -2296,6 +2343,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': 11,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
@@ -2409,11 +2457,13 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': 11,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
                     'Upload-Length': '11',
                     'Content-Type': 'application/offset+octet-stream',
+                    'Upload-Metadata': 'filename aGVsbG8udHh0',
                 },
                 'headersSpecified': True,
                 'method': None,
@@ -2543,11 +2593,13 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': 5,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
                     'Upload-Length': '11',
                     'Content-Type': 'application/offset+octet-stream',
+                    'Upload-Metadata': 'filename aGVsbG8udHh0',
                 },
                 'headersSpecified': True,
                 'method': None,
@@ -2572,6 +2624,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': 5,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
@@ -2600,6 +2653,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': 1,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
@@ -2718,12 +2772,14 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 ],
                 'abort': False,
                 'bodySize': 11,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': 'exact',
                 'headers': {
                     'Upload-Length': '11',
                     'Upload-Complete': '?1',
                     'Content-Type': 'application/partial-upload',
+                    'Upload-Metadata': 'filename aGVsbG8udHh0',
                 },
                 'headersSpecified': True,
                 'method': None,
@@ -2852,6 +2908,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 ],
                 'abort': False,
                 'bodySize': None,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': 'exact',
                 'headers': {},
@@ -2880,6 +2937,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 ],
                 'abort': False,
                 'bodySize': 5,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': 'exact',
                 'headers': {
@@ -2911,6 +2969,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 ],
                 'abort': False,
                 'bodySize': 5,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': 'exact',
                 'headers': {
@@ -2942,6 +3001,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 ],
                 'abort': False,
                 'bodySize': 1,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': 'exact',
                 'headers': {
@@ -3063,6 +3123,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 ],
                 'abort': False,
                 'bodySize': None,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': 'exact',
                 'headers': {},
@@ -3091,6 +3152,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 ],
                 'abort': False,
                 'bodySize': 6,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': 'exact',
                 'headers': {
@@ -3749,10 +3811,12 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': None,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
                     'Upload-Length': '11',
+                    'Upload-Metadata': 'filename aGVsbG8udHh0',
                     'X-Request-ID': 'contract-request-id',
                 },
                 'headersSpecified': True,
@@ -3846,10 +3910,12 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': None,
+                'bodyStart': None,
                 'errorMessage': 'socket down',
                 'headerMode': None,
                 'headers': {
                     'Upload-Length': '11',
+                    'Upload-Metadata': 'filename aGVsbG8udHh0',
                     'X-Request-ID': 'contract-request-id',
                 },
                 'headersSpecified': True,
@@ -3926,10 +3992,12 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': None,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
                     'Upload-Length': '11',
+                    'Upload-Metadata': 'filename aGVsbG8udHh0',
                 },
                 'headersSpecified': True,
                 'method': None,
@@ -3953,6 +4021,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': 11,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
@@ -4048,10 +4117,12 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': None,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
                     'Upload-Length': '11',
+                    'Upload-Metadata': 'filename aGVsbG8udHh0',
                     'X-Tus-Contract': 'custom-header',
                     'X-Tus-Trace': 'trace-123',
                 },
@@ -4077,6 +4148,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': 11,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
@@ -4178,10 +4250,12 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': None,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
                     'Upload-Length': '11',
+                    'Upload-Metadata': 'filename aGVsbG8udHh0',
                     'X-Request-ID': '00000000-0000-4000-8000-000000000000',
                 },
                 'headersSpecified': True,
@@ -4206,6 +4280,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': 11,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
@@ -4341,6 +4416,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': None,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {},
@@ -4367,6 +4443,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': 6,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
@@ -4483,10 +4560,12 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': None,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
                     'Upload-Length': '11',
+                    'Upload-Metadata': 'filename aGVsbG8udHh0',
                 },
                 'headersSpecified': True,
                 'method': None,
@@ -4510,6 +4589,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': 11,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
@@ -4610,10 +4690,12 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': None,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
                     'Upload-Length': '11',
+                    'Upload-Metadata': 'filename aGVsbG8udHh0',
                 },
                 'headersSpecified': True,
                 'method': None,
@@ -4637,6 +4719,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': 11,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
@@ -4737,10 +4820,12 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': None,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
                     'Upload-Length': '11',
+                    'Upload-Metadata': 'filename aGVsbG8udHh0',
                 },
                 'headersSpecified': True,
                 'method': None,
@@ -4764,6 +4849,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': 11,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
@@ -4874,10 +4960,12 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 ],
                 'abort': False,
                 'bodySize': None,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
                     'Upload-Defer-Length': '1',
+                    'Upload-Metadata': 'filename aGVsbG8udHh0',
                 },
                 'headersSpecified': True,
                 'method': None,
@@ -4901,6 +4989,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': 11,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
@@ -5012,10 +5101,12 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 ],
                 'abort': False,
                 'bodySize': None,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
                     'Upload-Defer-Length': '1',
+                    'Upload-Metadata': 'filename aGVsbG8udHh0',
                 },
                 'headersSpecified': True,
                 'method': None,
@@ -5039,6 +5130,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': 11,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
@@ -5143,10 +5235,12 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': None,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
                     'Upload-Length': '11',
+                    'Upload-Metadata': 'filename aGVsbG8udHh0',
                 },
                 'headersSpecified': True,
                 'method': None,
@@ -5170,6 +5264,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': 11,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
@@ -5297,10 +5392,12 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 ],
                 'abort': False,
                 'bodySize': None,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
                     'Upload-Defer-Length': '1',
+                    'Upload-Metadata': 'filename aGVsbG8udHh0',
                 },
                 'headersSpecified': True,
                 'method': None,
@@ -5324,6 +5421,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': 11,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
@@ -5474,10 +5572,12 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 ],
                 'abort': False,
                 'bodySize': None,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
                     'Upload-Defer-Length': '1',
+                    'Upload-Metadata': 'filename aGVsbG8udHh0',
                 },
                 'headersSpecified': True,
                 'method': None,
@@ -5501,6 +5601,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': 5,
+                'bodyStart': 0,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
@@ -5529,6 +5630,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': 5,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
@@ -5557,6 +5659,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': 1,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
@@ -5648,6 +5751,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': None,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {},
@@ -5674,6 +5778,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': 8,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
@@ -5812,9 +5917,11 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': None,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
+                    'Upload-Metadata': 'test d29ybGQ=',
                     'Upload-Concat': 'partial',
                     'Upload-Length': '5',
                 },
@@ -5840,9 +5947,11 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': None,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
+                    'Upload-Metadata': 'test d29ybGQ=',
                     'Upload-Concat': 'partial',
                     'Upload-Length': '6',
                 },
@@ -5868,6 +5977,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': 5,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
@@ -5896,6 +6006,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': 6,
+                'bodyStart': 5,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
@@ -5926,9 +6037,11 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 ],
                 'abort': False,
                 'bodySize': None,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
+                    'Upload-Metadata': 'foo aGVsbG8=',
                     'Upload-Concat': 'final;https://tus.io/uploads/parallel-part-1 https://tus.io/uploads/parallel-part-2',
                 },
                 'headersSpecified': True,
@@ -6059,9 +6172,11 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': None,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
+                    'Upload-Metadata': 'test d29ybGQ=',
                     'Upload-Concat': 'partial',
                     'Upload-Length': '5',
                     'X-Tus-Contract': 'parallel-cleanup-policy',
@@ -6089,9 +6204,11 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': None,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
+                    'Upload-Metadata': 'test d29ybGQ=',
                     'Upload-Concat': 'partial',
                     'Upload-Length': '6',
                     'X-Tus-Contract': 'parallel-cleanup-policy',
@@ -6119,6 +6236,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': 5,
+                'bodyStart': 0,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
@@ -6147,6 +6265,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': True,
                 'bodySize': 6,
+                'bodyStart': 5,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
@@ -6169,6 +6288,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': None,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
@@ -6195,6 +6315,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': None,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
@@ -6305,10 +6426,12 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': None,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
                     'Upload-Length': '11',
+                    'Upload-Metadata': 'filename aGVsbG8udHh0',
                 },
                 'headersSpecified': True,
                 'method': None,
@@ -6332,6 +6455,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': 11,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
@@ -6358,6 +6482,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': None,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {},
@@ -6384,6 +6509,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': 6,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
@@ -6410,6 +6536,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': None,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {},
@@ -6436,6 +6563,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': 6,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
@@ -6545,6 +6673,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': None,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {},
@@ -6646,10 +6775,12 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': True,
                 'bodySize': None,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
                     'Upload-Length': '11',
+                    'Upload-Metadata': 'filename aGVsbG8udHh0',
                 },
                 'headersSpecified': True,
                 'method': None,
@@ -6754,10 +6885,12 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': None,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
                     'Upload-Length': '11',
+                    'Upload-Metadata': 'filename aGVsbG8udHh0',
                     'X-Tus-Contract': 'abort-policy',
                     'X-Tus-Trace': 'abort-trace-123',
                 },
@@ -6783,6 +6916,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': True,
                 'bodySize': 11,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
@@ -6805,6 +6939,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': None,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
@@ -6924,10 +7059,12 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': None,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
                     'Upload-Length': '11',
+                    'Upload-Metadata': 'filename aGVsbG8udHh0',
                 },
                 'headersSpecified': True,
                 'method': None,
@@ -6951,6 +7088,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': 5,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {
@@ -6979,6 +7117,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': None,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {},
@@ -7002,6 +7141,7 @@ TUS_CLIENT_CONFORMANCE_SCENARIOS = [
                 'absentHeaders': [],
                 'abort': False,
                 'bodySize': None,
+                'bodyStart': None,
                 'errorMessage': None,
                 'headerMode': None,
                 'headers': {},

@@ -432,6 +432,10 @@ def format_event_value(value):
 
 
 GENERATED_TUS_EVENT_KEY_PART_SEPARATOR = ':'
+GENERATED_TUS_SUCCESS_REMOVE_STORED_URL_BEFORE_HOOK = True
+GENERATED_TUS_SUCCESS_REMOVE_STORED_URL_REQUIRES_OPTION = True
+GENERATED_TUS_URL_STORAGE_REMOVE_ON_SUCCESS_ENABLED = True
+GENERATED_TUS_URL_STORAGE_REMOVE_ON_SUCCESS_REQUIRES_OPTION = True
 
 
 def generated_tus_event_key(*parts):
@@ -696,7 +700,7 @@ def assert_stored_upload_state(test, case, storage):
         return
 
     fingerprint = case['storedUpload']['fingerprint']
-    if case['removeFingerprintOnSuccess']:
+    if should_remove_stored_upload_on_success(case):
         test.assertIsNone(storage.get_item(fingerprint), case['scenarioId'])
     else:
         test.assertEqual(
@@ -704,3 +708,17 @@ def assert_stored_upload_state(test, case, storage):
             case['storedUpload']['uploadUrl'],
             case['scenarioId'],
         )
+
+
+def should_remove_stored_upload_on_success(case):
+    if not GENERATED_TUS_SUCCESS_REMOVE_STORED_URL_BEFORE_HOOK:
+        return False
+    if not GENERATED_TUS_URL_STORAGE_REMOVE_ON_SUCCESS_ENABLED:
+        return False
+    if (
+        GENERATED_TUS_SUCCESS_REMOVE_STORED_URL_REQUIRES_OPTION
+        or GENERATED_TUS_URL_STORAGE_REMOVE_ON_SUCCESS_REQUIRES_OPTION
+    ):
+        return case['removeFingerprintOnSuccess']
+
+    return True
