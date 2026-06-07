@@ -62,6 +62,14 @@ def string_array_value(value, label):
     return value
 
 
+def int_array_value(value, label):
+    if not isinstance(value, list):
+        fail("{} must be a list".format(label))
+    for index, item in enumerate(value):
+        int_value(item, "{}[{}]".format(label, index))
+    return value
+
+
 def resolve_value(value_spec, context, label):
     if "value" in value_spec:
         return value_spec["value"]
@@ -154,6 +162,25 @@ def retry_offset_recovery(scenario):
                 "upload.retryOffsetRecovery.recoveryResponse.offsetHeader",
             ),
         },
+    }
+
+
+def request_lifecycle_hooks(scenario):
+    upload = object_value(scenario["upload"], "upload")
+    hooks = object_value(upload["requestLifecycleHooks"], "upload.requestLifecycleHooks")
+    return {
+        "expectedAfterResponseMethods": string_array_value(
+            hooks["expectedAfterResponseMethods"],
+            "upload.requestLifecycleHooks.expectedAfterResponseMethods",
+        ),
+        "expectedAfterResponseStatusCodes": int_array_value(
+            hooks["expectedAfterResponseStatusCodes"],
+            "upload.requestLifecycleHooks.expectedAfterResponseStatusCodes",
+        ),
+        "expectedBeforeRequestMethods": string_array_value(
+            hooks["expectedBeforeRequestMethods"],
+            "upload.requestLifecycleHooks.expectedBeforeRequestMethods",
+        ),
     }
 
 
