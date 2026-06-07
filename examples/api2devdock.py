@@ -70,6 +70,14 @@ def int_array_value(value, label):
     return value
 
 
+def string_array_array_value(value, label):
+    if not isinstance(value, list):
+        fail("{} must be a list".format(label))
+    for index, item in enumerate(value):
+        string_array_value(item, "{}[{}]".format(label, index))
+    return value
+
+
 def resolve_value(value_spec, context, label):
     if "value" in value_spec:
         return value_spec["value"]
@@ -182,6 +190,132 @@ def request_lifecycle_hooks(scenario):
             "upload.requestLifecycleHooks.expectedBeforeRequestMethods",
         ),
     }
+
+
+def upload_callbacks(scenario):
+    upload = object_value(scenario["upload"], "upload")
+    callbacks = object_value(upload["uploadCallbacks"], "upload.uploadCallbacks")
+    event_kinds = object_value(
+        callbacks["eventKinds"],
+        "upload.uploadCallbacks.eventKinds",
+    )
+    return {
+        "allowedExtraEventKeyPrefixes": string_array_value(
+            callbacks["allowedExtraEventKeyPrefixes"],
+            "upload.uploadCallbacks.allowedExtraEventKeyPrefixes",
+        ),
+        "eventKeyAlternativeGroups": string_array_array_value(
+            callbacks["eventKeyAlternativeGroups"],
+            "upload.uploadCallbacks.eventKeyAlternativeGroups",
+        ),
+        "eventKinds": {
+            "chunkComplete": string_value(
+                event_kinds["chunkComplete"],
+                "upload.uploadCallbacks.eventKinds.chunkComplete",
+            ),
+            "progress": string_value(
+                event_kinds["progress"],
+                "upload.uploadCallbacks.eventKinds.progress",
+            ),
+            "sourceClose": string_value(
+                event_kinds["sourceClose"],
+                "upload.uploadCallbacks.eventKinds.sourceClose",
+            ),
+            "success": string_value(
+                event_kinds["success"],
+                "upload.uploadCallbacks.eventKinds.success",
+            ),
+            "uploadUrlAvailable": string_value(
+                event_kinds["uploadUrlAvailable"],
+                "upload.uploadCallbacks.eventKinds.uploadUrlAvailable",
+            ),
+        },
+        "eventKeyPartSeparator": string_value(
+            callbacks["eventKeyPartSeparator"],
+            "upload.uploadCallbacks.eventKeyPartSeparator",
+        ),
+        "eventKeys": string_array_value(
+            callbacks["eventKeys"],
+            "upload.uploadCallbacks.eventKeys",
+        ),
+        "eventPolicyMatching": string_value(
+            callbacks["eventPolicyMatching"],
+            "upload.uploadCallbacks.eventPolicyMatching",
+        ),
+    }
+
+
+def upload_callback_event_key(callbacks, *parts):
+    return callbacks["eventKeyPartSeparator"].join(parts)
+
+
+def upload_callback_event_key_number(value):
+    return str(value)
+
+
+def upload_callback_event_key_total(value):
+    return scalar_string(value)
+
+
+def upload_callback_event_matches_expected(callbacks, expected_index, actual):
+    if actual == callbacks["eventKeys"][expected_index]:
+        return True
+
+    if expected_index >= len(callbacks["eventKeyAlternativeGroups"]):
+        return False
+
+    return actual in callbacks["eventKeyAlternativeGroups"][expected_index]
+
+
+def has_allowed_upload_callback_extra_event_prefix(callbacks, event):
+    for prefix in callbacks["allowedExtraEventKeyPrefixes"]:
+        if event.startswith(prefix):
+            return True
+
+    return False
+
+
+def match_upload_callback_event_keys(callbacks, actual):
+    policy = callbacks["eventPolicyMatching"]
+    if policy not in ("exact", "exact-except-allowed-extra-events"):
+        fail("unsupported upload callback event policy {!r}".format(policy))
+
+    expected_index = 0
+    matched = []
+    for event in actual:
+        if expected_index < len(callbacks["eventKeys"]) and upload_callback_event_matches_expected(
+            callbacks,
+            expected_index,
+            event,
+        ):
+            matched.append(callbacks["eventKeys"][expected_index])
+            expected_index += 1
+            continue
+
+        if policy == "exact-except-allowed-extra-events" and has_allowed_upload_callback_extra_event_prefix(
+            callbacks,
+            event,
+        ):
+            continue
+
+        fail(
+            "upload callback events emitted unexpected extra event {!r}; allowed prefixes {}; expected {}, got {}".format(
+                event,
+                callbacks["allowedExtraEventKeyPrefixes"],
+                callbacks["eventKeys"],
+                actual,
+            )
+        )
+
+    if expected_index != len(callbacks["eventKeys"]):
+        fail(
+            "upload callback events did not emit every expected non-extra event; expected {}, got {}".format(
+                callbacks["eventKeys"],
+                actual,
+            )
+        )
+
+    return matched
 
 
 def scenario_id(scenario):
