@@ -206,6 +206,22 @@ def upload_headers(scenario):
     return string_map_value(upload["headers"], "upload.headers")
 
 
+def upload_body_headers_by_method(scenario):
+    upload = object_value(scenario["upload"], "upload")
+    body_headers_by_method = object_value(
+        upload["bodyHeadersByMethod"],
+        "upload.bodyHeadersByMethod",
+    )
+    result = {}
+    for method, headers in body_headers_by_method.items():
+        string_value(method, "upload.bodyHeadersByMethod key")
+        result[method] = string_map_value(
+            headers,
+            "upload.bodyHeadersByMethod.{}".format(method),
+        )
+    return result
+
+
 def upload_add_request_id(scenario):
     upload = object_value(scenario["upload"], "upload")
     value = upload["addRequestId"]
