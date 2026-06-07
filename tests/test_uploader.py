@@ -11,7 +11,7 @@ import pytest
 
 from tusclient import exceptions
 from tusclient.fingerprint import fingerprint
-from tusclient.protocol_generated import DEFAULT_REQUEST_HEADERS
+from tusclient.protocol_generated import DEFAULT_REQUEST_HEADERS, REQUEST_ID_HEADER_NAME
 from tusclient.request_lifecycle import RequestLifecycleHooks
 from tusclient.storage import filestorage
 from tests import mixin
@@ -41,6 +41,31 @@ class UploaderTest(mixin.Mixin):
 
         self.client.set_headers({'foo': 'bar'})
         self.assertEqual(self.uploader.get_headers(), dict(DEFAULT_REQUEST_HEADERS, foo='bar'))
+
+        self.client.set_headers({REQUEST_ID_HEADER_NAME: 'custom-request-id'})
+        self.client.enable_request_id_header()
+        request_headers = self.uploader.get_headers()
+        self.assertEqual(request_headers['foo'], 'bar')
+        self.assertNotEqual(request_headers[REQUEST_ID_HEADER_NAME], 'custom-request-id')
+        self.assertEqual(len(request_headers[REQUEST_ID_HEADER_NAME]), 36)
+        self.assertIn('-', request_headers[REQUEST_ID_HEADER_NAME])
+
+    def test_prepare_request_headers_applies_operation_headers_before_custom_headers(self):
+        self.client.set_headers({'upload-offset': 'custom-offset'})
+        request_headers = self.uploader.prepare_request_headers({'upload-offset': '1'})
+        self.assertEqual(request_headers['upload-offset'], 'custom-offset')
+
+    def test_prepare_request_headers_applies_request_id_after_custom_headers(self):
+        self.client.set_headers({REQUEST_ID_HEADER_NAME: 'custom-request-id'})
+        self.client.enable_request_id_header()
+        request_headers = self.uploader.prepare_request_headers(
+            {REQUEST_ID_HEADER_NAME: 'operation-request-id'}
+        )
+
+        self.assertNotEqual(request_headers[REQUEST_ID_HEADER_NAME], 'operation-request-id')
+        self.assertNotEqual(request_headers[REQUEST_ID_HEADER_NAME], 'custom-request-id')
+        self.assertEqual(len(request_headers[REQUEST_ID_HEADER_NAME]), 36)
+        self.assertIn('-', request_headers[REQUEST_ID_HEADER_NAME])
 
     @responses.activate
     def test_get_offset(self):

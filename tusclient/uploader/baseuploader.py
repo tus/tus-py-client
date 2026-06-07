@@ -10,7 +10,7 @@ import requests
 from tusclient.exceptions import TusCommunicationError
 from tusclient.request import TusRequest, catch_requests_error
 from tusclient.fingerprint import fingerprint, interface
-from tusclient.protocol_generated import DEFAULT_REQUEST_HEADERS
+from tusclient.protocol_generated import DEFAULT_REQUEST_HEADERS, prepare_request_headers
 from tusclient.request_lifecycle import TusRequestContext
 from tusclient.storage.interface import Storage
 
@@ -178,8 +178,12 @@ class BaseUploader:
         Return headers of the uploader instance. This would include the headers of the
         client instance.
         """
+        return self.prepare_request_headers()
+
+    def prepare_request_headers(self, operation_headers=None):
         client_headers = getattr(self.client, "headers", {})
-        return dict(self.DEFAULT_HEADERS, **client_headers)
+        add_request_id = getattr(self.client, "add_request_id", False)
+        return prepare_request_headers(operation_headers, client_headers, add_request_id)
 
     def run_before_request(self, method, url, headers):
         context = TusRequestContext(method, url, headers)
@@ -195,13 +199,13 @@ class BaseUploader:
 
     def get_url_creation_headers(self):
         """Return headers required to create upload url"""
-        headers = self.get_headers()
+        operation_headers = {}
         if self.upload_length_deferred:
-            headers['upload-defer-length'] = '1'
+            operation_headers['upload-defer-length'] = '1'
         else:
-            headers["upload-length"] = str(self.file_size)
-        headers["upload-metadata"] = ",".join(self.encode_metadata())
-        return headers
+            operation_headers["upload-length"] = str(self.file_size)
+        operation_headers["upload-metadata"] = ",".join(self.encode_metadata())
+        return self.prepare_request_headers(operation_headers)
 
     @property
     def checksum_algorithm(self):

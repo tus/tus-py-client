@@ -206,6 +206,19 @@ def upload_headers(scenario):
     return string_map_value(upload["headers"], "upload.headers")
 
 
+def upload_add_request_id(scenario):
+    upload = object_value(scenario["upload"], "upload")
+    value = upload["addRequestId"]
+    if not isinstance(value, bool):
+        fail("upload.addRequestId must be a boolean")
+    return value
+
+
+def upload_request_id_header_name(scenario):
+    upload = object_value(scenario["upload"], "upload")
+    return string_value(upload["requestIdHeaderName"], "upload.requestIdHeaderName")
+
+
 def upload_callbacks(scenario):
     upload = object_value(scenario["upload"], "upload")
     callbacks = object_value(upload["uploadCallbacks"], "upload.uploadCallbacks")

@@ -14,6 +14,7 @@ class TusClientTest(unittest.TestCase):
     def test_instance_attributes(self):
         self.assertEqual(self.client.url, 'http://tusd.tusdemo.net/files/')
         self.assertEqual(self.client.headers, {'foo': 'bar'})
+        self.assertFalse(self.client.add_request_id)
 
     def test_set_headers(self):
         self.client.set_headers({'foo': 'bar tender'})
@@ -22,6 +23,13 @@ class TusClientTest(unittest.TestCase):
         # uploader headers must update when client headers change
         self.client.set_headers({'food': 'at the bar'})
         self.assertEqual(self.client.headers, {'foo': 'bar tender', 'food': 'at the bar'})
+
+    def test_request_id_header_toggle(self):
+        self.client.enable_request_id_header()
+        self.assertTrue(self.client.add_request_id)
+
+        self.client.disable_request_id_header()
+        self.assertFalse(self.client.add_request_id)
 
     @responses.activate
     def test_uploader(self):

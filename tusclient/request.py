@@ -51,21 +51,20 @@ class BaseTusRequest:
         self.file.seek(uploader.offset)
         self.client_cert = uploader.client_cert
 
-        self._request_headers = {
+        self._operation_headers = {
             "upload-offset": str(uploader.offset),
             "Content-Type": "application/offset+octet-stream",
         }
         self._offset = uploader.offset
         self._upload_length_deferred = uploader.upload_length_deferred
-        self._request_headers.update(uploader.get_headers())
         self._content_length = uploader.get_request_length()
         self._upload_checksum = uploader.upload_checksum
         self._checksum_algorithm = uploader.checksum_algorithm
         self._checksum_algorithm_name = uploader.checksum_algorithm_name
 
-    def add_checksum(self, chunk: bytes):
+    def add_checksum(self, headers, chunk: bytes):
         if self._upload_checksum:
-            self._request_headers["upload-checksum"] = " ".join(
+            headers["upload-checksum"] = " ".join(
                 (
                     self._checksum_algorithm_name,
                     base64.b64encode(self._checksum_algorithm(chunk).digest()).decode(
@@ -85,10 +84,11 @@ class TusRequest(BaseTusRequest):
         try:
             chunk = self.file.read(self._content_length)
             stream_eof = len(chunk) < self._content_length
-            self.add_checksum(chunk)
-            headers = self._request_headers
+            operation_headers = dict(self._operation_headers)
+            self.add_checksum(operation_headers, chunk)
             if stream_eof and self._upload_length_deferred:
-                headers["upload-length"] = str(self._offset + len(chunk))
+                operation_headers["upload-length"] = str(self._offset + len(chunk))
+            headers = self.uploader.prepare_request_headers(operation_headers)
             context = self.uploader.run_before_request("PATCH", self._url, headers)
             resp = requests.patch(
                 self._url,
@@ -121,7 +121,8 @@ class AsyncTusRequest(BaseTusRequest):
         Perform actual request.
         """
         chunk = self.file.read(self._content_length)
-        self.add_checksum(chunk)
+        operation_headers = dict(self._operation_headers)
+        self.add_checksum(operation_headers, chunk)
         try:
             ssl_ctx = ssl.create_default_context()
             if (self.client_cert is not None):
@@ -132,7 +133,8 @@ class AsyncTusRequest(BaseTusRequest):
             conn = aiohttp.TCPConnector(ssl=ssl_ctx)
             async with aiohttp.ClientSession(loop=self.io_loop, connector=conn) as session:
                 verify_tls_cert = None if self.verify_tls_cert else False
-                context = self.uploader.run_before_request("PATCH", self._url, self._request_headers)
+                headers = self.uploader.prepare_request_headers(operation_headers)
+                context = self.uploader.run_before_request("PATCH", self._url, headers)
                 async with session.patch(
                     self._url, data=chunk, headers=context.headers, ssl=verify_tls_cert
                 ) as resp:

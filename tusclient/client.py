@@ -34,11 +34,13 @@ class TusClient:
         headers: Optional[Dict[str, str]] = None,
         client_cert: Optional[Union[str, Tuple[str, str]]] = None,
         request_hooks: Optional[RequestLifecycleHooks] = None,
+        add_request_id: bool = False,
     ):
         self.url = url
         self.headers = headers or {}
         self.client_cert = client_cert
         self.request_hooks = request_hooks
+        self.add_request_id = add_request_id
 
     def set_headers(self, headers: Dict[str, str]):
         """
@@ -62,6 +64,12 @@ class TusClient:
                 callbacks to invoke before transport send and after transport response.
         """
         self.request_hooks = request_hooks
+
+    def enable_request_id_header(self):
+        self.add_request_id = True
+
+    def disable_request_id_header(self):
+        self.add_request_id = False
 
     def uploader(self, *args, **kwargs) -> Uploader:
         """
