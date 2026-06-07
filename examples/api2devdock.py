@@ -36,6 +36,32 @@ def read_path(value, path_parts, label):
     return current
 
 
+def object_value(value, label):
+    if not isinstance(value, dict):
+        fail("{} must be an object".format(label))
+    return value
+
+
+def string_value(value, label):
+    if not isinstance(value, str):
+        fail("{} must be a string".format(label))
+    return value
+
+
+def int_value(value, label):
+    if not isinstance(value, int) or isinstance(value, bool):
+        fail("{} must be an integer".format(label))
+    return value
+
+
+def string_array_value(value, label):
+    if not isinstance(value, list):
+        fail("{} must be a list".format(label))
+    for index, item in enumerate(value):
+        string_value(item, "{}[{}]".format(label, index))
+    return value
+
+
 def resolve_value(value_spec, context, label):
     if "value" in value_spec:
         return value_spec["value"]
@@ -62,6 +88,77 @@ def scenario_bytes(upload_config):
     if source["encoding"] != "utf8":
         fail("unsupported scenario source encoding {!r}".format(source["encoding"]))
     return source["value"].encode("utf-8")
+
+
+def fixed_chunk_size_bytes(scenario):
+    upload = object_value(scenario["upload"], "upload")
+    chunk_size = object_value(upload["chunkSize"], "upload.chunkSize")
+    kind = string_value(chunk_size["kind"], "upload.chunkSize.kind")
+    if kind != "fixed-bytes":
+        fail("unsupported chunk size kind {!r}".format(kind))
+    bytes_value = int_value(chunk_size["bytes"], "upload.chunkSize.bytes")
+    if bytes_value <= 0:
+        fail("upload.chunkSize.bytes must be positive")
+    return bytes_value
+
+
+def retry_offset_recovery(scenario):
+    upload = object_value(scenario["upload"], "upload")
+    retry = object_value(upload["retryOffsetRecovery"], "upload.retryOffsetRecovery")
+    fail_after_response = object_value(
+        retry["failAfterResponse"],
+        "upload.retryOffsetRecovery.failAfterResponse",
+    )
+    recovery_response = object_value(
+        retry["recoveryResponse"],
+        "upload.retryOffsetRecovery.recoveryResponse",
+    )
+    return {
+        "expectedFailureCount": int_value(
+            retry["expectedFailureCount"],
+            "upload.retryOffsetRecovery.expectedFailureCount",
+        ),
+        "expectedRecoveredOffset": int_value(
+            retry["expectedRecoveredOffset"],
+            "upload.retryOffsetRecovery.expectedRecoveredOffset",
+        ),
+        "expectedRecoveryRequestCount": int_value(
+            retry["expectedRecoveryRequestCount"],
+            "upload.retryOffsetRecovery.expectedRecoveryRequestCount",
+        ),
+        "expectedRequestMethods": string_array_value(
+            retry["expectedRequestMethods"],
+            "upload.retryOffsetRecovery.expectedRequestMethods",
+        ),
+        "failAfterResponse": {
+            "message": string_value(
+                fail_after_response["message"],
+                "upload.retryOffsetRecovery.failAfterResponse.message",
+            ),
+            "method": string_value(
+                fail_after_response["method"],
+                "upload.retryOffsetRecovery.failAfterResponse.method",
+            ),
+            "occurrence": int_value(
+                fail_after_response["occurrence"],
+                "upload.retryOffsetRecovery.failAfterResponse.occurrence",
+            ),
+        },
+        "recoveryResponse": {
+            "method": string_value(
+                recovery_response["method"],
+                "upload.retryOffsetRecovery.recoveryResponse.method",
+            ),
+            "offsetHeader": string_value(
+                recovery_response["offsetHeader"],
+                "upload.retryOffsetRecovery.recoveryResponse.offsetHeader",
+            ),
+        },
+    }
+
+
+def scenario_id(scenario):
+    return string_value(scenario["scenarioId"], "scenarioId")
 
 
 def scalar_string(value):

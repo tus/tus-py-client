@@ -11,6 +11,7 @@ from tusclient.exceptions import TusCommunicationError
 from tusclient.request import TusRequest, catch_requests_error
 from tusclient.fingerprint import fingerprint, interface
 from tusclient.protocol_generated import DEFAULT_REQUEST_HEADERS
+from tusclient.request_lifecycle import TusRequestContext
 from tusclient.storage.interface import Storage
 
 if TYPE_CHECKING:
@@ -180,6 +181,18 @@ class BaseUploader:
         client_headers = getattr(self.client, "headers", {})
         return dict(self.DEFAULT_HEADERS, **client_headers)
 
+    def run_before_request(self, method, url, headers):
+        context = TusRequestContext(method, url, headers)
+        hooks = getattr(self.client, "request_hooks", None)
+        if hooks is not None and hooks.before_request is not None:
+            hooks.before_request(context)
+        return context
+
+    def run_after_response(self, context, response):
+        hooks = getattr(self.client, "request_hooks", None)
+        if hooks is not None and hooks.after_response is not None:
+            hooks.after_response(context, response)
+
     def get_url_creation_headers(self):
         """Return headers required to create upload url"""
         headers = self.get_headers()
@@ -215,9 +228,12 @@ class BaseUploader:
         This is different from the instance attribute 'offset' because this makes an
         http request to the tus server to retrieve the offset.
         """
+        headers = self.get_headers()
+        context = self.run_before_request("HEAD", self.url, headers)
         resp = requests.head(
-            self.url, headers=self.get_headers(), verify=self.verify_tls_cert, cert=self.client_cert
+            self.url, headers=context.headers, verify=self.verify_tls_cert, cert=self.client_cert
         )
+        self.run_after_response(context, resp)
         offset = resp.headers.get("upload-offset")
         if offset is None:
             msg = "Attempt to retrieve offset fails with status {}".format(

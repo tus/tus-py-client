@@ -1,5 +1,6 @@
 from typing import Dict, Optional, Tuple, Union
 
+from tusclient.request_lifecycle import RequestLifecycleHooks
 from tusclient.uploader import Uploader, AsyncUploader
 
 
@@ -27,10 +28,17 @@ class TusClient:
         - client_cert (Optional[str | Tuple[str, str]])
     """
 
-    def __init__(self, url: str, headers: Optional[Dict[str, str]] = None, client_cert: Optional[Union[str, Tuple[str, str]]] = None):
+    def __init__(
+        self,
+        url: str,
+        headers: Optional[Dict[str, str]] = None,
+        client_cert: Optional[Union[str, Tuple[str, str]]] = None,
+        request_hooks: Optional[RequestLifecycleHooks] = None,
+    ):
         self.url = url
         self.headers = headers or {}
         self.client_cert = client_cert
+        self.request_hooks = request_hooks
 
     def set_headers(self, headers: Dict[str, str]):
         """
@@ -44,6 +52,16 @@ class TusClient:
                 key, value pairs of the headers to be set. This argument is required.
         """
         self.headers.update(headers)
+
+    def set_request_hooks(self, request_hooks: Optional[RequestLifecycleHooks]):
+        """
+        Set callbacks that are invoked around each HTTP request/response pair.
+
+        :Args:
+            - request_hooks (Optional[RequestLifecycleHooks]):
+                callbacks to invoke before transport send and after transport response.
+        """
+        self.request_hooks = request_hooks
 
     def uploader(self, *args, **kwargs) -> Uploader:
         """

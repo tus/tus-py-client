@@ -12,6 +12,7 @@ import pytest
 from tusclient import exceptions
 from tusclient.fingerprint import fingerprint
 from tusclient.protocol_generated import DEFAULT_REQUEST_HEADERS
+from tusclient.request_lifecycle import RequestLifecycleHooks
 from tusclient.storage import filestorage
 from tests import mixin
 
@@ -46,6 +47,43 @@ class UploaderTest(mixin.Mixin):
         responses.add(responses.HEAD, self.uploader.url,
                       adding_headers={"upload-offset": "300"})
         self.assertEqual(self.uploader.get_offset(), 300)
+
+    @responses.activate
+    def test_get_offset_request_lifecycle_hooks(self):
+        events = []
+
+        def before_request(context):
+            events.append(("before", context.method, context.url))
+            context.headers["x-hook"] = "before"
+
+        def after_response(context, response):
+            events.append(("after", context.method, response.status_code))
+            response.headers["upload-offset"] = "301"
+
+        def validate_headers(req):
+            self.assertEqual(req.headers["x-hook"], "before")
+            return (200, {"upload-offset": "300"}, "")
+
+        self.client.set_request_hooks(
+            RequestLifecycleHooks(
+                before_request=before_request,
+                after_response=after_response,
+            )
+        )
+        responses.add_callback(
+            responses.HEAD,
+            self.uploader.url,
+            callback=validate_headers,
+        )
+
+        self.assertEqual(self.uploader.get_offset(), 301)
+        self.assertEqual(
+            events,
+            [
+                ("before", "HEAD", self.uploader.url),
+                ("after", "HEAD", 200),
+            ],
+        )
 
     def test_encode_metadata(self):
         self.uploader.metadata = {'foo': 'bar', 'red': 'blue'}

@@ -40,6 +40,7 @@ class BaseTusRequest:
     """
 
     def __init__(self, uploader):
+        self.uploader = uploader
         self._url = uploader.url
         self.status_code = None
         self.response_headers = {}
@@ -88,14 +89,16 @@ class TusRequest(BaseTusRequest):
             headers = self._request_headers
             if stream_eof and self._upload_length_deferred:
                 headers["upload-length"] = str(self._offset + len(chunk))
+            context = self.uploader.run_before_request("PATCH", self._url, headers)
             resp = requests.patch(
                 self._url,
                 data=chunk,
-                headers=headers,
+                headers=context.headers,
                 verify=self.verify_tls_cert,
                 stream=True,
                 cert=self.client_cert
             )
+            self.uploader.run_after_response(context, resp)
             self.status_code = resp.status_code
             self.response_content = resp.content
             self.response_headers = {k.lower(): v for k, v in resp.headers.items()}
@@ -129,9 +132,11 @@ class AsyncTusRequest(BaseTusRequest):
             conn = aiohttp.TCPConnector(ssl=ssl_ctx)
             async with aiohttp.ClientSession(loop=self.io_loop, connector=conn) as session:
                 verify_tls_cert = None if self.verify_tls_cert else False
+                context = self.uploader.run_before_request("PATCH", self._url, self._request_headers)
                 async with session.patch(
-                    self._url, data=chunk, headers=self._request_headers, ssl=verify_tls_cert
+                    self._url, data=chunk, headers=context.headers, ssl=verify_tls_cert
                 ) as resp:
+                    self.uploader.run_after_response(context, resp)
                     self.status_code = resp.status
                     self.response_headers = {
                         k.lower(): v for k, v in resp.headers.items()

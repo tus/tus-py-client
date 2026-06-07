@@ -5,6 +5,7 @@ from parametrize import parametrize
 import responses
 
 from tusclient import request
+from tusclient.request_lifecycle import RequestLifecycleHooks
 from tests import mixin
 
 
@@ -30,6 +31,41 @@ class TusRequestTest(mixin.Mixin):
 
             self.request.perform()
             self.assertEqual(str(size), self.request.response_headers['upload-offset'])
+
+    def test_perform_request_lifecycle_hooks(self):
+        events = []
+
+        def before_request(context):
+            events.append(("before", context.method, context.url))
+            context.headers["x-hook"] = "before"
+
+        def after_response(context, response):
+            events.append(("after", context.method, response.status_code))
+            response.headers["upload-offset"] = "7"
+
+        def validate_headers(req):
+            self.assertEqual(req.headers["x-hook"], "before")
+            return (204, {"upload-offset": "5"}, "")
+
+        self.client.set_request_hooks(
+            RequestLifecycleHooks(
+                before_request=before_request,
+                after_response=after_response,
+            )
+        )
+
+        with responses.RequestsMock() as resps:
+            resps.add_callback(responses.PATCH, self.url, callback=validate_headers)
+            self.request.perform()
+
+        self.assertEqual(self.request.response_headers["upload-offset"], "7")
+        self.assertEqual(
+            events,
+            [
+                ("before", "PATCH", self.url),
+                ("after", "PATCH", 204),
+            ],
+        )
 
     def test_perform_checksum(self):
         self.uploader.upload_checksum = True
@@ -66,4 +102,3 @@ class TusRequestTest(mixin.Mixin):
             resps.add_callback(responses.PATCH, self.url, callback=validate_verify)
             tus_request.perform()
             self.assertEqual(verify, False)
-
