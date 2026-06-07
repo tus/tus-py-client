@@ -3,6 +3,9 @@ import unittest
 import responses
 
 from tusclient import client
+from tusclient.exceptions import TusCommunicationError
+from tusclient.protocol_generated import DEFAULT_REQUEST_HEADERS, TERMINATE_UPLOAD_METHOD
+from tusclient.request_lifecycle import RequestLifecycleHooks
 from tusclient.uploader import Uploader, AsyncUploader
 
 
@@ -30,6 +33,53 @@ class TusClientTest(unittest.TestCase):
 
         self.client.disable_request_id_header()
         self.assertFalse(self.client.add_request_id)
+
+    @responses.activate
+    def test_terminate_upload(self):
+        url = 'http://tusd.tusdemo.net/files/15acd89eabdf5738ffc'
+        events = []
+
+        def before_request(context):
+            events.append(('before', context.method, context.url))
+            context.headers['x-hook'] = 'before'
+
+        def after_response(context, response):
+            events.append(('after', context.method, response.status_code))
+
+        self.client.set_request_hooks(
+            RequestLifecycleHooks(
+                before_request=before_request,
+                after_response=after_response,
+            )
+        )
+        responses.add(TERMINATE_UPLOAD_METHOD, url, status=204)
+
+        response = self.client.terminate_upload(url)
+        request = responses.calls[0].request
+
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(request.method, TERMINATE_UPLOAD_METHOD)
+        for header_name, header_value in DEFAULT_REQUEST_HEADERS.items():
+            self.assertEqual(request.headers[header_name], header_value)
+        self.assertEqual(request.headers['x-hook'], 'before')
+        self.assertEqual(
+            events,
+            [
+                ('before', TERMINATE_UPLOAD_METHOD, url),
+                ('after', TERMINATE_UPLOAD_METHOD, 204),
+            ],
+        )
+
+    @responses.activate
+    def test_terminate_upload_non_success_status(self):
+        url = 'http://tusd.tusdemo.net/files/15acd89eabdf5738ffc'
+        responses.add(TERMINATE_UPLOAD_METHOD, url, status=404, body='gone')
+
+        with self.assertRaises(TusCommunicationError) as context:
+            self.client.terminate_upload(url)
+
+        self.assertEqual(context.exception.status_code, 404)
+        self.assertEqual(context.exception.response_content, b'gone')
 
     @responses.activate
     def test_uploader(self):

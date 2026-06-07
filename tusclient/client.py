@@ -1,6 +1,15 @@
 from typing import Dict, Optional, Tuple, Union
 
+import requests
+
+from tusclient.exceptions import TusCommunicationError
+from tusclient.protocol_generated import (
+    TERMINATE_UPLOAD_METHOD,
+    is_successful_response_status,
+    prepare_request_headers,
+)
 from tusclient.request_lifecycle import RequestLifecycleHooks
+from tusclient.request_lifecycle import TusRequestContext
 from tusclient.uploader import Uploader, AsyncUploader
 
 
@@ -70,6 +79,37 @@ class TusClient:
 
     def disable_request_id_header(self):
         self.add_request_id = False
+
+    def terminate_upload(self, upload_url: str, verify_tls_cert: bool = True):
+        headers = prepare_request_headers(None, self.headers, self.add_request_id)
+        context = TusRequestContext(TERMINATE_UPLOAD_METHOD, upload_url, headers)
+        if self.request_hooks is not None and self.request_hooks.before_request is not None:
+            self.request_hooks.before_request(context)
+
+        try:
+            response = requests.request(
+                TERMINATE_UPLOAD_METHOD,
+                upload_url,
+                headers=context.headers,
+                verify=verify_tls_cert,
+                cert=self.client_cert,
+            )
+        except requests.exceptions.RequestException as error:
+            raise TusCommunicationError(error)
+
+        if self.request_hooks is not None and self.request_hooks.after_response is not None:
+            self.request_hooks.after_response(context, response)
+
+        if not is_successful_response_status(response.status_code):
+            raise TusCommunicationError(
+                "unexpected status code ({}) while terminating upload".format(
+                    response.status_code
+                ),
+                response.status_code,
+                response.content,
+            )
+
+        return response
 
     def uploader(self, *args, **kwargs) -> Uploader:
         """

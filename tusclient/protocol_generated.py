@@ -2,6 +2,7 @@
 # If it looks wrong, please report the issue instead of editing this file by hand;
 # the source fix belongs in the protocol contract generator so all TUS clients stay in sync.
 
+CREATE_UPLOAD_METHOD = 'POST'
 DEFAULT_PROTOCOL_VERSION = '1.0.0'
 DEFAULT_REQUEST_HEADERS = {
     'Tus-Resumable': '1.0.0',
@@ -9,7 +10,18 @@ DEFAULT_REQUEST_HEADERS = {
 DEFAULT_RESPONSE_HEADERS = {
     'Tus-Resumable': '1.0.0',
 }
+OFFSET_DISCOVERY_METHOD = 'HEAD'
 REQUEST_ID_HEADER_NAME = 'X-Request-ID'
+SUCCESS_RESPONSE_STATUS_CATEGORY = 200
+TERMINATE_UPLOAD_METHOD = 'DELETE'
+UPLOAD_CHUNK_METHOD = 'PATCH'
+
+
+def is_successful_response_status(response_status_code):
+    return (
+        response_status_code >= SUCCESS_RESPONSE_STATUS_CATEGORY
+        and response_status_code < SUCCESS_RESPONSE_STATUS_CATEGORY + 100
+    )
 
 
 def prepare_request_headers(operation_headers=None, custom_headers=None, add_request_id=False):

@@ -288,6 +288,33 @@ def upload_callbacks(scenario):
     }
 
 
+def termination(scenario):
+    upload = object_value(scenario["upload"], "upload")
+    termination_config = object_value(upload["termination"], "upload.termination")
+    return {
+        "expectedVerificationStatus": int_value(
+            termination_config["expectedVerificationStatus"],
+            "upload.termination.expectedVerificationStatus",
+        ),
+        "method": string_value(
+            termination_config["method"],
+            "upload.termination.method",
+        ),
+        "minimumDeleteRequestCount": int_value(
+            termination_config["minimumDeleteRequestCount"],
+            "upload.termination.minimumDeleteRequestCount",
+        ),
+        "stopAfterAcceptedBytes": int_value(
+            termination_config["stopAfterAcceptedBytes"],
+            "upload.termination.stopAfterAcceptedBytes",
+        ),
+        "verificationMethod": string_value(
+            termination_config["verificationMethod"],
+            "upload.termination.verificationMethod",
+        ),
+    }
+
+
 def upload_callback_event_key(callbacks, *parts):
     return callbacks["eventKeyPartSeparator"].join(parts)
 
