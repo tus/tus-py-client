@@ -78,6 +78,15 @@ def string_array_array_value(value, label):
     return value
 
 
+def string_map_value(value, label):
+    if not isinstance(value, dict):
+        fail("{} must be an object".format(label))
+    for key, item in value.items():
+        string_value(key, "{} key".format(label))
+        string_value(item, "{}.{}".format(label, key))
+    return value
+
+
 def resolve_value(value_spec, context, label):
     if "value" in value_spec:
         return value_spec["value"]
@@ -190,6 +199,11 @@ def request_lifecycle_hooks(scenario):
             "upload.requestLifecycleHooks.expectedBeforeRequestMethods",
         ),
     }
+
+
+def upload_headers(scenario):
+    upload = object_value(scenario["upload"], "upload")
+    return string_map_value(upload["headers"], "upload.headers")
 
 
 def upload_callbacks(scenario):
