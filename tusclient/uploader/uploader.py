@@ -10,6 +10,14 @@ import ssl
 from tusclient.uploader.baseuploader import BaseUploader
 
 from tusclient.exceptions import TusUploadFailed, TusCommunicationError
+from tusclient.protocol_generated import (
+    CREATE_UPLOAD_METHOD,
+    LOCATION_HEADER_NAME,
+    UPLOAD_BODY_CONTENT_TYPE,
+    UPLOAD_BODY_CONTENT_TYPE_HEADER_NAME,
+    UPLOAD_OFFSET_HEADER_NAME,
+    is_successful_response_status,
+)
 from tusclient.request import TusRequest, AsyncTusRequest, catch_requests_error
 
 
@@ -21,6 +29,101 @@ def _verify_upload(request: TusRequest):
 
 
 class Uploader(BaseUploader):
+    @catch_requests_error
+    def create_url_with_upload(self, bytes_to_upload: int):
+        """
+        Create a new upload URL and send the first bytes in the creation request.
+        """
+        if bytes_to_upload < 0:
+            raise ValueError("bytes_to_upload must be non-negative")
+        if self.upload_length_deferred:
+            raise ValueError(
+                "create_url_with_upload cannot be used with upload_length_deferred"
+            )
+        if bytes_to_upload > self.get_file_size():
+            raise ValueError("bytes_to_upload cannot exceed the upload size")
+
+        stream = self.get_file_stream()
+        try:
+            chunk = stream.read(bytes_to_upload)
+        finally:
+            if self.file_stream is None:
+                stream.close()
+
+        if len(chunk) != bytes_to_upload:
+            raise ValueError(
+                "Could only read {} of {} requested upload bytes".format(
+                    len(chunk),
+                    bytes_to_upload,
+                )
+            )
+
+        headers = self.get_url_creation_headers()
+        headers[UPLOAD_BODY_CONTENT_TYPE_HEADER_NAME] = UPLOAD_BODY_CONTENT_TYPE
+        context = self.run_before_request(CREATE_UPLOAD_METHOD, self.client.url, headers)
+        resp = requests.request(
+            CREATE_UPLOAD_METHOD,
+            self.client.url,
+            data=chunk,
+            headers=context.headers,
+            verify=self.verify_tls_cert,
+            cert=self.client_cert,
+        )
+        self.run_after_response(context, resp)
+
+        if not is_successful_response_status(resp.status_code):
+            raise TusCommunicationError(
+                "Attempt to create upload with data fails with status {}".format(
+                    resp.status_code
+                ),
+                resp.status_code,
+                resp.content,
+            )
+
+        url = resp.headers.get(LOCATION_HEADER_NAME)
+        if url is None:
+            raise TusCommunicationError(
+                "Attempt to retrieve create file url with status {}".format(
+                    resp.status_code
+                ),
+                resp.status_code,
+                resp.content,
+            )
+
+        offset = resp.headers.get(UPLOAD_OFFSET_HEADER_NAME)
+        if offset is None:
+            raise TusCommunicationError(
+                "Attempt to retrieve accepted upload offset with status {}".format(
+                    resp.status_code
+                ),
+                resp.status_code,
+                resp.content,
+            )
+
+        try:
+            accepted_offset = int(offset)
+        except ValueError:
+            raise TusCommunicationError(
+                "Unexpected accepted upload offset {}".format(offset),
+                resp.status_code,
+                resp.content,
+            )
+        if accepted_offset < 0 or accepted_offset > bytes_to_upload:
+            raise TusCommunicationError(
+                "Unexpected accepted upload offset {}".format(accepted_offset),
+                resp.status_code,
+                resp.content,
+            )
+
+        previous_offset = self.offset
+        self.set_url(urljoin(self.client.url, url))
+        self.offset = accepted_offset
+        self.notify_progress(previous_offset)
+        self.notify_progress(self.offset)
+        self.notify_chunk_complete(self.offset - previous_offset, self.offset)
+        self.remove_url_on_success()
+        return self.url
+
     def upload(self, stop_at: Optional[int] = None):
         """
         Perform file upload.
