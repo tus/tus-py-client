@@ -307,6 +307,10 @@ TUS_SUPPORTED_PROTOCOLS = [
     'ietf-draft-03',
     'ietf-draft-05',
 ]
+URL_STORAGE_ID_MULTIPLIER = 1000000000000
+URL_STORAGE_ID_STRATEGY = 'rounded-random-number'
+URL_STORAGE_NAMESPACE = 'tus'
+URL_STORAGE_SEPARATOR = '::'
 UPLOAD_BODY_CONTENT_TYPE = 'application/offset+octet-stream'
 UPLOAD_BODY_CONTENT_TYPE_HEADER_NAME = 'Content-Type'
 UPLOAD_CHUNK_METHOD = 'PATCH'
@@ -362,6 +366,28 @@ def request_method_plan(operation_id, source_method, input_options=None):
         'headers': {},
         'method': source_method,
     }
+
+
+def url_storage_all_uploads_prefix():
+    return '{}{}'.format(URL_STORAGE_NAMESPACE, URL_STORAGE_SEPARATOR)
+
+
+def url_storage_fingerprint_prefix(fingerprint):
+    return '{}{}{}'.format(
+        url_storage_all_uploads_prefix(),
+        fingerprint,
+        URL_STORAGE_SEPARATOR,
+    )
+
+
+def url_storage_id(random_value):
+    if URL_STORAGE_ID_STRATEGY != 'rounded-random-number':
+        raise ValueError('tus: unsupported URL storage id strategy {}'.format(URL_STORAGE_ID_STRATEGY))
+    return round(random_value * URL_STORAGE_ID_MULTIPLIER)
+
+
+def url_storage_key(fingerprint, upload_id):
+    return '{}{}'.format(url_storage_fingerprint_prefix(fingerprint), upload_id)
 
 
 def add_operation_request_headers(headers, operation_headers):

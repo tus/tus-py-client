@@ -1,11 +1,15 @@
 """Resume a Transloadit devdock TUS upload using tus-py-client."""
 
 import sys
+from contextlib import contextmanager
 from io import BytesIO
+from os import remove
 from pathlib import Path
+from tempfile import NamedTemporaryFile
 
 from tusclient import client as tus
 from tusclient.fingerprint.interface import Fingerprint
+from tusclient.storage import filestorage
 from tusclient.storage.interface import Storage
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -35,6 +39,9 @@ class MemoryStorage(Storage):
 
     def count(self):
         return len(self.urls)
+
+    def keys(self):
+        return list(self.urls.keys())
 
 
 def uploader_for(scenario, create_response, content, storage):
@@ -90,41 +97,77 @@ def resume_stored_upload(scenario, create_response, content, storage):
     return uploader.url
 
 
+@contextmanager
+def url_storage_for(upload_config):
+    backend = upload_config.get("urlStorageBackend")
+    if backend is None:
+        yield MemoryStorage()
+        return
+
+    if backend["kind"] != "file":
+        fail("unsupported URL storage backend {!r}".format(backend["kind"]))
+
+    temp_fp = NamedTemporaryFile(delete=False)
+    temp_fp.close()
+    storage = filestorage.FileStorage(temp_fp.name)
+    try:
+        yield storage
+    finally:
+        storage.close()
+        remove(temp_fp.name)
+
+
 def upload_with_stored_resume(scenario, create_response):
     upload_config = scenario["upload"]
     resume = upload_config["resume"]
     content = scenario_bytes(upload_config)
-    storage = MemoryStorage()
 
-    first_upload_url = upload_first_chunk_and_pause(scenario, create_response, content, storage)
-    previous_upload_count = storage.count()
-    if previous_upload_count != resume["expectedPreviousUploadCount"]:
-        fail(
-            "stored upload count {}, expected {}".format(
-                previous_upload_count,
-                resume["expectedPreviousUploadCount"],
+    with url_storage_for(upload_config) as storage:
+        first_upload_url = upload_first_chunk_and_pause(scenario, create_response, content, storage)
+        previous_upload_count = storage.count()
+        storage_keys_after_first_upload = storage.keys()
+        if previous_upload_count != resume["expectedPreviousUploadCount"]:
+            fail(
+                "stored upload count {}, expected {}".format(
+                    previous_upload_count,
+                    resume["expectedPreviousUploadCount"],
+                )
             )
-        )
 
-    upload_url = resume_stored_upload(scenario, create_response, content, storage)
-    if upload_url != first_upload_url:
-        fail("resumed upload URL {}, expected {}".format(upload_url, first_upload_url))
+        upload_url = resume_stored_upload(scenario, create_response, content, storage)
+        if upload_url != first_upload_url:
+            fail("resumed upload URL {}, expected {}".format(upload_url, first_upload_url))
 
-    remaining_previous_upload_count = storage.count()
-    if remaining_previous_upload_count != resume["expectedRemainingPreviousUploadCount"]:
-        fail(
-            "remaining stored upload count {}, expected {}".format(
-                remaining_previous_upload_count,
-                resume["expectedRemainingPreviousUploadCount"],
+        remaining_previous_upload_count = storage.count()
+        if remaining_previous_upload_count != resume["expectedRemainingPreviousUploadCount"]:
+            fail(
+                "remaining stored upload count {}, expected {}".format(
+                    remaining_previous_upload_count,
+                    resume["expectedRemainingPreviousUploadCount"],
+                )
             )
-        )
 
-    return {
-        "firstUploadUrl": first_upload_url,
-        "previousUploadCount": previous_upload_count,
-        "remainingPreviousUploadCount": remaining_previous_upload_count,
-        "uploadUrl": upload_url,
-    }
+        result = {
+            "firstUploadUrl": first_upload_url,
+            "previousUploadCount": previous_upload_count,
+            "remainingPreviousUploadCount": remaining_previous_upload_count,
+            "uploadUrl": upload_url,
+        }
+
+        backend = upload_config.get("urlStorageBackend")
+        if backend is not None:
+            expected_key_prefix = backend["expectedStoredUploadKeyPrefix"]
+            result.update(
+                {
+                    "storageFileEntryCount": storage.count(),
+                    "storedUploadKeyPrefixMatched": any(
+                        key.startswith(expected_key_prefix) for key in storage_keys_after_first_upload
+                    ),
+                    "urlStorageBackend": backend["kind"],
+                }
+            )
+
+        return result
 
 
 def main():
