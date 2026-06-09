@@ -1,8 +1,11 @@
 """Shared helpers for API2 devdock examples."""
 
+from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 import os
 from pathlib import Path
+from threading import Thread
+from urllib.parse import urlparse, urlunparse
 
 
 def fail(message):
@@ -85,6 +88,41 @@ def string_map_value(value, label):
         string_value(key, "{} key".format(label))
         string_value(item, "{}.{}".format(label, key))
     return value
+
+
+def conformance_input_options(conformance_scenario):
+    entries = conformance_scenario["inputOptionEntries"]
+    if not isinstance(entries, list):
+        fail("conformanceScenario.inputOptionEntries must be a list")
+
+    result = {}
+    for index, entry in enumerate(entries):
+        option = object_value(
+            entry,
+            "conformanceScenario.inputOptionEntries[{}]".format(index),
+        )
+        key = string_value(
+            option["key"],
+            "conformanceScenario.inputOptionEntries[{}].key".format(index),
+        )
+        result[key] = option["value"]
+
+    return result
+
+
+def conformance_input_source_bytes(conformance_scenario):
+    input_source = object_value(
+        conformance_scenario["inputSource"],
+        "conformanceScenario.inputSource",
+    )
+    kind = string_value(input_source["kind"], "conformanceScenario.inputSource.kind")
+    if kind != "blob":
+        fail("unsupported conformance input source kind {!r}".format(kind))
+
+    return string_value(
+        input_source["content"],
+        "conformanceScenario.inputSource.content",
+    ).encode("utf-8")
 
 
 def resolve_value(value_spec, context, label):
@@ -398,6 +436,315 @@ def scalar_string(value):
     if isinstance(value, bool):
         return "true" if value else "false"
     return str(value)
+
+
+class TusConformancePlanServer:
+    def __init__(self, conformance_scenario, endpoint_origin):
+        self.endpoint_origin = urlparse(string_value(endpoint_origin, "endpointOrigin"))
+        if not self.endpoint_origin.scheme or not self.endpoint_origin.netloc:
+            fail("endpointOrigin must be an absolute URL")
+
+        self.input_source_content = conformance_input_source_bytes(conformance_scenario)
+        requests = conformance_scenario["requests"]
+        if not isinstance(requests, list):
+            fail("conformanceScenario.requests must be a list")
+        self.requests = requests
+        self.errors = []
+        self.observed = [None] * len(requests)
+        self.observed_count = 0
+        self.next_request_index = 0
+        self.httpd = HTTPServer(("127.0.0.1", 0), self._handler_class())
+        self.thread = Thread(target=self.httpd.serve_forever)
+        self.thread.daemon = True
+        self.thread.start()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.close()
+
+    def close(self):
+        self.httpd.shutdown()
+        self.httpd.server_close()
+        self.thread.join(timeout=5)
+
+    def endpoint_url(self):
+        return self.local_url(urlunparse(self.endpoint_origin))
+
+    def local_url(self, canonical_url):
+        parsed = urlparse(canonical_url)
+        if (
+            parsed.scheme != self.endpoint_origin.scheme
+            or parsed.netloc != self.endpoint_origin.netloc
+        ):
+            return canonical_url
+
+        server_origin = self._server_origin()
+        return urlunparse(
+            (
+                server_origin.scheme,
+                server_origin.netloc,
+                parsed.path,
+                parsed.params,
+                parsed.query,
+                parsed.fragment,
+            )
+        )
+
+    def canonical_url(self, actual_url):
+        parsed = urlparse(actual_url)
+        server_origin = self._server_origin()
+        if parsed.scheme != server_origin.scheme or parsed.netloc != server_origin.netloc:
+            return actual_url
+
+        return urlunparse(
+            (
+                self.endpoint_origin.scheme,
+                self.endpoint_origin.netloc,
+                parsed.path,
+                parsed.params,
+                parsed.query,
+                parsed.fragment,
+            )
+        )
+
+    def local_value(self, value):
+        return string_value(value, "value").replace(
+            self._origin_string(self.endpoint_origin),
+            self._origin_string(self._server_origin()),
+        )
+
+    def canonical_value(self, value):
+        return string_value(value, "value").replace(
+            self._origin_string(self._server_origin()),
+            self._origin_string(self.endpoint_origin),
+        )
+
+    def assert_exhausted(self):
+        self.assert_no_errors()
+        if self.observed_count == len(self.requests):
+            return
+
+        fail(
+            "expected {} conformance request(s), got {}".format(
+                len(self.requests),
+                self.observed_count,
+            )
+        )
+
+    def assert_no_errors(self):
+        if self.errors:
+            fail("; ".join(self.errors))
+
+    def result(self):
+        self.assert_no_errors()
+        observed = [request for request in self.observed if request is not None]
+        return {
+            "absentHeaderPresence": [
+                request["absentHeaderPresence"] for request in observed
+            ],
+            "requestBodySizes": [request["bodySize"] for request in observed],
+            "requestBodyStarts": [request["bodyStart"] for request in observed],
+            "requestCount": self.observed_count,
+            "requestHeaders": [request["headers"] for request in observed],
+            "requestMethods": [request["method"] for request in observed],
+            "requestUrls": [request["url"] for request in observed],
+        }
+
+    def _handler_class(self):
+        conformance_server = self
+
+        class TusConformanceRequestHandler(BaseHTTPRequestHandler):
+            def do_HEAD(self):
+                self._handle_conformance_request()
+
+            def do_PATCH(self):
+                self._handle_conformance_request()
+
+            def do_POST(self):
+                self._handle_conformance_request()
+
+            def do_DELETE(self):
+                self._handle_conformance_request()
+
+            def log_message(self, format, *args):
+                return
+
+            def _handle_conformance_request(self):
+                content_length = int(self.headers.get("Content-Length", "0"))
+                body = self.rfile.read(content_length) if content_length > 0 else b""
+                try:
+                    request_plan = conformance_server.observe_request(self, body)
+                    conformance_server.write_response(self, request_plan)
+                except Exception as error:
+                    conformance_server.errors.append(str(error))
+                    response_body = str(error).encode("utf-8")
+                    self.send_response(500)
+                    self.send_header("Content-Length", str(len(response_body)))
+                    self.end_headers()
+                    self.wfile.write(response_body)
+
+        return TusConformanceRequestHandler
+
+    def observe_request(self, handler, body):
+        if self.next_request_index >= len(self.requests):
+            fail("unexpected request {} {}".format(handler.command, handler.path))
+
+        request_plan = object_value(
+            self.requests[self.next_request_index],
+            "conformanceScenario.requests[{}]".format(self.next_request_index),
+        )
+        actual_url = self.canonical_url(self._request_url(handler))
+        self.assert_request_matches_plan(
+            self.next_request_index,
+            request_plan,
+            handler.command,
+            actual_url,
+            body,
+        )
+        self.assert_request_body_content(self.next_request_index, request_plan, body)
+        self.assert_absent_headers(self.next_request_index, request_plan, handler.headers)
+        expected_headers = object_value(
+            request_plan["effectiveHeaders"],
+            "conformanceScenario.requests[{}].effectiveHeaders".format(
+                self.next_request_index,
+            ),
+        )
+        self.assert_headers(self.next_request_index, expected_headers, handler.headers)
+
+        self.observed[self.next_request_index] = {
+            "absentHeaderPresence": self.captured_absent_header_presence(
+                request_plan,
+                handler.headers,
+            ),
+            "bodySize": None if request_plan.get("bodySize") is None else len(body),
+            "bodyStart": request_plan.get("bodyStart"),
+            "headers": self.captured_headers(expected_headers, handler.headers),
+            "method": handler.command,
+            "url": actual_url,
+        }
+        self.observed_count += 1
+        self.next_request_index += 1
+        return request_plan
+
+    def assert_request_matches_plan(self, request_index, request_plan, method, actual_url, body):
+        expected_method = string_value(
+            request_plan["effectiveMethod"],
+            "conformanceScenario.requests[{}].effectiveMethod".format(request_index),
+        )
+        expected_url = string_value(
+            request_plan["expectedUrl"],
+            "conformanceScenario.requests[{}].expectedUrl".format(request_index),
+        )
+        if method != expected_method:
+            fail(
+                "request {} expected method {}, got {}".format(
+                    request_index,
+                    expected_method,
+                    method,
+                )
+            )
+        if actual_url != expected_url:
+            fail(
+                "request {} expected URL {}, got {}".format(
+                    request_index,
+                    expected_url,
+                    actual_url,
+                )
+            )
+        body_size = request_plan.get("bodySize")
+        if body_size is not None and len(body) != body_size:
+            fail(
+                "request {} expected body size {}, got {}".format(
+                    request_index,
+                    body_size,
+                    len(body),
+                )
+            )
+
+    def assert_request_body_content(self, request_index, request_plan, body):
+        body_start = request_plan.get("bodyStart")
+        if body_start is None:
+            return
+
+        expected = self.input_source_content[body_start : body_start + len(body)]
+        if body != expected:
+            fail("request {} body did not match input source slice".format(request_index))
+
+    def assert_absent_headers(self, request_index, request_plan, actual_headers):
+        normalized_headers = self._normalized_headers(actual_headers)
+        for name in request_plan["absentHeaders"]:
+            if name.lower() not in normalized_headers:
+                continue
+
+            fail("request {} expected header {} to be absent".format(request_index, name))
+
+    def assert_headers(self, request_index, expected_headers, actual_headers):
+        normalized_headers = self._normalized_headers(actual_headers)
+        for name, expected_value in expected_headers.items():
+            actual_value = normalized_headers.get(name.lower())
+            local_expected_value = self.local_value(expected_value)
+            if actual_value == local_expected_value:
+                continue
+
+            fail(
+                "request {} expected header {}={!r}, got {!r}".format(
+                    request_index,
+                    name,
+                    local_expected_value,
+                    actual_value,
+                )
+            )
+
+    def captured_headers(self, expected_headers, actual_headers):
+        normalized_headers = self._normalized_headers(actual_headers)
+        result = {}
+        for name in expected_headers:
+            actual_value = normalized_headers.get(name.lower())
+            if actual_value is not None:
+                result[name] = self.canonical_value(actual_value)
+
+        return result
+
+    def captured_absent_header_presence(self, request_plan, actual_headers):
+        normalized_headers = self._normalized_headers(actual_headers)
+        result = {}
+        for name in request_plan["absentHeaders"]:
+            result[name] = name.lower() in normalized_headers
+        return result
+
+    def write_response(self, handler, request_plan):
+        response_plan = object_value(
+            request_plan["response"],
+            "conformanceScenario request response",
+        )
+        response_body = (response_plan.get("body") or "").encode("utf-8")
+        handler.send_response(response_plan["statusCode"])
+        for name, value in response_plan["effectiveHeaders"].items():
+            handler.send_header(name, self.local_value(value))
+        if response_body:
+            handler.send_header("Content-Length", str(len(response_body)))
+        handler.end_headers()
+        if response_body:
+            handler.wfile.write(response_body)
+
+    def _server_origin(self):
+        host, port = self.httpd.server_address
+        return urlparse("http://{}:{}".format(host, port))
+
+    def _request_url(self, handler):
+        host = handler.headers.get("Host")
+        if host is None:
+            host = "{}:{}".format(*self.httpd.server_address)
+        return "http://{}{}".format(host, handler.path)
+
+    def _normalized_headers(self, headers):
+        return {name.lower(): value for name, value in headers.items()}
+
+    @staticmethod
+    def _origin_string(parsed_url):
+        return "{}://{}".format(parsed_url.scheme, parsed_url.netloc)
 
 
 def tus_url(upload_config, scenario, create_response):

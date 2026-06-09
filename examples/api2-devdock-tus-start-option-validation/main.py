@@ -9,6 +9,8 @@ from tusclient import client as tus
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from api2devdock import (
+    conformance_input_options,
+    conformance_input_source_bytes,
     fail,
     int_value,
     load_scenario,
@@ -23,41 +25,6 @@ def bool_value(value, label):
     if not isinstance(value, bool):
         fail("{} must be a boolean".format(label))
     return value
-
-
-def conformance_input_options(conformance_scenario):
-    entries = conformance_scenario["inputOptionEntries"]
-    if not isinstance(entries, list):
-        fail("conformanceScenario.inputOptionEntries must be a list")
-
-    result = {}
-    for index, entry in enumerate(entries):
-        option = object_value(
-            entry,
-            "conformanceScenario.inputOptionEntries[{}]".format(index),
-        )
-        key = string_value(
-            option["key"],
-            "conformanceScenario.inputOptionEntries[{}].key".format(index),
-        )
-        result[key] = option["value"]
-
-    return result
-
-
-def conformance_input_source_bytes(conformance_scenario):
-    input_source = object_value(
-        conformance_scenario["inputSource"],
-        "conformanceScenario.inputSource",
-    )
-    kind = string_value(input_source["kind"], "conformanceScenario.inputSource.kind")
-    if kind != "blob":
-        fail("unsupported conformance input source kind {!r}".format(kind))
-
-    return string_value(
-        input_source["content"],
-        "conformanceScenario.inputSource.content",
-    ).encode("utf-8")
 
 
 def conformance_completion(conformance_scenario):
