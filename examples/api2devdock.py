@@ -122,13 +122,38 @@ def conformance_input_source_bytes(conformance_scenario):
         "conformanceScenario.inputSource",
     )
     kind = string_value(input_source["kind"], "conformanceScenario.inputSource.kind")
-    if kind != "blob":
+    if kind not in ("blob", "node-path-reference"):
         fail("unsupported conformance input source kind {!r}".format(kind))
 
     return string_value(
         input_source["content"],
         "conformanceScenario.inputSource.content",
     ).encode("utf-8")
+
+
+def conformance_input_source_kind(conformance_scenario):
+    input_source = object_value(
+        conformance_scenario["inputSource"],
+        "conformanceScenario.inputSource",
+    )
+    return string_value(input_source["kind"], "conformanceScenario.inputSource.kind")
+
+
+def conformance_scenario_wants_event(conformance_scenario, event_kind):
+    events = conformance_scenario.get("events", [])
+    if not isinstance(events, list):
+        fail("conformanceScenario.events must be a list")
+
+    for index, event in enumerate(events):
+        event = object_value(event, "conformanceScenario.events[{}]".format(index))
+        kind = string_value(
+            event["kind"],
+            "conformanceScenario.events[{}].kind".format(index),
+        )
+        if kind == event_kind:
+            return True
+
+    return False
 
 
 def resolve_value(value_spec, context, label):
