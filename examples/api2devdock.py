@@ -445,17 +445,19 @@ def scalar_string(value):
 
 
 class TusConformancePlanServer:
-    def __init__(self, conformance_scenario, endpoint_origin):
+    def __init__(self, conformance_scenario, endpoint_origin, on_abort_request=None):
         self.endpoint_origin = urlparse(string_value(endpoint_origin, "endpointOrigin"))
         if not self.endpoint_origin.scheme or not self.endpoint_origin.netloc:
             fail("endpointOrigin must be an absolute URL")
 
+        self.on_abort_request = on_abort_request
         self.input_source_content = conformance_input_source_bytes(conformance_scenario)
         requests = conformance_scenario["requests"]
         if not isinstance(requests, list):
             fail("conformanceScenario.requests must be a list")
         self.requests = requests
         self.errors = []
+        self.events = []
         self.observed = [None] * len(requests)
         self.observed_count = 0
         self.next_request_index = 0
@@ -550,6 +552,7 @@ class TusConformancePlanServer:
             "absentHeaderPresence": [
                 request["absentHeaderPresence"] for request in observed
             ],
+            "events": self.events,
             "requestBodySizes": [request["bodySize"] for request in observed],
             "requestBodyStarts": [request["bodyStart"] for request in observed],
             "requestCount": self.observed_count,
@@ -582,6 +585,10 @@ class TusConformancePlanServer:
                 body = self.rfile.read(content_length) if content_length > 0 else b""
                 try:
                     request_plan = conformance_server.observe_request(self, body)
+                    if request_plan.get("abort", False):
+                        conformance_server.abort_request(conformance_server.observed_count - 1)
+                        self.close_connection = True
+                        return
                     conformance_server.write_response(self, request_plan)
                 except Exception as error:
                     conformance_server.errors.append(str(error))
@@ -633,6 +640,18 @@ class TusConformancePlanServer:
         self.observed_count += 1
         self.next_request_index += 1
         return request_plan
+
+    def abort_request(self, request_index):
+        observed = self.observed[request_index]
+        event = {
+            "kind": "request-abort",
+            "method": observed["method"],
+            "requestIndex": request_index,
+            "url": observed["url"],
+        }
+        self.events.append(event)
+        if self.on_abort_request is not None:
+            self.on_abort_request(event)
 
     def assert_request_matches_plan(self, request_index, request_plan, method, actual_url, body):
         expected_method = string_value(

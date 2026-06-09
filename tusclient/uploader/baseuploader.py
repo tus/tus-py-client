@@ -4,6 +4,7 @@ import re
 from base64 import b64encode
 from sys import maxsize as MAXSIZE
 import hashlib
+from threading import Event
 
 import requests
 
@@ -197,10 +198,17 @@ class BaseUploader:
         self.retry_delays = retry_delays
         self.on_progress = on_progress
         self.on_chunk_complete = on_chunk_complete
+        self._abort_requested = Event()
         (
             self.__checksum_algorithm_name,
             self.__checksum_algorithm,
         ) = self.CHECKSUM_ALGORITHM_PAIR
+
+    def abort(self):
+        self._abort_requested.set()
+
+    def is_aborted(self):
+        return self._abort_requested.is_set()
 
     def get_headers(self):
         """
@@ -225,11 +233,17 @@ class BaseUploader:
         }
 
     def run_before_request(self, method, url, headers):
+        if self.client is not None:
+            self.client._set_current_uploader(self)
         context = TusRequestContext(method, url, headers)
         hooks = getattr(self.client, "request_hooks", None)
         if hooks is not None and hooks.before_request is not None:
             hooks.before_request(context)
         return context
+
+    def clear_current_request(self):
+        if self.client is not None:
+            self.client._clear_current_uploader(self)
 
     def run_after_response(self, context, response):
         hooks = getattr(self.client, "request_hooks", None)
@@ -273,9 +287,12 @@ class BaseUploader:
         """
         headers = self.get_headers()
         context = self.run_before_request("HEAD", self.url, headers)
-        resp = requests.head(
-            self.url, headers=context.headers, verify=self.verify_tls_cert, cert=self.client_cert
-        )
+        try:
+            resp = requests.head(
+                self.url, headers=context.headers, verify=self.verify_tls_cert, cert=self.client_cert
+            )
+        finally:
+            self.clear_current_request()
         self.run_after_response(context, resp)
         offset = resp.headers.get("upload-offset")
         if offset is None:
@@ -379,6 +396,10 @@ class BaseUploader:
             return
 
         self.url_storage.remove_item(self._get_fingerprint())
+
+    def remove_stored_url(self):
+        if self.store_url and self.url_storage:
+            self.url_storage.remove_item(self._get_fingerprint())
 
     def get_file_stream(self):
         """

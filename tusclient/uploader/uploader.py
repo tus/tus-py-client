@@ -13,7 +13,7 @@ from tusclient.detailed_error import (
     create_upload_request_error,
     create_upload_response_error,
 )
-from tusclient.exceptions import TusUploadFailed, TusCommunicationError
+from tusclient.exceptions import TusUploadAborted, TusUploadFailed, TusCommunicationError
 from tusclient.protocol_generated import (
     CREATE_UPLOAD_METHOD,
     LOCATION_HEADER_NAME,
@@ -79,7 +79,11 @@ class Uploader(BaseUploader):
                 cert=self.client_cert,
             )
         except requests.exceptions.RequestException as error:
+            if self.is_aborted():
+                raise TusUploadAborted()
             raise create_upload_request_error(context, error)
+        finally:
+            self.clear_current_request()
         self.run_after_response(context, resp)
 
         if not is_successful_response_status(resp.status_code):
@@ -184,7 +188,11 @@ class Uploader(BaseUploader):
                 cert=self.client_cert,
             )
         except requests.exceptions.RequestException as error:
+            if self.is_aborted():
+                raise TusUploadAborted()
             raise create_upload_request_error(context, error)
+        finally:
+            self.clear_current_request()
         self.run_after_response(context, resp)
         url = resp.headers.get("location")
         if not is_successful_response_status(resp.status_code) or url is None:
@@ -282,23 +290,28 @@ class AsyncUploader(BaseUploader):
             async with aiohttp.ClientSession(connector=conn) as session:
                 headers = self.get_url_creation_headers()
                 context = self.run_before_request("POST", self.client.url, headers)
-                verify_tls_cert = None if self.verify_tls_cert else False
-                async with session.post(
-                    self.client.url, headers=context.headers, ssl=verify_tls_cert
-                ) as resp:
-                    self.run_after_response(context, resp)
-                    url = resp.headers.get("location")
-                    if url is None:
-                        msg = (
-                            "Attempt to retrieve create file url with status {}".format(
-                                resp.status
+                try:
+                    verify_tls_cert = None if self.verify_tls_cert else False
+                    async with session.post(
+                        self.client.url, headers=context.headers, ssl=verify_tls_cert
+                    ) as resp:
+                        self.run_after_response(context, resp)
+                        url = resp.headers.get("location")
+                        if url is None:
+                            msg = (
+                                "Attempt to retrieve create file url with status {}".format(
+                                    resp.status
+                                )
                             )
-                        )
-                        raise TusCommunicationError(
-                            msg, resp.status, await resp.content.read()
-                        )
-                    return urljoin(self.client.url, url)
+                            raise TusCommunicationError(
+                                msg, resp.status, await resp.content.read()
+                            )
+                        return urljoin(self.client.url, url)
+                finally:
+                    self.clear_current_request()
         except aiohttp.ClientError as error:
+            if self.is_aborted():
+                raise TusUploadAborted()
             raise TusCommunicationError(error)
 
     async def _do_request(self):

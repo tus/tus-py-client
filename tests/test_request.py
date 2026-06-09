@@ -3,7 +3,9 @@ import hashlib
 
 from parametrize import parametrize
 import responses
+import requests
 
+from tusclient.exceptions import TusUploadAborted
 from tusclient import request
 from tusclient.request_lifecycle import RequestLifecycleHooks
 from tests import mixin
@@ -102,3 +104,15 @@ class TusRequestTest(mixin.Mixin):
             resps.add_callback(responses.PATCH, self.url, callback=validate_verify)
             tus_request.perform()
             self.assertEqual(verify, False)
+
+    def test_perform_maps_aborted_transport_error(self):
+        tus_request = request.TusRequest(self.uploader)
+        self.uploader.abort()
+
+        def disconnect(req):
+            raise requests.exceptions.ConnectionError("connection closed")
+
+        with responses.RequestsMock() as resps:
+            resps.add_callback(responses.PATCH, self.url, callback=disconnect)
+            with self.assertRaises(TusUploadAborted):
+                tus_request.perform()

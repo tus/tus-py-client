@@ -5,6 +5,7 @@ import responses
 
 from tusclient import client
 from tusclient.exceptions import TusCommunicationError
+from tusclient.fingerprint.interface import Fingerprint
 from tusclient.protocol_generated import (
     DEFAULT_REQUEST_HEADERS,
     CREATE_UPLOAD_METHOD,
@@ -18,7 +19,30 @@ from tusclient.protocol_generated import (
     upload_body_headers,
 )
 from tusclient.request_lifecycle import RequestLifecycleHooks
+from tusclient.storage.interface import Storage
 from tusclient.uploader import Uploader, AsyncUploader
+
+
+class MemoryStorage(Storage):
+    def __init__(self):
+        self.values = {}
+
+    def get_item(self, key):
+        return self.values.get(key)
+
+    def set_item(self, key, value):
+        self.values[key] = value
+
+    def remove_item(self, key):
+        self.values.pop(key, None)
+
+
+class FixedFingerprint(Fingerprint):
+    def __init__(self, value):
+        self.value = value
+
+    def get_fingerprint(self, fs):
+        return self.value
 
 
 class TusClientTest(unittest.TestCase):
@@ -92,6 +116,25 @@ class TusClientTest(unittest.TestCase):
 
         self.assertEqual(context.exception.status_code, 404)
         self.assertEqual(context.exception.response_content, b'gone')
+
+    @responses.activate
+    def test_abort_upload_terminates_and_removes_stored_url(self):
+        upload_url = 'http://tusd.tusdemo.net/files/abort'
+        storage = MemoryStorage()
+        uploader = self.client.uploader(
+            file_stream=BytesIO(b'hello'),
+            fingerprinter=FixedFingerprint('abort-fingerprint'),
+            store_url=True,
+            url_storage=storage,
+        )
+        uploader.set_url(upload_url)
+        responses.add(TERMINATE_UPLOAD_METHOD, upload_url, status=204)
+
+        response = self.client.abort_upload(uploader, terminate_upload=True)
+
+        self.assertEqual(response.status_code, 204)
+        self.assertTrue(uploader.is_aborted())
+        self.assertIsNone(storage.get_item('abort-fingerprint'))
 
     @responses.activate
     def test_create_upload_with_data(self):

@@ -4,6 +4,7 @@ import requests
 
 from tusclient.exceptions import TusCommunicationError
 from tusclient.protocol_generated import (
+    ABORT_REMOVE_STORED_URL_AFTER_TERMINATION,
     TERMINATE_UPLOAD_METHOD,
     is_successful_response_status,
     prepare_request_headers,
@@ -50,6 +51,8 @@ class TusClient:
         self.client_cert = client_cert
         self.request_hooks = request_hooks
         self.add_request_id = add_request_id
+        self._abort_requested = False
+        self._current_uploader = None
 
     def set_headers(self, headers: Dict[str, str]):
         """
@@ -79,6 +82,39 @@ class TusClient:
 
     def disable_request_id_header(self):
         self.add_request_id = False
+
+    def _set_current_uploader(self, uploader):
+        self._current_uploader = uploader
+        if self._abort_requested:
+            self._abort_requested = False
+            uploader.abort()
+
+    def _clear_current_uploader(self, uploader):
+        if self._current_uploader is uploader:
+            self._current_uploader = None
+
+    def abort_upload(
+        self,
+        uploader=None,
+        terminate_upload: bool = False,
+        verify_tls_cert: bool = True,
+    ):
+        active_uploader = uploader or self._current_uploader
+        if active_uploader is None:
+            self._abort_requested = True
+            return None
+
+        active_uploader.abort()
+        if not terminate_upload or not active_uploader.url:
+            return None
+
+        response = self.terminate_upload(
+            active_uploader.url,
+            verify_tls_cert=verify_tls_cert,
+        )
+        if ABORT_REMOVE_STORED_URL_AFTER_TERMINATION == "after-successful-termination":
+            active_uploader.remove_stored_url()
+        return response
 
     def terminate_upload(self, upload_url: str, verify_tls_cert: bool = True):
         headers = prepare_request_headers(None, self.headers, self.add_request_id)

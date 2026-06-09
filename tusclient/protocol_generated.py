@@ -2,6 +2,19 @@
 # If it looks wrong, please report the issue instead of editing this file by hand;
 # the source fix belongs in the protocol contract generator so all TUS clients stay in sync.
 
+ABORT_ERROR_MESSAGE = 'Request was aborted'
+ABORT_ERROR_TYPE = 'DOMException'
+ABORT_REMOVE_STORED_URL_AFTER_TERMINATION = 'after-successful-termination'
+ABORT_SEQUENCE = [
+    'mark-aborted',
+    'abort-parallel-uploads',
+    'abort-current-request',
+    'clear-retry-timer',
+    'terminate-upload-if-requested',
+]
+ABORT_SUPPRESS_ERROR_AFTER_ABORT = True
+ABORT_TERMINATE_UPLOAD = 'when-requested-and-upload-url-known'
+ABORT_TERMINATE_UPLOAD_CONTEXT = 'detached-from-aborted-request'
 CREATE_UPLOAD_METHOD = 'POST'
 DEFAULT_CLIENT_PROTOCOL = 'tus-v1'
 DEFAULT_PROTOCOL_VERSION = '1.0.0'

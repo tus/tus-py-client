@@ -7,7 +7,7 @@ import requests
 import aiohttp
 import ssl
 
-from tusclient.exceptions import TusUploadFailed, TusCommunicationError
+from tusclient.exceptions import TusUploadAborted, TusUploadFailed, TusCommunicationError
 from tusclient.protocol_generated import (
     UPLOAD_CHUNK_METHOD,
     UPLOAD_CHUNK_OPERATION_ID,
@@ -115,21 +115,26 @@ class TusRequest(BaseTusRequest):
             operation_headers.update(method_plan["headers"])
             headers = self.uploader.prepare_request_headers(operation_headers)
             context = self.uploader.run_before_request(method_plan["method"], self._url, headers)
-            resp = requests.request(
-                method_plan["method"],
-                self._url,
-                data=chunk,
-                headers=context.headers,
-                verify=self.verify_tls_cert,
-                stream=True,
-                cert=self.client_cert,
-            )
+            try:
+                resp = requests.request(
+                    method_plan["method"],
+                    self._url,
+                    data=chunk,
+                    headers=context.headers,
+                    verify=self.verify_tls_cert,
+                    stream=True,
+                    cert=self.client_cert,
+                )
+            finally:
+                self.uploader.clear_current_request()
             self.uploader.run_after_response(context, resp)
             self.status_code = resp.status_code
             self.response_content = resp.content
             self.response_headers = {k.lower(): v for k, v in resp.headers.items()}
             self.stream_eof = stream_eof
         except requests.exceptions.RequestException as error:
+            if self.uploader.is_aborted():
+                raise TusUploadAborted()
             raise TusUploadFailed(error)
 
 class AsyncTusRequest(BaseTusRequest):
@@ -173,19 +178,24 @@ class AsyncTusRequest(BaseTusRequest):
                 context = self.uploader.run_before_request(
                     method_plan["method"], self._url, headers
                 )
-                async with session.request(
-                    method_plan["method"],
-                    self._url,
-                    data=chunk,
-                    headers=context.headers,
-                    ssl=verify_tls_cert,
-                ) as resp:
-                    self.uploader.run_after_response(context, resp)
-                    self.status_code = resp.status
-                    self.response_headers = {
-                        k.lower(): v for k, v in resp.headers.items()
-                    }
-                    self.response_content = await resp.content.read()
-                    self.stream_eof = stream_eof
+                try:
+                    async with session.request(
+                        method_plan["method"],
+                        self._url,
+                        data=chunk,
+                        headers=context.headers,
+                        ssl=verify_tls_cert,
+                    ) as resp:
+                        self.uploader.run_after_response(context, resp)
+                        self.status_code = resp.status
+                        self.response_headers = {
+                            k.lower(): v for k, v in resp.headers.items()
+                        }
+                        self.response_content = await resp.content.read()
+                        self.stream_eof = stream_eof
+                finally:
+                    self.uploader.clear_current_request()
         except aiohttp.ClientError as error:
+            if self.uploader.is_aborted():
+                raise TusUploadAborted()
             raise TusUploadFailed(error)

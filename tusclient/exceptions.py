@@ -2,6 +2,8 @@
 Global Tusclient exception and warning classes.
 """
 
+from tusclient.protocol_generated import ABORT_ERROR_MESSAGE
+
 
 class TusCommunicationError(Exception):
     """
@@ -63,3 +65,10 @@ class TusDetailedError(TusCommunicationError):
 
 class TusUploadFailed(TusCommunicationError):
     """Should be raised when an attempted upload fails"""
+
+
+class TusUploadAborted(TusCommunicationError):
+    """Should be raised when an upload request is explicitly aborted"""
+
+    def __init__(self, message=ABORT_ERROR_MESSAGE):
+        super(TusUploadAborted, self).__init__(message)
