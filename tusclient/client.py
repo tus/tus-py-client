@@ -133,6 +133,7 @@ class TusClient:
                 Number of bytes to send during upload creation.
             see tusclient.uploader.Uploader for remaining arguments.
         """
+        kwargs["upload_data_during_creation"] = True
         uploader = self.uploader(*args, **kwargs)
         uploader.create_url_with_upload(bytes_to_upload)
         return uploader

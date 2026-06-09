@@ -12,6 +12,7 @@ from tusclient.request import TusRequest, catch_requests_error
 from tusclient.fingerprint import fingerprint, interface
 from tusclient.protocol_generated import DEFAULT_REQUEST_HEADERS, prepare_request_headers
 from tusclient.request_lifecycle import TusRequestContext
+from tusclient.start_validation import validate_upload_start_or_raise
 from tusclient.storage.interface import Storage
 
 if TYPE_CHECKING:
@@ -130,6 +131,12 @@ class BaseUploader:
         fingerprinter: Optional[interface.Fingerprint] = None,
         upload_checksum=False,
         upload_length_deferred=False,
+        upload_size: Optional[int] = None,
+        upload_data_during_creation=False,
+        parallel_uploads: Optional[int] = None,
+        parallel_upload_boundaries=None,
+        protocol: Optional[str] = None,
+        retry_delays=None,
         on_progress: Optional[Callable[[int, Optional[int]], None]] = None,
         on_chunk_complete: Optional[Callable[[int, int, Optional[int]], None]] = None,
     ):
@@ -143,6 +150,20 @@ class BaseUploader:
             raise ValueError(
                 "Please specify a storage instance to enable resumablility."
             )
+
+        validate_upload_start_or_raise(
+            client=client,
+            file_path=file_path,
+            file_stream=file_stream,
+            parallel_upload_boundaries=parallel_upload_boundaries,
+            parallel_uploads=parallel_uploads,
+            protocol=protocol,
+            retry_delays=retry_delays,
+            upload_data_during_creation=upload_data_during_creation,
+            upload_length_deferred=upload_length_deferred,
+            upload_size=upload_size,
+            url=url,
+        )
 
         self.verify_tls_cert = verify_tls_cert
         self.file_path = file_path
@@ -165,7 +186,13 @@ class BaseUploader:
         self._retried = 0
         self.retry_delay = retry_delay
         self.upload_checksum = upload_checksum
+        self.upload_data_during_creation = upload_data_during_creation
         self.upload_length_deferred = upload_length_deferred
+        self.upload_size = upload_size
+        self.parallel_uploads = parallel_uploads
+        self.parallel_upload_boundaries = parallel_upload_boundaries
+        self.protocol = protocol
+        self.retry_delays = retry_delays
         self.on_progress = on_progress
         self.on_chunk_complete = on_chunk_complete
         (
