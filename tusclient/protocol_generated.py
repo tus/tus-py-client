@@ -3,6 +3,7 @@
 # the source fix belongs in the protocol contract generator so all TUS clients stay in sync.
 
 CREATE_UPLOAD_METHOD = 'POST'
+DEFAULT_CLIENT_PROTOCOL = 'tus-v1'
 DEFAULT_PROTOCOL_VERSION = '1.0.0'
 DEFAULT_REQUEST_HEADERS = {
     'Tus-Resumable': '1.0.0',
@@ -307,6 +308,33 @@ TUS_SUPPORTED_PROTOCOLS = [
     'ietf-draft-03',
     'ietf-draft-05',
 ]
+TUS_PROTOCOL_REQUEST_HEADERS = {
+    'tus-v1': {
+        'Tus-Resumable': '1.0.0',
+    },
+    'ietf-draft-03': {
+        'Upload-Draft-Interop-Version': '5',
+    },
+    'ietf-draft-05': {
+        'Upload-Draft-Interop-Version': '6',
+    },
+}
+TUS_PROTOCOL_UPLOAD_BODY_CONTENT_TYPES = {
+    'ietf-draft-05': 'application/partial-upload',
+    'tus-v1': 'application/offset+octet-stream',
+}
+TUS_PROTOCOL_UPLOAD_COMPLETE_HEADERS = {
+    'ietf-draft-03': {
+        'completeValue': '?1',
+        'incompleteValue': '?0',
+        'name': 'Upload-Complete',
+    },
+    'ietf-draft-05': {
+        'completeValue': '?1',
+        'incompleteValue': '?0',
+        'name': 'Upload-Complete',
+    },
+}
 URL_STORAGE_ID_MULTIPLIER = 1000000000000
 URL_STORAGE_ID_STRATEGY = 'rounded-random-number'
 URL_STORAGE_NAMESPACE = 'tus'
@@ -327,9 +355,50 @@ def is_successful_response_status(response_status_code):
     )
 
 
-def prepare_request_headers(operation_headers=None, custom_headers=None, add_request_id=False):
+def normalize_client_protocol(protocol=None):
+    if protocol is None or protocol == DEFAULT_PROTOCOL_VERSION:
+        return DEFAULT_CLIENT_PROTOCOL
+    return protocol
+
+
+def protocol_request_headers(protocol=None):
+    normalized_protocol = normalize_client_protocol(protocol)
+    headers = TUS_PROTOCOL_REQUEST_HEADERS.get(normalized_protocol)
+    if headers is None:
+        raise ValueError('tus: unsupported protocol {}'.format(protocol))
+    return dict(headers)
+
+
+def protocol_upload_body_content_type(protocol=None):
+    return TUS_PROTOCOL_UPLOAD_BODY_CONTENT_TYPES.get(normalize_client_protocol(protocol))
+
+
+def upload_body_headers(protocol=None, done=None):
     headers = {}
-    add_operation_request_headers(headers, operation_headers)
+    content_type = protocol_upload_body_content_type(protocol)
+    if content_type:
+        headers[UPLOAD_BODY_CONTENT_TYPE_HEADER_NAME] = content_type
+    if done is not None:
+        upload_complete_header = TUS_PROTOCOL_UPLOAD_COMPLETE_HEADERS.get(
+            normalize_client_protocol(protocol)
+        )
+        if upload_complete_header:
+            headers[upload_complete_header['name']] = (
+                upload_complete_header['completeValue']
+                if done
+                else upload_complete_header['incompleteValue']
+            )
+    return headers
+
+
+def prepare_request_headers(
+    operation_headers=None,
+    custom_headers=None,
+    add_request_id=False,
+    protocol=None,
+):
+    headers = {}
+    add_operation_request_headers(headers, operation_headers, protocol)
     add_custom_request_headers(headers, custom_headers)
     add_request_id_header(headers, add_request_id)
     return headers
@@ -390,8 +459,8 @@ def url_storage_key(fingerprint, upload_id):
     return '{}{}'.format(url_storage_fingerprint_prefix(fingerprint), upload_id)
 
 
-def add_operation_request_headers(headers, operation_headers):
-    headers.update(DEFAULT_REQUEST_HEADERS)
+def add_operation_request_headers(headers, operation_headers, protocol=None):
+    headers.update(protocol_request_headers(protocol))
     if operation_headers:
         headers.update(operation_headers)
 

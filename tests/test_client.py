@@ -10,10 +10,12 @@ from tusclient.protocol_generated import (
     CREATE_UPLOAD_METHOD,
     LOCATION_HEADER_NAME,
     TERMINATE_UPLOAD_METHOD,
+    TUS_PROTOCOL_REQUEST_HEADERS,
     UPLOAD_BODY_CONTENT_TYPE,
     UPLOAD_BODY_CONTENT_TYPE_HEADER_NAME,
     UPLOAD_LENGTH_HEADER_NAME,
     UPLOAD_OFFSET_HEADER_NAME,
+    upload_body_headers,
 )
 from tusclient.request_lifecycle import RequestLifecycleHooks
 from tusclient.uploader import Uploader, AsyncUploader
@@ -152,6 +154,47 @@ class TusClientTest(unittest.TestCase):
                 ('after', CREATE_UPLOAD_METHOD, 201),
             ],
         )
+
+    @responses.activate
+    def test_create_upload_with_data_uses_selected_protocol_headers(self):
+        upload_url = 'http://tusd.tusdemo.net/files/ietf-draft-05'
+        protocol = 'ietf-draft-05'
+        protocol_request_headers = TUS_PROTOCOL_REQUEST_HEADERS[protocol]
+        body_headers = upload_body_headers(protocol, done=True)
+
+        def validate_create_request(request):
+            self.assertEqual(request.body, b'hello')
+            self.assertNotIn('Tus-Resumable', request.headers)
+            for header_name, header_value in protocol_request_headers.items():
+                self.assertEqual(request.headers[header_name], header_value)
+            for header_name, header_value in body_headers.items():
+                self.assertEqual(request.headers[header_name], header_value)
+
+            return (
+                201,
+                {
+                    LOCATION_HEADER_NAME: upload_url,
+                    UPLOAD_OFFSET_HEADER_NAME: '5',
+                },
+                '',
+            )
+
+        responses.add_callback(
+            CREATE_UPLOAD_METHOD,
+            self.client.url,
+            callback=validate_create_request,
+        )
+
+        uploader = self.client.create_upload_with_data(
+            5,
+            file_stream=BytesIO(b'hello'),
+            chunk_size=5,
+            metadata={},
+            protocol=protocol,
+        )
+
+        self.assertEqual(uploader.url, upload_url)
+        self.assertEqual(uploader.offset, 5)
 
     @responses.activate
     def test_create_upload_with_data_non_success_status(self):

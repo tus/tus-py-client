@@ -12,6 +12,7 @@ from tusclient.protocol_generated import (
     UPLOAD_CHUNK_METHOD,
     UPLOAD_CHUNK_OPERATION_ID,
     request_method_plan,
+    upload_body_headers,
 )
 
 
@@ -58,7 +59,6 @@ class BaseTusRequest:
 
         self._operation_headers = {
             "upload-offset": str(uploader.offset),
-            "Content-Type": "application/offset+octet-stream",
         }
         self._offset = uploader.offset
         self._upload_length_deferred = uploader.upload_length_deferred
@@ -85,6 +85,11 @@ class BaseTusRequest:
             self.uploader.request_method_input_options(),
         )
 
+    def _is_final_chunk(self, stream_eof, chunk_size):
+        if self._upload_length_deferred:
+            return stream_eof
+        return self._offset + chunk_size >= self.uploader.file_size
+
 
 class TusRequest(BaseTusRequest):
     """Class to handle async Tus upload requests"""
@@ -98,6 +103,12 @@ class TusRequest(BaseTusRequest):
             stream_eof = len(chunk) < self._content_length
             operation_headers = dict(self._operation_headers)
             self.add_checksum(operation_headers, chunk)
+            operation_headers.update(
+                upload_body_headers(
+                    self.uploader.protocol,
+                    done=self._is_final_chunk(stream_eof, len(chunk)),
+                )
+            )
             if stream_eof and self._upload_length_deferred:
                 operation_headers["upload-length"] = str(self._offset + len(chunk))
             method_plan = self.request_method_plan()
@@ -121,7 +132,6 @@ class TusRequest(BaseTusRequest):
         except requests.exceptions.RequestException as error:
             raise TusUploadFailed(error)
 
-
 class AsyncTusRequest(BaseTusRequest):
     """Class to handle async Tus upload requests"""
 
@@ -136,8 +146,15 @@ class AsyncTusRequest(BaseTusRequest):
         Perform actual request.
         """
         chunk = self.file.read(self._content_length)
+        stream_eof = len(chunk) < self._content_length
         operation_headers = dict(self._operation_headers)
         self.add_checksum(operation_headers, chunk)
+        operation_headers.update(
+            upload_body_headers(
+                self.uploader.protocol,
+                done=self._is_final_chunk(stream_eof, len(chunk)),
+            )
+        )
         try:
             ssl_ctx = ssl.create_default_context()
             if self.client_cert is not None:
@@ -169,5 +186,6 @@ class AsyncTusRequest(BaseTusRequest):
                         k.lower(): v for k, v in resp.headers.items()
                     }
                     self.response_content = await resp.content.read()
+                    self.stream_eof = stream_eof
         except aiohttp.ClientError as error:
             raise TusUploadFailed(error)

@@ -17,10 +17,9 @@ from tusclient.exceptions import TusUploadFailed, TusCommunicationError
 from tusclient.protocol_generated import (
     CREATE_UPLOAD_METHOD,
     LOCATION_HEADER_NAME,
-    UPLOAD_BODY_CONTENT_TYPE,
-    UPLOAD_BODY_CONTENT_TYPE_HEADER_NAME,
     UPLOAD_OFFSET_HEADER_NAME,
     is_successful_response_status,
+    upload_body_headers,
 )
 from tusclient.request import TusRequest, AsyncTusRequest, catch_requests_error
 
@@ -63,7 +62,12 @@ class Uploader(BaseUploader):
             )
 
         headers = self.get_url_creation_headers()
-        headers[UPLOAD_BODY_CONTENT_TYPE_HEADER_NAME] = UPLOAD_BODY_CONTENT_TYPE
+        headers.update(
+            upload_body_headers(
+                self.protocol,
+                done=bytes_to_upload == self.get_file_size(),
+            )
+        )
         context = self.run_before_request(CREATE_UPLOAD_METHOD, self.client.url, headers)
         try:
             resp = requests.request(

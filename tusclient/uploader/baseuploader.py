@@ -178,6 +178,7 @@ class BaseUploader:
         self.remove_fingerprint_on_success = remove_fingerprint_on_success
         self.url_storage = url_storage
         self.fingerprinter = fingerprinter or fingerprint.Fingerprint()
+        self.protocol = protocol
         self.offset = 0
         self.url = None
         self.__init_url_and_offset(url)
@@ -193,7 +194,6 @@ class BaseUploader:
         self.parallel_uploads = parallel_uploads
         self.parallel_upload_boundaries = parallel_upload_boundaries
         self.override_patch_method = override_patch_method
-        self.protocol = protocol
         self.retry_delays = retry_delays
         self.on_progress = on_progress
         self.on_chunk_complete = on_chunk_complete
@@ -212,7 +212,12 @@ class BaseUploader:
     def prepare_request_headers(self, operation_headers=None):
         client_headers = getattr(self.client, "headers", {})
         add_request_id = getattr(self.client, "add_request_id", False)
-        return prepare_request_headers(operation_headers, client_headers, add_request_id)
+        return prepare_request_headers(
+            operation_headers,
+            client_headers,
+            add_request_id,
+            self.protocol,
+        )
 
     def request_method_input_options(self):
         return {
