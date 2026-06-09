@@ -8,6 +8,11 @@ import aiohttp
 import ssl
 
 from tusclient.exceptions import TusUploadFailed, TusCommunicationError
+from tusclient.protocol_generated import (
+    UPLOAD_CHUNK_METHOD,
+    UPLOAD_CHUNK_OPERATION_ID,
+    request_method_plan,
+)
 
 
 # Catches requests exceptions and throws custom tuspy errors.
@@ -73,6 +78,13 @@ class BaseTusRequest:
                 )
             )
 
+    def request_method_plan(self):
+        return request_method_plan(
+            UPLOAD_CHUNK_OPERATION_ID,
+            UPLOAD_CHUNK_METHOD,
+            self.uploader.request_method_input_options(),
+        )
+
 
 class TusRequest(BaseTusRequest):
     """Class to handle async Tus upload requests"""
@@ -88,15 +100,18 @@ class TusRequest(BaseTusRequest):
             self.add_checksum(operation_headers, chunk)
             if stream_eof and self._upload_length_deferred:
                 operation_headers["upload-length"] = str(self._offset + len(chunk))
+            method_plan = self.request_method_plan()
+            operation_headers.update(method_plan["headers"])
             headers = self.uploader.prepare_request_headers(operation_headers)
-            context = self.uploader.run_before_request("PATCH", self._url, headers)
-            resp = requests.patch(
+            context = self.uploader.run_before_request(method_plan["method"], self._url, headers)
+            resp = requests.request(
+                method_plan["method"],
                 self._url,
                 data=chunk,
                 headers=context.headers,
                 verify=self.verify_tls_cert,
                 stream=True,
-                cert=self.client_cert
+                cert=self.client_cert,
             )
             self.uploader.run_after_response(context, resp)
             self.status_code = resp.status_code
@@ -125,18 +140,28 @@ class AsyncTusRequest(BaseTusRequest):
         self.add_checksum(operation_headers, chunk)
         try:
             ssl_ctx = ssl.create_default_context()
-            if (self.client_cert is not None):
+            if self.client_cert is not None:
                 if self.client_cert is str:
                     ssl_ctx.load_cert_chain(certfile=self.client_cert)
                 else:
-                    ssl_ctx.load_cert_chain(certfile=self.client_cert[0], keyfile=self.client_cert[1])
+                    ssl_ctx.load_cert_chain(
+                        certfile=self.client_cert[0], keyfile=self.client_cert[1]
+                    )
             conn = aiohttp.TCPConnector(ssl=ssl_ctx)
             async with aiohttp.ClientSession(loop=self.io_loop, connector=conn) as session:
                 verify_tls_cert = None if self.verify_tls_cert else False
+                method_plan = self.request_method_plan()
+                operation_headers.update(method_plan["headers"])
                 headers = self.uploader.prepare_request_headers(operation_headers)
-                context = self.uploader.run_before_request("PATCH", self._url, headers)
-                async with session.patch(
-                    self._url, data=chunk, headers=context.headers, ssl=verify_tls_cert
+                context = self.uploader.run_before_request(
+                    method_plan["method"], self._url, headers
+                )
+                async with session.request(
+                    method_plan["method"],
+                    self._url,
+                    data=chunk,
+                    headers=context.headers,
+                    ssl=verify_tls_cert,
                 ) as resp:
                     self.uploader.run_after_response(context, resp)
                     self.status_code = resp.status

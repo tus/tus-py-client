@@ -19,6 +19,19 @@ DETAILED_ERROR_REQUEST_CONTEXT_TEMPLATE = ', originated from request (method: {m
 DETAILED_ERROR_UNEXPECTED_CREATE_RESPONSE = 'tus: unexpected response while creating upload'
 LOCATION_HEADER_NAME = 'Location'
 METADATA_HEADER_NAME = 'Upload-Metadata'
+METHOD_OVERRIDE_INPUT_OPTION_NAMES = {
+    'overridePatchMethod': 'override_patch_method',
+}
+METHOD_OVERRIDES = [
+    {
+        'headerName': 'X-HTTP-Method-Override',
+        'headerValue': 'PATCH',
+        'inputFlag': 'overridePatchMethod',
+        'method': 'POST',
+        'operationId': 'patchTusUpload',
+        'sourceMethod': 'PATCH',
+    },
+]
 OFFSET_DISCOVERY_METHOD = 'HEAD'
 REQUEST_ID_HEADER_NAME = 'X-Request-ID'
 START_VALIDATION_CLIENT_FLOW_VALUES = {
@@ -297,6 +310,7 @@ TUS_SUPPORTED_PROTOCOLS = [
 UPLOAD_BODY_CONTENT_TYPE = 'application/offset+octet-stream'
 UPLOAD_BODY_CONTENT_TYPE_HEADER_NAME = 'Content-Type'
 UPLOAD_CHUNK_METHOD = 'PATCH'
+UPLOAD_CHUNK_OPERATION_ID = 'patchTusUpload'
 UPLOAD_DEFER_LENGTH_HEADER_NAME = 'Upload-Defer-Length'
 UPLOAD_LENGTH_HEADER_NAME = 'Upload-Length'
 UPLOAD_OFFSET_HEADER_NAME = 'Upload-Offset'
@@ -315,6 +329,39 @@ def prepare_request_headers(operation_headers=None, custom_headers=None, add_req
     add_custom_request_headers(headers, custom_headers)
     add_request_id_header(headers, add_request_id)
     return headers
+
+
+def request_method_plan(operation_id, source_method, input_options=None):
+    input_options = input_options or {}
+    for method_override in METHOD_OVERRIDES:
+        if method_override['operationId'] != operation_id:
+            continue
+
+        input_flag = method_override['inputFlag']
+        option_name = METHOD_OVERRIDE_INPUT_OPTION_NAMES[input_flag]
+        if not input_options.get(option_name, False):
+            continue
+
+        if source_method != method_override['sourceMethod']:
+            raise ValueError(
+                'tus: method override expected {} for {}, got {}'.format(
+                    method_override['sourceMethod'],
+                    operation_id,
+                    source_method,
+                )
+            )
+
+        return {
+            'headers': {
+                method_override['headerName']: method_override['headerValue'],
+            },
+            'method': method_override['method'],
+        }
+
+    return {
+        'headers': {},
+        'method': source_method,
+    }
 
 
 def add_operation_request_headers(headers, operation_headers):

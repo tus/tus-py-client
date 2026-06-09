@@ -133,6 +133,7 @@ class BaseUploader:
         upload_length_deferred=False,
         upload_size: Optional[int] = None,
         upload_data_during_creation=False,
+        override_patch_method=False,
         parallel_uploads: Optional[int] = None,
         parallel_upload_boundaries=None,
         protocol: Optional[str] = None,
@@ -191,6 +192,7 @@ class BaseUploader:
         self.upload_size = upload_size
         self.parallel_uploads = parallel_uploads
         self.parallel_upload_boundaries = parallel_upload_boundaries
+        self.override_patch_method = override_patch_method
         self.protocol = protocol
         self.retry_delays = retry_delays
         self.on_progress = on_progress
@@ -211,6 +213,11 @@ class BaseUploader:
         client_headers = getattr(self.client, "headers", {})
         add_request_id = getattr(self.client, "add_request_id", False)
         return prepare_request_headers(operation_headers, client_headers, add_request_id)
+
+    def request_method_input_options(self):
+        return {
+            "override_patch_method": self.override_patch_method,
+        }
 
     def run_before_request(self, method, url, headers):
         context = TusRequestContext(method, url, headers)

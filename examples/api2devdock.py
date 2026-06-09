@@ -57,6 +57,12 @@ def int_value(value, label):
     return value
 
 
+def bool_value(value, label):
+    if not isinstance(value, bool):
+        fail("{} must be a boolean".format(label))
+    return value
+
+
 def string_array_value(value, label):
     if not isinstance(value, list):
         fail("{} must be a list".format(label))
