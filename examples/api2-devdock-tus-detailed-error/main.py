@@ -62,8 +62,12 @@ def conformance_request(conformance_scenario):
 
 
 def assert_expected_headers(actual_headers, expected_headers):
+    normalized_actual_headers = {}
+    for key, value in actual_headers.items():
+        normalized_actual_headers[key.lower()] = value
+
     for key, expected_value in expected_headers.items():
-        actual_value = actual_headers.get(key)
+        actual_value = normalized_actual_headers.get(key.lower())
         if actual_value != expected_value:
             fail(
                 "detailed error expected header {}={!r}, got {!r}".format(
