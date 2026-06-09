@@ -9,6 +9,10 @@ import ssl
 
 from tusclient.uploader.baseuploader import BaseUploader
 
+from tusclient.detailed_error import (
+    create_upload_request_error,
+    create_upload_response_error,
+)
 from tusclient.exceptions import TusUploadFailed, TusCommunicationError
 from tusclient.protocol_generated import (
     CREATE_UPLOAD_METHOD,
@@ -61,44 +65,29 @@ class Uploader(BaseUploader):
         headers = self.get_url_creation_headers()
         headers[UPLOAD_BODY_CONTENT_TYPE_HEADER_NAME] = UPLOAD_BODY_CONTENT_TYPE
         context = self.run_before_request(CREATE_UPLOAD_METHOD, self.client.url, headers)
-        resp = requests.request(
-            CREATE_UPLOAD_METHOD,
-            self.client.url,
-            data=chunk,
-            headers=context.headers,
-            verify=self.verify_tls_cert,
-            cert=self.client_cert,
-        )
+        try:
+            resp = requests.request(
+                CREATE_UPLOAD_METHOD,
+                self.client.url,
+                data=chunk,
+                headers=context.headers,
+                verify=self.verify_tls_cert,
+                cert=self.client_cert,
+            )
+        except requests.exceptions.RequestException as error:
+            raise create_upload_request_error(context, error)
         self.run_after_response(context, resp)
 
         if not is_successful_response_status(resp.status_code):
-            raise TusCommunicationError(
-                "Attempt to create upload with data fails with status {}".format(
-                    resp.status_code
-                ),
-                resp.status_code,
-                resp.content,
-            )
+            raise create_upload_response_error(context, resp)
 
         url = resp.headers.get(LOCATION_HEADER_NAME)
         if url is None:
-            raise TusCommunicationError(
-                "Attempt to retrieve create file url with status {}".format(
-                    resp.status_code
-                ),
-                resp.status_code,
-                resp.content,
-            )
+            raise create_upload_response_error(context, resp)
 
         offset = resp.headers.get(UPLOAD_OFFSET_HEADER_NAME)
         if offset is None:
-            raise TusCommunicationError(
-                "Attempt to retrieve accepted upload offset with status {}".format(
-                    resp.status_code
-                ),
-                resp.status_code,
-                resp.content,
-            )
+            raise create_upload_response_error(context, resp)
 
         try:
             accepted_offset = int(offset)
@@ -183,19 +172,19 @@ class Uploader(BaseUploader):
         """
         headers = self.get_url_creation_headers()
         context = self.run_before_request("POST", self.client.url, headers)
-        resp = requests.post(
-            self.client.url,
-            headers=context.headers,
-            verify=self.verify_tls_cert,
-            cert=self.client_cert,
-        )
+        try:
+            resp = requests.post(
+                self.client.url,
+                headers=context.headers,
+                verify=self.verify_tls_cert,
+                cert=self.client_cert,
+            )
+        except requests.exceptions.RequestException as error:
+            raise create_upload_request_error(context, error)
         self.run_after_response(context, resp)
         url = resp.headers.get("location")
-        if url is None:
-            msg = "Attempt to retrieve create file url with status {}".format(
-                resp.status_code
-            )
-            raise TusCommunicationError(msg, resp.status_code, resp.content)
+        if not is_successful_response_status(resp.status_code) or url is None:
+            raise create_upload_response_error(context, resp)
         return urljoin(self.client.url, url)
 
     def _do_request(self):

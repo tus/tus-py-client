@@ -10,6 +10,13 @@ DEFAULT_REQUEST_HEADERS = {
 DEFAULT_RESPONSE_HEADERS = {
     'Tus-Resumable': '1.0.0',
 }
+DETAILED_ERROR_CAUSE_STRING_TEMPLATE = 'Error: {message}'
+DETAILED_ERROR_CAUSED_BY_TEMPLATE = ', caused by {cause}'
+DETAILED_ERROR_CREATE_UPLOAD_REQUEST_FAILED = 'tus: failed to create upload'
+DETAILED_ERROR_EMPTY_RESPONSE_BODY = ''
+DETAILED_ERROR_MISSING_VALUE = 'n/a'
+DETAILED_ERROR_REQUEST_CONTEXT_TEMPLATE = ', originated from request (method: {method}, url: {url}, response code: {status}, response text: {body}, request id: {requestId})'
+DETAILED_ERROR_UNEXPECTED_CREATE_RESPONSE = 'tus: unexpected response while creating upload'
 LOCATION_HEADER_NAME = 'Location'
 METADATA_HEADER_NAME = 'Upload-Metadata'
 OFFSET_DISCOVERY_METHOD = 'HEAD'
