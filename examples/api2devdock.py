@@ -139,6 +139,33 @@ def conformance_input_source_kind(conformance_scenario):
     return string_value(input_source["kind"], "conformanceScenario.inputSource.kind")
 
 
+def conformance_retry_decisions(conformance_scenario):
+    decisions = conformance_scenario["retryDecisions"]
+    if not isinstance(decisions, list):
+        fail("conformanceScenario.retryDecisions must be a list")
+
+    result = []
+    for index, decision in enumerate(decisions):
+        decision = object_value(
+            decision,
+            "conformanceScenario.retryDecisions[{}]".format(index),
+        )
+        result.append(
+            {
+                "decision": bool_value(
+                    decision["decision"],
+                    "conformanceScenario.retryDecisions[{}].decision".format(index),
+                ),
+                "retryAttempt": int_value(
+                    decision["retryAttempt"],
+                    "conformanceScenario.retryDecisions[{}].retryAttempt".format(index),
+                ),
+            }
+        )
+
+    return result
+
+
 def conformance_scenario_wants_event(conformance_scenario, event_kind):
     events = conformance_scenario.get("events", [])
     if not isinstance(events, list):

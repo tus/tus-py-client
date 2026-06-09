@@ -297,6 +297,74 @@ class UploaderTest(mixin.Mixin):
             self.uploader.upload_chunk()
         self.assertEqual(self.uploader._retried, num_of_retries)
 
+    @mock.patch('tusclient.uploader.uploader.TusRequest')
+    def test_upload_retry_delays_and_should_retry_reset_after_progress(self, request_mock):
+        first_failure = mock.Mock()
+        first_failure.status_code = 500
+        first_failure.response_content = b''
+        first_failure.response_headers = {}
+        first_failure.perform.return_value = None
+
+        second_failure = mock.Mock()
+        second_failure.status_code = 500
+        second_failure.response_content = b''
+        second_failure.response_headers = {}
+        second_failure.perform.return_value = None
+
+        success = mock.Mock()
+        success.status_code = 204
+        success.response_content = b''
+        success.response_headers = {'upload-offset': '11'}
+        success.perform.return_value = None
+
+        retry_attempts = []
+
+        def should_retry(error, retry_attempt):
+            retry_attempts.append(retry_attempt)
+            return True
+
+        self.uploader.retries = 0
+        self.uploader.retry_delays = [250]
+        self.uploader.on_should_retry = should_retry
+        self.uploader.offset = 0
+        request_mock.side_effect = [first_failure, second_failure, success]
+
+        with mock.patch.object(self.uploader, 'get_offset', side_effect=[5, 5]) as get_offset:
+            with mock.patch('tusclient.uploader.uploader.time.sleep') as sleep:
+                self.uploader.upload_chunk()
+
+        self.assertEqual(retry_attempts, [0, 0])
+        self.assertEqual(self.uploader.offset, 11)
+        self.assertEqual(get_offset.call_count, 2)
+        sleep.assert_has_calls([mock.call(0.25), mock.call(0.25)])
+
+    @mock.patch('tusclient.uploader.uploader.TusRequest')
+    def test_upload_retry_stops_when_should_retry_returns_false(self, request_mock):
+        failure = mock.Mock()
+        failure.status_code = 500
+        failure.response_content = b''
+        failure.response_headers = {}
+        failure.perform.return_value = None
+
+        retry_attempts = []
+
+        def should_retry(error, retry_attempt):
+            retry_attempts.append(retry_attempt)
+            return False
+
+        self.uploader.retries = 0
+        self.uploader.retry_delays = [0]
+        self.uploader.on_should_retry = should_retry
+        request_mock.side_effect = [failure]
+
+        with mock.patch.object(self.uploader, 'get_offset') as get_offset:
+            with pytest.raises(exceptions.TusCommunicationError):
+                self.uploader.upload_chunk()
+
+        self.assertEqual(retry_attempts, [0])
+        self.assertEqual(self.uploader._retried, 0)
+        get_offset.assert_not_called()
+
     @responses.activate
     def test_upload_empty(self):
         responses.add(

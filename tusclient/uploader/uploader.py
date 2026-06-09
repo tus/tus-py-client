@@ -208,18 +208,24 @@ class Uploader(BaseUploader):
             self._retry_or_cry(error)
 
     def _retry_or_cry(self, error):
-        if self.retries > self._retried:
-            time.sleep(self.retry_delay)
-
-            self._retried += 1
-            try:
-                self.offset = self.get_offset()
-            except TusCommunicationError as err:
-                self._retry_or_cry(err)
-            else:
-                self._do_request()
-        else:
+        retry_attempt = self._retried
+        if self._retry_limit() <= retry_attempt:
             raise error
+        if not self._should_retry(error, retry_attempt):
+            raise error
+
+        time.sleep(self._retry_delay_seconds(retry_attempt))
+        self._retried += 1
+        previous_offset = self.offset
+        try:
+            recovered_offset = self.get_offset()
+        except TusCommunicationError as err:
+            self._retry_or_cry(err)
+        else:
+            if recovered_offset > previous_offset:
+                self._retried = 0
+            self.offset = recovered_offset
+            self._do_request()
 
 
 class AsyncUploader(BaseUploader):
@@ -323,15 +329,21 @@ class AsyncUploader(BaseUploader):
             await self._retry_or_cry(error)
 
     async def _retry_or_cry(self, error):
-        if self.retries > self._retried:
-            await asyncio.sleep(self.retry_delay)
-
-            self._retried += 1
-            try:
-                self.offset = self.get_offset()
-            except TusCommunicationError as err:
-                await self._retry_or_cry(err)
-            else:
-                await self._do_request()
-        else:
+        retry_attempt = self._retried
+        if self._retry_limit() <= retry_attempt:
             raise error
+        if not self._should_retry(error, retry_attempt):
+            raise error
+
+        await asyncio.sleep(self._retry_delay_seconds(retry_attempt))
+        self._retried += 1
+        previous_offset = self.offset
+        try:
+            recovered_offset = self.get_offset()
+        except TusCommunicationError as err:
+            await self._retry_or_cry(err)
+        else:
+            if recovered_offset > previous_offset:
+                self._retried = 0
+            self.offset = recovered_offset
+            await self._do_request()

@@ -87,6 +87,8 @@ class BaseUploader:
             Callback invoked with bytes sent and total bytes after upload progress changes.
         - on_chunk_complete (Optional[Callable]):
             Callback invoked with chunk size, accepted offset, and total bytes after a chunk is accepted.
+        - on_should_retry (Optional[Callable]):
+            Callback invoked with an error and retry attempt before scheduling a retry.
 
     :Constructor Args:
         - file_path (str)
@@ -139,6 +141,7 @@ class BaseUploader:
         parallel_upload_boundaries=None,
         protocol: Optional[str] = None,
         retry_delays=None,
+        on_should_retry: Optional[Callable[[Exception, int], bool]] = None,
         on_progress: Optional[Callable[[int, Optional[int]], None]] = None,
         on_chunk_complete: Optional[Callable[[int, int, Optional[int]], None]] = None,
     ):
@@ -196,6 +199,7 @@ class BaseUploader:
         self.parallel_upload_boundaries = parallel_upload_boundaries
         self.override_patch_method = override_patch_method
         self.retry_delays = retry_delays
+        self.on_should_retry = on_should_retry
         self.on_progress = on_progress
         self.on_chunk_complete = on_chunk_complete
         self._abort_requested = Event()
@@ -231,6 +235,24 @@ class BaseUploader:
         return {
             "override_patch_method": self.override_patch_method,
         }
+
+    def _retry_limit(self):
+        if self.retry_delays is not None:
+            return len(self.retry_delays)
+
+        return self.retries
+
+    def _retry_delay_seconds(self, retry_attempt):
+        if self.retry_delays is not None:
+            return self.retry_delays[retry_attempt] / 1000
+
+        return self.retry_delay
+
+    def _should_retry(self, error, retry_attempt):
+        if self.on_should_retry is None:
+            return True
+
+        return bool(self.on_should_retry(error, retry_attempt))
 
     def run_before_request(self, method, url, headers):
         if self.client is not None:
