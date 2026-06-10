@@ -283,6 +283,107 @@ class UploaderTest(mixin.Mixin):
         self.uploader.upload()
         self.assertEqual(self.uploader.offset, self.uploader.get_file_size())
 
+    @responses.activate
+    def test_parallel_upload_concat(self):
+        content = b"hello world"
+        part_1_url = f"{self.client.url}parallel-part-1"
+        part_2_url = f"{self.client.url}parallel-part-2"
+        final_url = f"{self.client.url}parallel-final"
+        events = []
+
+        def add_expected_request(method, url, expected_headers, response_headers, body=b""):
+            def callback(request):
+                for name, value in expected_headers.items():
+                    self.assertEqual(request.headers.get(name), value)
+                self.assertEqual(request.body or b"", body)
+                return (201 if method == responses.POST else 204, response_headers, "")
+
+            responses.add_callback(method, url, callback=callback)
+
+        add_expected_request(
+            responses.POST,
+            self.client.url,
+            {
+                "Tus-Resumable": "1.0.0",
+                "Upload-Concat": "partial",
+                "Upload-Length": "5",
+                "Upload-Metadata": "test d29ybGQ=",
+            },
+            {"Location": part_1_url},
+        )
+        add_expected_request(
+            responses.POST,
+            self.client.url,
+            {
+                "Tus-Resumable": "1.0.0",
+                "Upload-Concat": "partial",
+                "Upload-Length": "6",
+                "Upload-Metadata": "test d29ybGQ=",
+            },
+            {"Location": part_2_url},
+        )
+        add_expected_request(
+            responses.PATCH,
+            part_1_url,
+            {
+                "Content-Type": "application/offset+octet-stream",
+                "Tus-Resumable": "1.0.0",
+                "Upload-Offset": "0",
+            },
+            {"Upload-Offset": "5"},
+            body=b"hello",
+        )
+        add_expected_request(
+            responses.PATCH,
+            part_2_url,
+            {
+                "Content-Type": "application/offset+octet-stream",
+                "Tus-Resumable": "1.0.0",
+                "Upload-Offset": "0",
+            },
+            {"Upload-Offset": "6"},
+            body=b" world",
+        )
+
+        def final_callback(request):
+            self.assertEqual(request.headers.get("Tus-Resumable"), "1.0.0")
+            self.assertEqual(
+                request.headers.get("Upload-Concat"),
+                "final;{} {}".format(part_1_url, part_2_url),
+            )
+            self.assertEqual(request.headers.get("Upload-Metadata"), "foo aGVsbG8=")
+            self.assertNotIn("Upload-Length", request.headers)
+            self.assertEqual(request.body or b"", b"")
+            return (201, {"Location": final_url}, "")
+
+        responses.add_callback(responses.POST, self.client.url, callback=final_callback)
+
+        uploader = self.client.uploader(
+            file_stream=io.BytesIO(content),
+            metadata={"foo": "hello"},
+            metadata_for_partial_uploads={"test": "world"},
+            parallel_uploads=2,
+            on_progress=lambda bytes_sent, bytes_total: events.append(
+                ("progress", bytes_sent, bytes_total),
+            ),
+            on_chunk_complete=lambda chunk_size, bytes_accepted, bytes_total: events.append(
+                ("chunk-complete", chunk_size, bytes_accepted, bytes_total),
+            ),
+        )
+        uploader.upload()
+
+        self.assertEqual(uploader.url, final_url)
+        self.assertEqual(uploader.offset, len(content))
+        self.assertEqual(
+            events,
+            [
+                ("progress", 5, 11),
+                ("chunk-complete", 5, 5, 11),
+                ("progress", 11, 11),
+                ("chunk-complete", 6, 11, 11),
+            ],
+        )
+
     @mock.patch('tusclient.uploader.uploader.TusRequest')
     def test_upload_retry(self, request_mock):
         num_of_retries = 3

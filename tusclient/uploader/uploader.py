@@ -17,8 +17,11 @@ from tusclient.exceptions import TusUploadAborted, TusUploadFailed, TusCommunica
 from tusclient.protocol_generated import (
     CREATE_UPLOAD_METHOD,
     LOCATION_HEADER_NAME,
+    UPLOAD_CHUNK_METHOD,
+    UPLOAD_CHUNK_OPERATION_ID,
     UPLOAD_OFFSET_HEADER_NAME,
     is_successful_response_status,
+    request_method_plan,
     upload_body_headers,
 )
 from tusclient.request import TusRequest, AsyncTusRequest, catch_requests_error
@@ -134,6 +137,13 @@ class Uploader(BaseUploader):
                 defaults to the file size.
         """
         self.stop_at = stop_at or self.file_size
+        parallel_uploads = self.parallel_upload_count()
+
+        if parallel_uploads > 1:
+            if stop_at is not None and stop_at != self.file_size:
+                raise ValueError("tus: stop_at is not supported with parallel uploads")
+            self.upload_parallel(parallel_uploads)
+            return
 
         if not self.url:
             # Ensure the POST request is performed even for empty files.
@@ -144,6 +154,135 @@ class Uploader(BaseUploader):
 
         while self.stop_at is None or (self.offset < self.stop_at):
             self.upload_chunk()
+
+    def upload_parallel(self, parallel_uploads: int):
+        self.assert_parallel_upload_policy_supported()
+        part_ranges = self.parallel_upload_part_ranges(parallel_uploads)
+        partial_urls = [
+            self.create_partial_url(end - start)
+            for start, end in part_ranges
+        ]
+        accepted_bytes = 0
+
+        for part_url, (start, end) in zip(partial_urls, part_ranges):
+            part_size = end - start
+            accepted_bytes += self.upload_partial_chunk(part_url, start, end)
+            self.offset = accepted_bytes
+            self.notify_progress(self.offset)
+            self.notify_chunk_complete(part_size, self.offset)
+
+        self.set_url(self.create_final_url(partial_urls))
+        self.offset = self.file_size
+        self.remove_url_on_success()
+
+    @catch_requests_error
+    def create_partial_url(self, part_size: int):
+        headers = self.get_url_creation_headers(
+            metadata=self.metadata_for_partial_uploads,
+            partial=True,
+            upload_length=part_size,
+        )
+        context = self.run_before_request(CREATE_UPLOAD_METHOD, self.client.url, headers)
+        try:
+            resp = requests.request(
+                CREATE_UPLOAD_METHOD,
+                self.client.url,
+                headers=context.headers,
+                verify=self.verify_tls_cert,
+                cert=self.client_cert,
+            )
+        except requests.exceptions.RequestException as error:
+            if self.is_aborted():
+                raise TusUploadAborted()
+            raise create_upload_request_error(context, error)
+        finally:
+            self.clear_current_request()
+        self.run_after_response(context, resp)
+        url = resp.headers.get(LOCATION_HEADER_NAME)
+        if not is_successful_response_status(resp.status_code) or url is None:
+            raise create_upload_response_error(context, resp)
+        return urljoin(self.client.url, url)
+
+    @catch_requests_error
+    def upload_partial_chunk(self, partial_url: str, start: int, end: int):
+        chunk = self.read_file_range(start, end)
+        operation_headers = {
+            UPLOAD_OFFSET_HEADER_NAME: "0",
+        }
+        operation_headers.update(upload_body_headers(self.protocol, done=True))
+        method_plan = request_method_plan(
+            UPLOAD_CHUNK_OPERATION_ID,
+            UPLOAD_CHUNK_METHOD,
+            self.request_method_input_options(),
+        )
+        operation_headers.update(method_plan["headers"])
+        headers = self.prepare_request_headers(operation_headers)
+        context = self.run_before_request(method_plan["method"], partial_url, headers)
+        try:
+            resp = requests.request(
+                method_plan["method"],
+                partial_url,
+                data=chunk,
+                headers=context.headers,
+                verify=self.verify_tls_cert,
+                stream=True,
+                cert=self.client_cert,
+            )
+        except requests.exceptions.RequestException as error:
+            if self.is_aborted():
+                raise TusUploadAborted()
+            raise create_upload_request_error(context, error)
+        finally:
+            self.clear_current_request()
+        self.run_after_response(context, resp)
+
+        if not is_successful_response_status(resp.status_code):
+            raise create_upload_response_error(context, resp)
+
+        accepted_offset = resp.headers.get(UPLOAD_OFFSET_HEADER_NAME)
+        if accepted_offset is None:
+            raise create_upload_response_error(context, resp)
+
+        try:
+            accepted_offset = int(accepted_offset)
+        except ValueError:
+            raise TusCommunicationError(
+                "Unexpected accepted upload offset {}".format(accepted_offset),
+                resp.status_code,
+                resp.content,
+            )
+        if accepted_offset != len(chunk):
+            raise TusCommunicationError(
+                "Unexpected accepted upload offset {}".format(accepted_offset),
+                resp.status_code,
+                resp.content,
+            )
+
+        return accepted_offset
+
+    @catch_requests_error
+    def create_final_url(self, partial_urls):
+        headers = self.get_url_creation_headers(final_upload_urls=partial_urls)
+        context = self.run_before_request(CREATE_UPLOAD_METHOD, self.client.url, headers)
+        try:
+            resp = requests.request(
+                CREATE_UPLOAD_METHOD,
+                self.client.url,
+                headers=context.headers,
+                verify=self.verify_tls_cert,
+                cert=self.client_cert,
+            )
+        except requests.exceptions.RequestException as error:
+            if self.is_aborted():
+                raise TusUploadAborted()
+            raise create_upload_request_error(context, error)
+        finally:
+            self.clear_current_request()
+        self.run_after_response(context, resp)
+        url = resp.headers.get(LOCATION_HEADER_NAME)
+        if not is_successful_response_status(resp.status_code) or url is None:
+            raise create_upload_response_error(context, resp)
+        return urljoin(self.client.url, url)
 
     def upload_chunk(self):
         """
@@ -245,6 +384,19 @@ class AsyncUploader(BaseUploader):
                 defaults to the file size.
         """
         self.stop_at = stop_at or self.file_size
+        parallel_uploads = self.parallel_upload_count()
+
+        if parallel_uploads > 1:
+            if stop_at is not None and stop_at != self.file_size:
+                raise ValueError("tus: stop_at is not supported with parallel uploads")
+            loop = asyncio.get_running_loop()
+            await loop.run_in_executor(
+                None,
+                Uploader.upload_parallel,
+                self,
+                parallel_uploads,
+            )
+            return
 
         if not self.url:
             self.set_url(await self.create_url())
@@ -252,6 +404,15 @@ class AsyncUploader(BaseUploader):
 
         while self.stop_at is None or (self.offset < self.stop_at):
             await self.upload_chunk()
+
+    def create_partial_url(self, part_size: int):
+        return Uploader.create_partial_url(self, part_size)
+
+    def upload_partial_chunk(self, partial_url: str, start: int, end: int):
+        return Uploader.upload_partial_chunk(self, partial_url, start, end)
+
+    def create_final_url(self, partial_urls):
+        return Uploader.create_final_url(self, partial_urls)
 
     async def upload_chunk(self):
         """
