@@ -256,12 +256,6 @@ class BaseUploader:
             "override_patch_method": self.override_patch_method,
         }
 
-    def _retry_limit(self):
-        if self.retry_delays is not None:
-            return len(self.retry_delays)
-
-        return self.retries
-
     def _upload_retry_delays_ms(self):
         """The retry budget as the delays-indexed-by-attempt list (in milliseconds).
 
@@ -273,18 +267,6 @@ class BaseUploader:
             return list(self.retry_delays)
 
         return [self.retry_delay * 1000] * self.retries
-
-    def _retry_delay_seconds(self, retry_attempt):
-        if self.retry_delays is not None:
-            return self.retry_delays[retry_attempt] / 1000
-
-        return self.retry_delay
-
-    def _should_retry(self, error, retry_attempt):
-        if self.on_should_retry is None:
-            return True
-
-        return bool(self.on_should_retry(error, retry_attempt))
 
     def run_before_request(self, method, url, headers):
         if self.client is not None:

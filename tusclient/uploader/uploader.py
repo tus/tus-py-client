@@ -8,6 +8,9 @@ import ssl
 
 from tusclient.uploader.baseuploader import BaseUploader
 
+from tusclient.async_upload_chunks_generated import (
+    upload_chunk_with_retry as async_upload_chunk_with_retry,
+)
 from tusclient.detailed_error import (
     create_upload_request_error,
     create_upload_response_error,
@@ -396,26 +399,18 @@ class AsyncUploader(BaseUploader):
         """
         Upload chunk of file.
         """
-        self._retried = 0
-
         # Ensure that we have a URL, as this is behavior we allowed previously.
         # See https://github.com/tus/tus-py-client/issues/82.
         if not self.url:
             self.set_url(await self.create_url())
             self.offset = 0
 
-        previous_offset = self.offset
-        if not self.upload_length_deferred:
-            self.notify_progress(previous_offset)
-        await self._do_request()
-        self.offset = int(self.request.response_headers.get("upload-offset"))
-        if self.upload_length_deferred and self.request.stream_eof:
-            self.file_size = self.offset
-            self.stop_at = self.offset
-        if self.upload_length_deferred:
-            self.notify_progress(previous_offset)
-        self.notify_progress(self.offset)
-        self.notify_chunk_complete(self.offset - previous_offset, self.offset)
+        await async_upload_chunk_with_retry(
+            self,
+            self._perform_patch_request,
+            self._upload_retry_delays_ms(),
+            on_should_retry=self.on_should_retry,
+        )
         self.remove_url_on_success()
 
     async def create_url(self):
@@ -459,30 +454,16 @@ class AsyncUploader(BaseUploader):
                 raise TusUploadAborted()
             raise TusCommunicationError(error)
 
-    async def _do_request(self):
+    async def _perform_patch_request(self):
+        """Send one chunk PATCH and absorb its accepted state on success.
+
+        The retry algorithm around this transport step lives in the generated
+        ``upload_chunk_with_retry`` (see tusclient/async_upload_chunks_generated.py).
+        """
         self.request = AsyncTusRequest(self)
-        try:
-            await self.request.perform()
-            _verify_upload(self.request)
-        except TusUploadFailed as error:
-            await self._retry_or_cry(error)
-
-    async def _retry_or_cry(self, error):
-        retry_attempt = self._retried
-        if self._retry_limit() <= retry_attempt:
-            raise error
-        if not self._should_retry(error, retry_attempt):
-            raise error
-
-        await asyncio.sleep(self._retry_delay_seconds(retry_attempt))
-        self._retried += 1
-        previous_offset = self.offset
-        try:
-            recovered_offset = self.get_offset()
-        except TusCommunicationError as err:
-            await self._retry_or_cry(err)
-        else:
-            if recovered_offset > previous_offset:
-                self._retried = 0
-            self.offset = recovered_offset
-            await self._do_request()
+        await self.request.perform()
+        _verify_upload(self.request)
+        self.offset = int(self.request.response_headers.get("upload-offset"))
+        if self.upload_length_deferred and self.request.stream_eof:
+            self.file_size = self.offset
+            self.stop_at = self.offset
