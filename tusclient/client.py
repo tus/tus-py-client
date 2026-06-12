@@ -2,6 +2,7 @@ from typing import Dict, Optional, Tuple, Union
 
 import requests
 
+from tusclient.abort_generated import terminate_upload_with_retry
 from tusclient.exceptions import TusCommunicationError
 from tusclient.protocol_generated import (
     ABORT_REMOVE_STORED_URL_AFTER_TERMINATION,
@@ -117,6 +118,15 @@ class TusClient:
         return response
 
     def terminate_upload(self, upload_url: str, verify_tls_cert: bool = True):
+        # The retry/abort sequencing lives in the generated termination runtime; this client
+        # keeps its historical single-attempt behavior by passing an empty retry budget.
+        return terminate_upload_with_retry(
+            upload_url,
+            lambda url: self._send_terminate_request(url, verify_tls_cert),
+            retry_delays=[],
+        )
+
+    def _send_terminate_request(self, upload_url: str, verify_tls_cert: bool):
         headers = prepare_request_headers(None, self.headers, self.add_request_id)
         context = TusRequestContext(TERMINATE_UPLOAD_METHOD, upload_url, headers)
         if self.request_hooks is not None and self.request_hooks.before_request is not None:
