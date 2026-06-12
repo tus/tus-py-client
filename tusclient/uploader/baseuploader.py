@@ -262,6 +262,18 @@ class BaseUploader:
 
         return self.retries
 
+    def _upload_retry_delays_ms(self):
+        """The retry budget as the delays-indexed-by-attempt list (in milliseconds).
+
+        The legacy ``retries``/``retry_delay`` options map onto it as ``retries``
+        repetitions of the same delay, which preserves their historical budget and
+        sleep behavior through the generated retry runtime.
+        """
+        if self.retry_delays is not None:
+            return list(self.retry_delays)
+
+        return [self.retry_delay * 1000] * self.retries
+
     def _retry_delay_seconds(self, retry_attempt):
         if self.retry_delays is not None:
             return self.retry_delays[retry_attempt] / 1000

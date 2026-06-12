@@ -431,7 +431,7 @@ class UploaderTest(mixin.Mixin):
         request_mock.side_effect = [first_failure, second_failure, success]
 
         with mock.patch.object(self.uploader, 'get_offset', side_effect=[5, 5]) as get_offset:
-            with mock.patch('tusclient.uploader.uploader.time.sleep') as sleep:
+            with mock.patch('tusclient.upload_chunks_generated.time.sleep') as sleep:
                 self.uploader.upload_chunk()
 
         self.assertEqual(retry_attempts, [0, 0])
