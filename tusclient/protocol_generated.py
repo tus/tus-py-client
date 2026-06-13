@@ -439,15 +439,6 @@ def request_method_plan(operation_id, source_method, input_options=None):
         if not input_options.get(option_name, False):
             continue
 
-        if source_method != method_override['sourceMethod']:
-            raise ValueError(
-                'tus: method override expected {} for {}, got {}'.format(
-                    method_override['sourceMethod'],
-                    operation_id,
-                    source_method,
-                )
-            )
-
         return {
             'headers': {
                 method_override['headerName']: method_override['headerValue'],
