@@ -43,7 +43,6 @@ METHOD_OVERRIDES = [
         'inputFlag': 'overridePatchMethod',
         'method': 'POST',
         'operationId': 'patchTusUpload',
-        'sourceMethod': 'PATCH',
     },
 ]
 OFFSET_DISCOVERY_METHOD = 'HEAD'
