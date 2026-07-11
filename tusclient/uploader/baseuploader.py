@@ -1,15 +1,37 @@
-from typing import Optional, IO, Dict, Tuple, TYPE_CHECKING, Union
+from typing import Callable, Optional, IO, Dict, Tuple, TYPE_CHECKING, Union
 import os
 import re
 from base64 import b64encode
 from sys import maxsize as MAXSIZE
 import hashlib
+from threading import Event
 
 import requests
 
 from tusclient.exceptions import TusCommunicationError
 from tusclient.request import TusRequest, catch_requests_error
 from tusclient.fingerprint import fingerprint, interface
+from tusclient.protocol_generated import (
+    DEFAULT_REQUEST_HEADERS,
+    PARALLEL_FINAL_CONCAT_PREFIX,
+    PARALLEL_PARTIAL_HEADER_KIND,
+    PARALLEL_PARTIAL_METADATA_SOURCE,
+    PARALLEL_PARTIAL_NESTED_UPLOADS,
+    PARALLEL_PARTIAL_URL_STORAGE,
+    PARALLEL_UPLOAD_DEFAULT,
+    PARALLEL_UPLOAD_MINIMUM,
+    PARALLEL_UPLOAD_SPLIT_STRATEGY,
+    PARALLEL_UPLOAD_URL_SEPARATOR,
+    START_VALIDATION_MESSAGES,
+    METADATA_HEADER_NAME,
+    UPLOAD_CONCAT_HEADER_NAME,
+    UPLOAD_CONCAT_PARTIAL_VALUE,
+    UPLOAD_DEFER_LENGTH_HEADER_NAME,
+    UPLOAD_LENGTH_HEADER_NAME,
+    prepare_request_headers,
+)
+from tusclient.request_lifecycle import TusRequestContext
+from tusclient.start_validation import validate_upload_start_or_raise
 from tusclient.storage.interface import Storage
 
 if TYPE_CHECKING:
@@ -61,6 +83,8 @@ class BaseUploader:
             If not specified, it defaults to True.
         - store_url (bool):
             Determines whether or not url should be stored, and uploads should be resumed.
+        - remove_fingerprint_on_success (bool):
+            Determines whether the stored upload URL should be removed after a successful upload.
         - url_storage (<tusclient.storage.interface.Storage>):
             An implementation of <tusclient.storage.interface.Storage> which is an API for URL storage.
             This value must be set if store_url is set to true. A ready to use implementation exists atbe used out of the box. But you can
@@ -77,6 +101,12 @@ class BaseUploader:
             Whether or not to declare the upload length when finished reading the file stream instead of when the upload is started. This is useful
             when uploading from a streaming resource, where the total file size isn't available when the upload is created
             but only becomes known when the stream finishes. The server must support the `creation-defer-length` extension.
+        - on_progress (Optional[Callable]):
+            Callback invoked with bytes sent and total bytes after upload progress changes.
+        - on_chunk_complete (Optional[Callable]):
+            Callback invoked with chunk size, accepted offset, and total bytes after a chunk is accepted.
+        - on_should_retry (Optional[Callable]):
+            Callback invoked with an error and retry attempt before scheduling a retry.
 
     :Constructor Args:
         - file_path (str)
@@ -90,13 +120,14 @@ class BaseUploader:
         - retry_delay (Optional[int])
         - verify_tls_cert (Optional[bool])
         - store_url (Optional[bool])
+        - remove_fingerprint_on_success (Optional[bool])
         - url_storage (Optinal [<tusclient.storage.interface.Storage>])
         - fingerprinter (Optional [<tusclient.fingerprint.interface.Fingerprint>])
         - upload_checksum (Optional[bool])
         - upload_length_deferred (Optional[bool])
     """
 
-    DEFAULT_HEADERS = {"Tus-Resumable": "1.0.0"}
+    DEFAULT_HEADERS = dict(DEFAULT_REQUEST_HEADERS)
     DEFAULT_CHUNK_SIZE = MAXSIZE
     CHECKSUM_ALGORITHM_PAIR = (
         "sha1",
@@ -116,10 +147,22 @@ class BaseUploader:
         retry_delay: int = 30,
         verify_tls_cert: bool = True,
         store_url=False,
+        remove_fingerprint_on_success=False,
         url_storage: Optional[Storage] = None,
         fingerprinter: Optional[interface.Fingerprint] = None,
         upload_checksum=False,
         upload_length_deferred=False,
+        upload_size: Optional[int] = None,
+        upload_data_during_creation=False,
+        override_patch_method=False,
+        parallel_uploads: Optional[int] = None,
+        parallel_upload_boundaries=None,
+        metadata_for_partial_uploads: Optional[Dict] = None,
+        protocol: Optional[str] = None,
+        retry_delays=None,
+        on_should_retry: Optional[Callable[[Exception, int], bool]] = None,
+        on_progress: Optional[Callable[[int, Optional[int]], None]] = None,
+        on_chunk_complete: Optional[Callable[[int, int, Optional[int]], None]] = None,
     ):
         if file_path is None and file_stream is None:
             raise ValueError("Either 'file_path' or 'file_stream' cannot be None.")
@@ -132,6 +175,20 @@ class BaseUploader:
                 "Please specify a storage instance to enable resumablility."
             )
 
+        validate_upload_start_or_raise(
+            client=client,
+            file_path=file_path,
+            file_stream=file_stream,
+            parallel_upload_boundaries=parallel_upload_boundaries,
+            parallel_uploads=parallel_uploads,
+            protocol=protocol,
+            retry_delays=retry_delays,
+            upload_data_during_creation=upload_data_during_creation,
+            upload_length_deferred=upload_length_deferred,
+            upload_size=upload_size,
+            url=url,
+        )
+
         self.verify_tls_cert = verify_tls_cert
         self.file_path = file_path
         self.file_stream = file_stream
@@ -141,8 +198,10 @@ class BaseUploader:
         self.metadata = metadata or {}
         self.metadata_encoding = metadata_encoding
         self.store_url = store_url
+        self.remove_fingerprint_on_success = remove_fingerprint_on_success
         self.url_storage = url_storage
         self.fingerprinter = fingerprinter or fingerprint.Fingerprint()
+        self.protocol = protocol
         self.offset = 0
         self.url = None
         self.__init_url_and_offset(url)
@@ -152,29 +211,109 @@ class BaseUploader:
         self._retried = 0
         self.retry_delay = retry_delay
         self.upload_checksum = upload_checksum
+        self.upload_data_during_creation = upload_data_during_creation
         self.upload_length_deferred = upload_length_deferred
+        self.upload_size = upload_size
+        self.parallel_uploads = parallel_uploads
+        self.parallel_upload_boundaries = parallel_upload_boundaries
+        self.metadata_for_partial_uploads = metadata_for_partial_uploads or {}
+        self.override_patch_method = override_patch_method
+        self.retry_delays = retry_delays
+        self.on_should_retry = on_should_retry
+        self.on_progress = on_progress
+        self.on_chunk_complete = on_chunk_complete
+        self._abort_requested = Event()
         (
             self.__checksum_algorithm_name,
             self.__checksum_algorithm,
         ) = self.CHECKSUM_ALGORITHM_PAIR
+
+    def abort(self):
+        self._abort_requested.set()
+
+    def is_aborted(self):
+        return self._abort_requested.is_set()
 
     def get_headers(self):
         """
         Return headers of the uploader instance. This would include the headers of the
         client instance.
         """
-        client_headers = getattr(self.client, "headers", {})
-        return dict(self.DEFAULT_HEADERS, **client_headers)
+        return self.prepare_request_headers()
 
-    def get_url_creation_headers(self):
+    def prepare_request_headers(self, operation_headers=None):
+        client_headers = getattr(self.client, "headers", {})
+        add_request_id = getattr(self.client, "add_request_id", False)
+        return prepare_request_headers(
+            operation_headers,
+            client_headers,
+            add_request_id,
+            self.protocol,
+        )
+
+    def request_method_input_options(self):
+        return {
+            "override_patch_method": self.override_patch_method,
+        }
+
+    def _upload_retry_delays_ms(self):
+        """The retry budget as the delays-indexed-by-attempt list (in milliseconds).
+
+        The legacy ``retries``/``retry_delay`` options map onto it as ``retries``
+        repetitions of the same delay, which preserves their historical budget and
+        sleep behavior through the generated retry runtime.
+        """
+        if self.retry_delays is not None:
+            return list(self.retry_delays)
+
+        return [self.retry_delay * 1000] * self.retries
+
+    def run_before_request(self, method, url, headers):
+        if self.client is not None:
+            self.client._set_current_uploader(self)
+        context = TusRequestContext(method, url, headers)
+        hooks = getattr(self.client, "request_hooks", None)
+        if hooks is not None and hooks.before_request is not None:
+            hooks.before_request(context)
+        return context
+
+    def clear_current_request(self):
+        if self.client is not None:
+            self.client._clear_current_uploader(self)
+
+    def run_after_response(self, context, response):
+        hooks = getattr(self.client, "request_hooks", None)
+        if hooks is not None and hooks.after_response is not None:
+            hooks.after_response(context, response)
+
+    def get_url_creation_headers(
+        self,
+        metadata=None,
+        partial=False,
+        upload_length=None,
+        final_upload_urls=None,
+    ):
         """Return headers required to create upload url"""
-        headers = self.get_headers()
-        if self.upload_length_deferred:
-            headers['upload-defer-length'] = '1'
+        operation_headers = {}
+        if final_upload_urls is not None:
+            operation_headers[UPLOAD_CONCAT_HEADER_NAME] = "{}{}".format(
+                PARALLEL_FINAL_CONCAT_PREFIX,
+                PARALLEL_UPLOAD_URL_SEPARATOR.join(final_upload_urls),
+            )
         else:
-            headers["upload-length"] = str(self.file_size)
-        headers["upload-metadata"] = ",".join(self.encode_metadata())
-        return headers
+            if partial:
+                operation_headers[UPLOAD_CONCAT_HEADER_NAME] = UPLOAD_CONCAT_PARTIAL_VALUE
+            if self.upload_length_deferred:
+                operation_headers[UPLOAD_DEFER_LENGTH_HEADER_NAME] = "1"
+            else:
+                operation_headers[UPLOAD_LENGTH_HEADER_NAME] = str(
+                    self.file_size if upload_length is None else upload_length
+                )
+
+        encoded_metadata = self.encode_metadata(metadata)
+        if encoded_metadata:
+            operation_headers[METADATA_HEADER_NAME] = ",".join(encoded_metadata)
+        return self.prepare_request_headers(operation_headers)
 
     @property
     def checksum_algorithm(self):
@@ -201,9 +340,15 @@ class BaseUploader:
         This is different from the instance attribute 'offset' because this makes an
         http request to the tus server to retrieve the offset.
         """
-        resp = requests.head(
-            self.url, headers=self.get_headers(), verify=self.verify_tls_cert, cert=self.client_cert
-        )
+        headers = self.get_headers()
+        context = self.run_before_request("HEAD", self.url, headers)
+        try:
+            resp = requests.head(
+                self.url, headers=context.headers, verify=self.verify_tls_cert, cert=self.client_cert
+            )
+        finally:
+            self.clear_current_request()
+        self.run_after_response(context, resp)
         offset = resp.headers.get("upload-offset")
         if offset is None:
             msg = "Attempt to retrieve offset fails with status {}".format(
@@ -212,12 +357,13 @@ class BaseUploader:
             raise TusCommunicationError(msg, resp.status_code, resp.content)
         return int(offset)
 
-    def encode_metadata(self):
+    def encode_metadata(self, metadata=None):
         """
         Return list of encoded metadata as defined by the Tus protocol.
         """
         encoded_list = []
-        for key, value in self.metadata.items():
+        metadata = self.metadata if metadata is None else metadata
+        for key, value in metadata.items():
             key_str = str(key)  # dict keys may be of any object type.
 
             # confirm that the key does not contain unwanted characters.
@@ -230,6 +376,106 @@ class BaseUploader:
                 "{} {}".format(key_str, b64encode(value_bytes).decode("ascii"))
             )
         return encoded_list
+
+    def parallel_upload_count(self):
+        parallel_uploads = (
+            PARALLEL_UPLOAD_DEFAULT
+            if self.parallel_uploads is None
+            else self.parallel_uploads
+        )
+        if parallel_uploads == 1:
+            return parallel_uploads
+        if parallel_uploads < PARALLEL_UPLOAD_MINIMUM:
+            raise ValueError(
+                "tus: parallel uploads must be at least {}".format(
+                    PARALLEL_UPLOAD_MINIMUM,
+                )
+            )
+
+        return parallel_uploads
+
+    def parallel_upload_part_ranges(self, parallel_uploads):
+        if self.parallel_upload_boundaries is not None:
+            return [
+                self._parallel_upload_boundary_range(index, boundary)
+                for index, boundary in enumerate(self.parallel_upload_boundaries)
+            ]
+
+        if PARALLEL_UPLOAD_SPLIT_STRATEGY != "contiguous-floor-size-last-remainder":
+            raise ValueError(
+                "tus: unsupported parallel upload split strategy {}".format(
+                    PARALLEL_UPLOAD_SPLIT_STRATEGY,
+                )
+            )
+        if self.file_size is None:
+            raise ValueError(START_VALIDATION_MESSAGES["parallelUploadMissingSize"])
+        if parallel_uploads <= 0:
+            raise ValueError("tus: parallel upload count must be positive")
+
+        part_size = self.file_size // parallel_uploads
+        if part_size <= 0:
+            raise ValueError("tus: parallel upload parts must not be empty")
+
+        ranges = []
+        start = 0
+        for index in range(parallel_uploads):
+            end = start + part_size
+            if index == parallel_uploads - 1:
+                end = self.file_size
+            ranges.append((start, end))
+            start = end
+
+        return ranges
+
+    def assert_parallel_upload_policy_supported(self):
+        if PARALLEL_PARTIAL_HEADER_KIND != "partial-upload":
+            raise ValueError(
+                "tus: unsupported partial upload header kind {}".format(
+                    PARALLEL_PARTIAL_HEADER_KIND,
+                )
+            )
+        if PARALLEL_PARTIAL_METADATA_SOURCE != "metadataForPartialUploads":
+            raise ValueError(
+                "tus: unsupported parallel partial metadata policy {}".format(
+                    PARALLEL_PARTIAL_METADATA_SOURCE,
+                )
+            )
+        if PARALLEL_PARTIAL_NESTED_UPLOADS != "disabled":
+            raise ValueError(
+                "tus: unsupported nested parallel upload policy {}".format(
+                    PARALLEL_PARTIAL_NESTED_UPLOADS,
+                )
+            )
+        if PARALLEL_PARTIAL_URL_STORAGE != "parent-managed":
+            raise ValueError(
+                "tus: unsupported parallel partial URL storage policy {}".format(
+                    PARALLEL_PARTIAL_URL_STORAGE,
+                )
+            )
+
+    def read_file_range(self, start, end):
+        stream = self.get_file_stream()
+        try:
+            stream.seek(start)
+            chunk = stream.read(end - start)
+        finally:
+            if self.file_stream is None:
+                stream.close()
+
+        if len(chunk) != end - start:
+            raise ValueError(START_VALIDATION_MESSAGES["parallelUploadSliceMissingValue"])
+
+        return chunk
+
+    def _parallel_upload_boundary_range(self, index, boundary):
+        if isinstance(boundary, dict):
+            return boundary["start"], boundary["end"]
+        if isinstance(boundary, (list, tuple)) and len(boundary) == 2:
+            return boundary[0], boundary[1]
+
+        raise ValueError(
+            "tus: invalid parallel upload boundary at index {}".format(index)
+        )
 
     def __init_url_and_offset(self, url: Optional[str] = None):
         """
@@ -264,8 +510,12 @@ class BaseUploader:
                     raise error
 
     def _get_fingerprint(self):
-        with self.get_file_stream() as stream:
+        stream = self.get_file_stream()
+        try:
             return self.fingerprinter.get_fingerprint(stream)
+        finally:
+            if self.file_stream is None:
+                stream.close()
 
     def set_url(self, url: str):
         """Set the upload URL"""
@@ -281,6 +531,31 @@ class BaseUploader:
         if self.stop_at is None:
             return self.chunk_size
         return min(self.chunk_size, self.stop_at - self.offset)
+
+    def notify_progress(self, bytes_sent: int):
+        if self.on_progress:
+            self.on_progress(bytes_sent, self.file_size)
+
+    def notify_chunk_complete(self, chunk_size: int, bytes_accepted: int):
+        if self.on_chunk_complete:
+            self.on_chunk_complete(chunk_size, bytes_accepted, self.file_size)
+
+    def remove_url_on_success(self):
+        if not (
+            self.store_url
+            and self.url_storage
+            and self.remove_fingerprint_on_success
+        ):
+            return
+
+        if self.file_size is None or self.offset < self.file_size:
+            return
+
+        self.url_storage.remove_item(self._get_fingerprint())
+
+    def remove_stored_url(self):
+        if self.store_url and self.url_storage:
+            self.url_storage.remove_item(self._get_fingerprint())
 
     def get_file_stream(self):
         """

@@ -10,6 +10,9 @@ from parametrize import parametrize
 import pytest
 
 from tusclient import exceptions
+from tusclient.fingerprint import fingerprint
+from tusclient.protocol_generated import DEFAULT_REQUEST_HEADERS, REQUEST_ID_HEADER_NAME
+from tusclient.request_lifecycle import RequestLifecycleHooks
 from tusclient.storage import filestorage
 from tests import mixin
 
@@ -34,16 +37,78 @@ class UploaderTest(mixin.Mixin):
         self.assertEqual(self.uploader.offset, 0)
 
     def test_headers(self):
-        self.assertEqual(self.uploader.get_headers(), {"Tus-Resumable": "1.0.0"})
+        self.assertEqual(self.uploader.get_headers(), DEFAULT_REQUEST_HEADERS)
 
         self.client.set_headers({'foo': 'bar'})
-        self.assertEqual(self.uploader.get_headers(), {"Tus-Resumable": "1.0.0", 'foo': 'bar'})
+        self.assertEqual(self.uploader.get_headers(), dict(DEFAULT_REQUEST_HEADERS, foo='bar'))
+
+        self.client.set_headers({REQUEST_ID_HEADER_NAME: 'custom-request-id'})
+        self.client.enable_request_id_header()
+        request_headers = self.uploader.get_headers()
+        self.assertEqual(request_headers['foo'], 'bar')
+        self.assertNotEqual(request_headers[REQUEST_ID_HEADER_NAME], 'custom-request-id')
+        self.assertEqual(len(request_headers[REQUEST_ID_HEADER_NAME]), 36)
+        self.assertIn('-', request_headers[REQUEST_ID_HEADER_NAME])
+
+    def test_prepare_request_headers_applies_operation_headers_before_custom_headers(self):
+        self.client.set_headers({'upload-offset': 'custom-offset'})
+        request_headers = self.uploader.prepare_request_headers({'upload-offset': '1'})
+        self.assertEqual(request_headers['upload-offset'], 'custom-offset')
+
+    def test_prepare_request_headers_applies_request_id_after_custom_headers(self):
+        self.client.set_headers({REQUEST_ID_HEADER_NAME: 'custom-request-id'})
+        self.client.enable_request_id_header()
+        request_headers = self.uploader.prepare_request_headers(
+            {REQUEST_ID_HEADER_NAME: 'operation-request-id'}
+        )
+
+        self.assertNotEqual(request_headers[REQUEST_ID_HEADER_NAME], 'operation-request-id')
+        self.assertNotEqual(request_headers[REQUEST_ID_HEADER_NAME], 'custom-request-id')
+        self.assertEqual(len(request_headers[REQUEST_ID_HEADER_NAME]), 36)
+        self.assertIn('-', request_headers[REQUEST_ID_HEADER_NAME])
 
     @responses.activate
     def test_get_offset(self):
         responses.add(responses.HEAD, self.uploader.url,
                       adding_headers={"upload-offset": "300"})
         self.assertEqual(self.uploader.get_offset(), 300)
+
+    @responses.activate
+    def test_get_offset_request_lifecycle_hooks(self):
+        events = []
+
+        def before_request(context):
+            events.append(("before", context.method, context.url))
+            context.headers["x-hook"] = "before"
+
+        def after_response(context, response):
+            events.append(("after", context.method, response.status_code))
+            response.headers["upload-offset"] = "301"
+
+        def validate_headers(req):
+            self.assertEqual(req.headers["x-hook"], "before")
+            return (200, {"upload-offset": "300"}, "")
+
+        self.client.set_request_hooks(
+            RequestLifecycleHooks(
+                before_request=before_request,
+                after_response=after_response,
+            )
+        )
+        responses.add_callback(
+            responses.HEAD,
+            self.uploader.url,
+            callback=validate_headers,
+        )
+
+        self.assertEqual(self.uploader.get_offset(), 301)
+        self.assertEqual(
+            events,
+            [
+                ("before", "HEAD", self.uploader.url),
+                ("after", "HEAD", 200),
+            ],
+        )
 
     def test_encode_metadata(self):
         self.uploader.metadata = {'foo': 'bar', 'red': 'blue'}
@@ -85,9 +150,16 @@ class UploaderTest(mixin.Mixin):
         # test for stored urls
         responses.add(responses.HEAD, 'http://tusd.tusdemo.net/files/foo_bar',
                       adding_headers={"upload-offset": "10"})
-        storage_path = '{}/storage_file'.format(os.path.dirname(os.path.abspath(__file__)))
+        temp_fp = tempfile.NamedTemporaryFile(delete=False)
+        temp_fp.close()
+        storage = filestorage.FileStorage(temp_fp.name)
+        self.addCleanup(lambda: os.path.exists(temp_fp.name) and os.remove(temp_fp.name))
+        self.addCleanup(storage.close)
+        with open(filename, "rb") as stream:
+            key = fingerprint.Fingerprint().get_fingerprint(stream)
+        storage.set_item(key, "http://tusd.tusdemo.net/files/foo_bar")
         resumable_uploader = self.client.uploader(
-            file_path=filename, store_url=True, url_storage=filestorage.FileStorage(storage_path)
+            file_path=filename, store_url=True, url_storage=storage
         )
         self.assertEqual(resumable_uploader.url, "http://tusd.tusdemo.net/files/foo_bar")
         self.assertEqual(resumable_uploader.offset, 10)
@@ -211,6 +283,107 @@ class UploaderTest(mixin.Mixin):
         self.uploader.upload()
         self.assertEqual(self.uploader.offset, self.uploader.get_file_size())
 
+    @responses.activate
+    def test_parallel_upload_concat(self):
+        content = b"hello world"
+        part_1_url = f"{self.client.url}parallel-part-1"
+        part_2_url = f"{self.client.url}parallel-part-2"
+        final_url = f"{self.client.url}parallel-final"
+        events = []
+
+        def add_expected_request(method, url, expected_headers, response_headers, body=b""):
+            def callback(request):
+                for name, value in expected_headers.items():
+                    self.assertEqual(request.headers.get(name), value)
+                self.assertEqual(request.body or b"", body)
+                return (201 if method == responses.POST else 204, response_headers, "")
+
+            responses.add_callback(method, url, callback=callback)
+
+        add_expected_request(
+            responses.POST,
+            self.client.url,
+            {
+                "Tus-Resumable": "1.0.0",
+                "Upload-Concat": "partial",
+                "Upload-Length": "5",
+                "Upload-Metadata": "test d29ybGQ=",
+            },
+            {"Location": part_1_url},
+        )
+        add_expected_request(
+            responses.POST,
+            self.client.url,
+            {
+                "Tus-Resumable": "1.0.0",
+                "Upload-Concat": "partial",
+                "Upload-Length": "6",
+                "Upload-Metadata": "test d29ybGQ=",
+            },
+            {"Location": part_2_url},
+        )
+        add_expected_request(
+            responses.PATCH,
+            part_1_url,
+            {
+                "Content-Type": "application/offset+octet-stream",
+                "Tus-Resumable": "1.0.0",
+                "Upload-Offset": "0",
+            },
+            {"Upload-Offset": "5"},
+            body=b"hello",
+        )
+        add_expected_request(
+            responses.PATCH,
+            part_2_url,
+            {
+                "Content-Type": "application/offset+octet-stream",
+                "Tus-Resumable": "1.0.0",
+                "Upload-Offset": "0",
+            },
+            {"Upload-Offset": "6"},
+            body=b" world",
+        )
+
+        def final_callback(request):
+            self.assertEqual(request.headers.get("Tus-Resumable"), "1.0.0")
+            self.assertEqual(
+                request.headers.get("Upload-Concat"),
+                "final;{} {}".format(part_1_url, part_2_url),
+            )
+            self.assertEqual(request.headers.get("Upload-Metadata"), "foo aGVsbG8=")
+            self.assertNotIn("Upload-Length", request.headers)
+            self.assertEqual(request.body or b"", b"")
+            return (201, {"Location": final_url}, "")
+
+        responses.add_callback(responses.POST, self.client.url, callback=final_callback)
+
+        uploader = self.client.uploader(
+            file_stream=io.BytesIO(content),
+            metadata={"foo": "hello"},
+            metadata_for_partial_uploads={"test": "world"},
+            parallel_uploads=2,
+            on_progress=lambda bytes_sent, bytes_total: events.append(
+                ("progress", bytes_sent, bytes_total),
+            ),
+            on_chunk_complete=lambda chunk_size, bytes_accepted, bytes_total: events.append(
+                ("chunk-complete", chunk_size, bytes_accepted, bytes_total),
+            ),
+        )
+        uploader.upload()
+
+        self.assertEqual(uploader.url, final_url)
+        self.assertEqual(uploader.offset, len(content))
+        self.assertEqual(
+            events,
+            [
+                ("progress", 5, 11),
+                ("chunk-complete", 5, 5, 11),
+                ("progress", 11, 11),
+                ("chunk-complete", 6, 11, 11),
+            ],
+        )
+
     @mock.patch('tusclient.uploader.uploader.TusRequest')
     def test_upload_retry(self, request_mock):
         num_of_retries = 3
@@ -224,6 +397,74 @@ class UploaderTest(mixin.Mixin):
         with pytest.raises(exceptions.TusCommunicationError):
             self.uploader.upload_chunk()
         self.assertEqual(self.uploader._retried, num_of_retries)
+
+    @mock.patch('tusclient.uploader.uploader.TusRequest')
+    def test_upload_retry_delays_and_should_retry_reset_after_progress(self, request_mock):
+        first_failure = mock.Mock()
+        first_failure.status_code = 500
+        first_failure.response_content = b''
+        first_failure.response_headers = {}
+        first_failure.perform.return_value = None
+
+        second_failure = mock.Mock()
+        second_failure.status_code = 500
+        second_failure.response_content = b''
+        second_failure.response_headers = {}
+        second_failure.perform.return_value = None
+
+        success = mock.Mock()
+        success.status_code = 204
+        success.response_content = b''
+        success.response_headers = {'upload-offset': '11'}
+        success.perform.return_value = None
+
+        retry_attempts = []
+
+        def should_retry(error, retry_attempt):
+            retry_attempts.append(retry_attempt)
+            return True
+
+        self.uploader.retries = 0
+        self.uploader.retry_delays = [250]
+        self.uploader.on_should_retry = should_retry
+        self.uploader.offset = 0
+        request_mock.side_effect = [first_failure, second_failure, success]
+
+        with mock.patch.object(self.uploader, 'get_offset', side_effect=[5, 5]) as get_offset:
+            with mock.patch('tusclient.upload_chunks_generated.time.sleep') as sleep:
+                self.uploader.upload_chunk()
+
+        self.assertEqual(retry_attempts, [0, 0])
+        self.assertEqual(self.uploader.offset, 11)
+        self.assertEqual(get_offset.call_count, 2)
+        sleep.assert_has_calls([mock.call(0.25), mock.call(0.25)])
+
+    @mock.patch('tusclient.uploader.uploader.TusRequest')
+    def test_upload_retry_stops_when_should_retry_returns_false(self, request_mock):
+        failure = mock.Mock()
+        failure.status_code = 500
+        failure.response_content = b''
+        failure.response_headers = {}
+        failure.perform.return_value = None
+
+        retry_attempts = []
+
+        def should_retry(error, retry_attempt):
+            retry_attempts.append(retry_attempt)
+            return False
+
+        self.uploader.retries = 0
+        self.uploader.retry_delays = [0]
+        self.uploader.on_should_retry = should_retry
+        request_mock.side_effect = [failure]
+
+        with mock.patch.object(self.uploader, 'get_offset') as get_offset:
+            with pytest.raises(exceptions.TusCommunicationError):
+                self.uploader.upload_chunk()
+
+        self.assertEqual(retry_attempts, [0])
+        self.assertEqual(self.uploader._retried, 0)
+        get_offset.assert_not_called()
 
     @responses.activate
     def test_upload_empty(self):
