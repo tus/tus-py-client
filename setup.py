@@ -2,6 +2,8 @@ from setuptools import setup
 
 import tusclient
 
+CRC32C_REQUIREMENT = 'google-crc32c>=1.0.0'
+
 setup(
     name='tuspy',
     version=tusclient.__version__,
@@ -11,16 +13,18 @@ setup(
     install_requires=[
         'requests>=2.18.4',
         'tinydb>=3.5.0',
-        'aiohttp>=3.6.2'
+        'aiohttp>=3.6.2',
     ],
     extras_require={
+        'crc32c': [CRC32C_REQUIREMENT],
         'test': [
             'responses>=0.5.1',
             'aioresponses>=0.6.2',
             'coverage>=4.2',
             'pytest>=3.0.3',
             'pytest-cov>=2.3.1,<2.6',
-            'parametrize>=0.1.1'
+            'parametrize>=0.1.1',
+            CRC32C_REQUIREMENT,
         ],
         'dev': [
             'tox>=2.3.1',
