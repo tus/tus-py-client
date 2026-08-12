@@ -19,7 +19,9 @@ setup(
         'crc32c': [CRC32C_REQUIREMENT],
         'test': [
             'responses>=0.5.1',
-            'aioresponses>=0.6.2',
+            'aiohttp<3.14',
+            'aioresponses>=0.6.2,<0.7.9; python_version < "3.10"',
+            'aioresponses>=0.7.9; python_version >= "3.10"',
             'coverage>=4.2',
             'pytest>=3.0.3',
             'pytest-cov>=2.3.1,<2.6',
