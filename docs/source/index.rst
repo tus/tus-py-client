@@ -41,6 +41,12 @@ Installation
 
     pip install tuspy
 
+CRC32C checksums require an optional dependency:
+
+.. code:: bash
+
+    pip install 'tuspy[crc32c]'
+
 Now you are ready to use the api.
 
 .. code:: python
@@ -58,7 +64,7 @@ Now you are ready to use the api.
     uploader = my_client.uploader('path/to/file.ext', chunk_size=200)
 
     # A file stream may also be passed in place of a file path.
-    fs = open('path/to/file.ext')
+    fs = open('path/to/file.ext', mode='rb')
     uploader = my_client.uploader(file_stream=fs, chunk_size=200)
 
     # upload a chunk i.e 200 bytes

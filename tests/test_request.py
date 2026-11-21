@@ -1,5 +1,5 @@
 import base64
-import hashlib
+import io
 
 from parametrize import parametrize
 import responses
@@ -31,20 +31,49 @@ class TusRequestTest(mixin.Mixin):
             self.request.perform()
             self.assertEqual(str(size), self.request.response_headers['upload-offset'])
 
-    def test_perform_checksum(self):
-        self.uploader.upload_checksum = True
-        tus_request = request.TusRequest(self.uploader)
+    @parametrize(
+        "algorithm,digest",
+        [
+            ("crc32", "cbf43926"),
+            ("crc32c", "e3069283"),
+            ("md5", "25f9e794323b453885f5181f1b624d0b"),
+            ("sha1", "f7c3bc1d808e04732adf679965ccc34ca7ae3441"),
+            (
+                "sha256",
+                "15e2b0d3c33891ebb0f1ef609ec419420c20e320ce94c65fbc8c3312448eb225",
+            ),
+            (
+                "sha512",
+                "d9e6762dd1c8eaf6d61b3c6192fc408d4d6d5f1176d0c29169bc24e71c3f274a"
+                "d27fcd5811b313d681f7e55ec02d73d499c95455b6b5bb503acf574fba8ffe85",
+            ),
+        ],
+    )
+    def test_perform_checksum(self, algorithm: str, digest: str):
+        content = b"123456789"
+        expected_checksum = "{} {}".format(
+            algorithm,
+            base64.standard_b64encode(bytes.fromhex(digest)).decode("ascii"),
+        )
 
-        with open(FILEPATH_TEXT, "rb") as stream, responses.RequestsMock() as resps:
-            content = stream.read()
-            expected_checksum = "sha1 " + \
-                base64.standard_b64encode(hashlib.sha1(
-                    content).digest()).decode("ascii")
+        with responses.RequestsMock() as resps:
+            resps.add(
+                responses.HEAD,
+                self.url,
+                adding_headers={"upload-offset": "0"},
+            )
+            uploader = self.client.uploader(
+                file_stream=io.BytesIO(content),
+                url=self.url,
+                upload_checksum=True,
+                checksum_algorithm=algorithm,
+            )
+            tus_request = request.TusRequest(uploader)
+            sent_checksum = ""
 
-            sent_checksum = ''
             def validate_headers(req):
                 nonlocal sent_checksum
-                sent_checksum = req.headers['upload-checksum']
+                sent_checksum = req.headers["upload-checksum"]
                 return (204, {}, None)
 
             resps.add_callback(responses.PATCH, self.url, callback=validate_headers)
@@ -66,4 +95,3 @@ class TusRequestTest(mixin.Mixin):
             resps.add_callback(responses.PATCH, self.url, callback=validate_verify)
             tus_request.perform()
             self.assertEqual(verify, False)
-

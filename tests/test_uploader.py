@@ -1,5 +1,6 @@
 import os
 import io
+import sys
 import tempfile
 from base64 import b64encode
 from unittest import mock
@@ -256,6 +257,56 @@ class UploaderTest(mixin.Mixin):
         self.uploader.upload_checksum = True
         self.uploader.upload()
         self.assertEqual(self.uploader.offset, self.uploader.get_file_size())
+
+    @parametrize("algorithm", ["crc32", "crc32c", "md5", "sha1", "sha256", "sha512"])
+    @responses.activate
+    def test_checksum_algorithm(self, algorithm: str):
+        responses.add(
+            responses.HEAD,
+            self.url,
+            adding_headers={"upload-offset": "0"},
+        )
+        uploader = self.client.uploader(
+            FILEPATH_TEXT,
+            url=self.url,
+            checksum_algorithm=algorithm,
+        )
+
+        self.assertEqual(uploader.checksum_algorithm_name, algorithm)
+
+    def test_checksum_algorithm_defaults_to_sha1(self):
+        default_algorithm = self.uploader.DEFAULT_CHECKSUM_ALGORITHM
+
+        self.assertEqual(self.uploader.checksum_algorithm_name, default_algorithm)
+        self.assertIs(
+            self.uploader.checksum_algorithm,
+            self.uploader.CHECKSUM_ALGORITHMS[default_algorithm],
+        )
+
+    @responses.activate
+    def test_crc32c_checksum_requires_optional_dependency(self):
+        responses.add(
+            responses.HEAD,
+            self.url,
+            adding_headers={"upload-offset": "0"},
+        )
+        uploader = self.client.uploader(
+            FILEPATH_TEXT,
+            url=self.url,
+            checksum_algorithm="crc32c",
+        )
+
+        with mock.patch.dict(sys.modules, {"google_crc32c": None}):
+            with pytest.raises(ImportError, match=r"tuspy\[crc32c\]"):
+                uploader.checksum_algorithm(b"123456789")
+
+    def test_unsupported_checksum_algorithm(self):
+        with pytest.raises(ValueError, match="Unsupported checksum algorithm 'sha384'"):
+            self.client.uploader(
+                FILEPATH_TEXT,
+                url=self.url,
+                checksum_algorithm="sha384",
+            )
 
     @parametrize("chunk_size", [1, 2, 3, 4, 5, 6])
     @responses.activate

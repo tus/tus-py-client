@@ -67,9 +67,7 @@ class BaseTusRequest:
             self._request_headers["upload-checksum"] = " ".join(
                 (
                     self._checksum_algorithm_name,
-                    base64.b64encode(self._checksum_algorithm(chunk).digest()).decode(
-                        "ascii"
-                    ),
+                    base64.b64encode(self._checksum_algorithm(chunk)).decode("ascii"),
                 )
             )
 

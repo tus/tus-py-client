@@ -4,6 +4,8 @@ import re
 from base64 import b64encode
 from sys import maxsize as MAXSIZE
 import hashlib
+import struct
+import zlib
 
 import requests
 
@@ -14,6 +16,26 @@ from tusclient.storage.interface import Storage
 
 if TYPE_CHECKING:
     from tusclient.client import TusClient
+
+
+def _crc32(data=b""):
+    return struct.pack(">I", zlib.crc32(data) & 0xFFFFFFFF)
+
+
+def _crc32c(data=b""):
+    try:
+        import google_crc32c
+    except ImportError as error:
+        raise ImportError(
+            "CRC32C checksum support requires the optional google-crc32c "
+            "dependency. Install it with \"pip install 'tuspy[crc32c]'\"."
+        ) from error
+
+    return google_crc32c.Checksum(data).digest()
+
+
+def _digest(factory):
+    return lambda data=b"": factory(data).digest()
 
 
 class BaseUploader:
@@ -73,6 +95,9 @@ class BaseUploader:
         - upload_checksum (bool):
             Whether or not to supply the Upload-Checksum header along with each
             chunk. Defaults to False.
+        - checksum_algorithm (str):
+            The checksum algorithm to use. Supported values are crc32, crc32c,
+            md5, sha1, sha256, and sha512. Defaults to sha1.
         - upload_length_deferred (bool):
             Whether or not to declare the upload length when finished reading the file stream instead of when the upload is started. This is useful
             when uploading from a streaming resource, where the total file size isn't available when the upload is created
@@ -93,15 +118,21 @@ class BaseUploader:
         - url_storage (Optinal [<tusclient.storage.interface.Storage>])
         - fingerprinter (Optional [<tusclient.fingerprint.interface.Fingerprint>])
         - upload_checksum (Optional[bool])
+        - checksum_algorithm (Optional[str])
         - upload_length_deferred (Optional[bool])
     """
 
     DEFAULT_HEADERS = {"Tus-Resumable": "1.0.0"}
     DEFAULT_CHUNK_SIZE = MAXSIZE
-    CHECKSUM_ALGORITHM_PAIR = (
-        "sha1",
-        hashlib.sha1,
-    )
+    DEFAULT_CHECKSUM_ALGORITHM = "sha1"
+    CHECKSUM_ALGORITHMS = {
+        "crc32": _crc32,
+        "crc32c": _crc32c,
+        "md5": _digest(hashlib.md5),
+        "sha1": _digest(hashlib.sha1),
+        "sha256": _digest(hashlib.sha256),
+        "sha512": _digest(hashlib.sha512),
+    }
 
     def __init__(
         self,
@@ -119,6 +150,7 @@ class BaseUploader:
         url_storage: Optional[Storage] = None,
         fingerprinter: Optional[interface.Fingerprint] = None,
         upload_checksum=False,
+        checksum_algorithm: Optional[str] = None,
         upload_length_deferred=False,
     ):
         if file_path is None and file_stream is None:
@@ -130,6 +162,21 @@ class BaseUploader:
         if store_url and url_storage is None:
             raise ValueError(
                 "Please specify a storage instance to enable resumablility."
+            )
+
+        checksum_algorithm_name = (
+            self.DEFAULT_CHECKSUM_ALGORITHM
+            if checksum_algorithm is None
+            else checksum_algorithm
+        )
+        try:
+            checksum_algorithm_impl = self.CHECKSUM_ALGORITHMS[checksum_algorithm_name]
+        except KeyError:
+            supported_algorithms = ", ".join(sorted(self.CHECKSUM_ALGORITHMS))
+            raise ValueError(
+                "Unsupported checksum algorithm '{}'. Supported algorithms: {}.".format(
+                    checksum_algorithm_name, supported_algorithms
+                )
             )
 
         self.verify_tls_cert = verify_tls_cert
@@ -153,10 +200,8 @@ class BaseUploader:
         self.retry_delay = retry_delay
         self.upload_checksum = upload_checksum
         self.upload_length_deferred = upload_length_deferred
-        (
-            self.__checksum_algorithm_name,
-            self.__checksum_algorithm,
-        ) = self.CHECKSUM_ALGORITHM_PAIR
+        self.__checksum_algorithm_name = checksum_algorithm_name
+        self.__checksum_algorithm = checksum_algorithm_impl
 
     def get_headers(self):
         """
@@ -170,7 +215,7 @@ class BaseUploader:
         """Return headers required to create upload url"""
         headers = self.get_headers()
         if self.upload_length_deferred:
-            headers['upload-defer-length'] = '1'
+            headers["upload-defer-length"] = "1"
         else:
             headers["upload-length"] = str(self.file_size)
         headers["upload-metadata"] = ",".join(self.encode_metadata())
@@ -202,7 +247,10 @@ class BaseUploader:
         http request to the tus server to retrieve the offset.
         """
         resp = requests.head(
-            self.url, headers=self.get_headers(), verify=self.verify_tls_cert, cert=self.client_cert
+            self.url,
+            headers=self.get_headers(),
+            verify=self.verify_tls_cert,
+            cert=self.client_cert,
         )
         offset = resp.headers.get("upload-offset")
         if offset is None:
